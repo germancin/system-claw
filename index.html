@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sofia Trading Dashboard - V2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; color: #e0e0e0; overflow-x: hidden; }
+  
+  /* Header */
+  .header { background: linear-gradient(135deg, #0d1321, #1a1f35); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e2a4a; z-index: 10; position: relative; }
+  .header h1 { font-size: 22px; color: #fff; }
+  .header h1 span { color: #f59e0b; }
+  .header .status { display: flex; gap: 16px; font-size: 13px; color: #94a3b8; }
+  .header .status .live { color: #22c55e; font-weight: 600; }
+  .header .status .live::before { content: '●'; margin-right: 4px; }
+  
+  /* Hamburger Menu Button */
+  .hamburger { display: block; width: 24px; height: 20px; position: absolute; left: 24px; top: 50%; transform: translateY(-50%); cursor: pointer; z-index: 11; }
+  .hamburger span { display: block; height: 2px; background: #fff; border-radius: 2px; margin-bottom: 6px; transition: all 0.2s ease-in-out; }
+  .hamburger span:last-child { margin-bottom: 0; }
+  .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+  .header h1 { margin-left: 40px; }
+  
+  /* Main Content Grid */
+  .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; padding: 20px; transition: margin-left 0.3s ease; }
+  body.chat-open .main-grid { margin-left: 300px; } /* Shift content when chat is open */
+
+  /* Chat Sidebar */
+  .chat-sidebar { position: fixed; left: -300px; top: 0; width: 300px; height: 100vh; background: #0d1321; border-right: 1px solid #1e2a4a; z-index: 9; transition: left 0.3s ease; display: flex; flex-direction: column; padding-top: 60px; /* Space for header */}
+  body.chat-open .chat-sidebar { left: 0; }
+
+  .chat-header { padding: 10px 16px; border-bottom: 1px solid #1e2a4a; font-size: 13px; color: #94a3b8; display: flex; align-items: center; gap: 8px; }
+  .chat-header .sofia-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+  .chat-messages { flex: 1; padding: 12px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+  .msg.sofia { background: #1a2240; border-bottom-left-radius: 4px; align-self: flex-start; }
+  .msg.sofia .name { font-size: 11px; color: #f59e0b; margin-bottom: 4px; font-weight: 600; }
+  .msg.user { background: #1e3a5f; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .chat-input { display: flex; padding: 12px 16px; gap: 10px; border-top: 1px solid #1e2a4a; }
+  .chat-input input { flex: 1; background: #131a2e; border: 1px solid #1e2a4a; border-radius: 8px; padding: 10px 14px; color: #e0e0e0; font-size: 13px; outline: none; }
+  .chat-input input:focus { border-color: #f59e0b; }
+  .chat-input button { background: #f59e0b; color: #0a0e17; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; font-size: 13px; }
+
+  /* Main Content Area */
+  .content-area { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .analysis-section { grid-column: 1 / 3; }
+  .scorecard-section { grid-column: 2 / 3; grid-row: 1 / 3;}
+  
+  .section-title { font-size: 13px; text-transform: uppercase; color: #64748b; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: #1e2a4a; }
+  
+  .card { background: #131a2e; border: 1px solid #1e2a4a; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .card h3 { font-size: 16px; color: #fff; margin-bottom: 12px; }
+
+  /* Prediction Box */
+  .prediction-box { background: #0a1628; border: 1px solid #1e3a5f; border-radius: 8px; padding: 16px; margin-top: 12px; display: flex; align-items: center; gap: 15px; }
+  .prediction-box .icon { font-size: 40px; line-height: 1; font-weight: 700; }
+  .prediction-box .icon.long { color: #4ade80; }
+  .prediction-box .icon.short { color: #f87171; }
+  .prediction-text strong { font-size: 20px; display: block; margin-bottom: 4px; }
+  .prediction-text .reason { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+  /* News & Catalysts */
+  .news-list .news-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1e2a4a; }
+  .news-list .news-item:last-child { border-bottom: none; }
+  .news-list .news-time { font-size: 11px; color: #64748b; min-width: 55px; padding-top: 2px; }
+  .news-list .news-content { font-size: 13px; line-height: 1.5; }
+  .news-list .news-impact { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+  .news-list .news-impact.high { background: #3b1219; color: #f87171; }
+  .news-list .news-impact.medium { background: #3f3520; color: #fbbf24; }
+
+  /* Key Levels */
+  .levels-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+  .level-item { background: #0a1628; border-radius: 6px; padding: 10px; text-align: center; }
+  .level-item .label { font-size: 11px; color: #64748b; text-transform: uppercase; }
+  .level-item .value { font-size: 18px; font-weight: 600; margin-top: 4px; }
+  .level-item .value.support { color: #4ade80; }
+  .level-item .value.resistance { color: #f87171; }
+  .level-item .value.pivot { color: #60a5fa; }
+  
+  /* Strategies Card */
+  .strategies-card { grid-column: 1 / 2; }
+  .strategy-item { background: #1a2240; border: 1px solid #1e2a4a; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s; }
+  .strategy-item:hover { border-color: #f59e0b; }
+  .strategy-item.active { border-color: #f59e0b; background: #1a2240; }
+  .strategy-item h4 { font-size: 14px; color: #fff; margin-bottom: 4px; }
+  .strategy-item .meta { font-size: 12px; color: #64748b; }
+  .strategy-item .accuracy { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+  .accuracy-bar { flex: 1; height: 6px; background: #1e2a4a; border-radius: 3px; overflow: hidden; }
+  .accuracy-fill { height: 100%; border-radius: 3px; }
+  .accuracy-fill.high { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .accuracy-fill.med { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .accuracy-fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
+  .accuracy span { font-size: 12px; font-weight: 600; }
+  .accuracy span.high { color: #4ade80; }
+  .accuracy span.med { color: #fbbf24; }
+  .tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; margin-top: 6px; }
+  .tag.nq { background: #1e3a5f; color: #60a5fa; }
+  .tag.gold { background: #3f3520; color: #fbbf24; }
+  
+  /* Scorecard */
+  .scorecard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat-card { background: #0a1628; border-radius: 8px; padding: 14px; text-align: center; }
+  .stat-card .number { font-size: 28px; font-weight: 700; }
+  .stat-card .number.green { color: #4ade80; }
+  .stat-card .number.yellow { color: #fbbf24; }
+  .stat-card .number.blue { color: #60a5fa; }
+  .stat-card .label { font-size: 11px; color: #64748b; text-transform: uppercase; margin-top: 4px; }
+  .streak-card { grid-column: 1 / 3; }
+  
+  /* Recent Calls */
+  .recent-calls-list .call-item { display: flex; align-items: center; gap: 8px; padding: 8px; background: #0a1628; border-radius: 6px; margin-bottom: 6px; font-size: 12px; }
+  .recent-calls-list .call-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .recent-calls-list .call-icon.win { background: #14532d; color: #4ade80; }
+  .recent-calls-list .call-icon.loss { background: #450a0a; color: #f87171; }
+  .recent-calls-list .call-date { color: #64748b; margin-left: auto; }
+  
+  /* Sources */
+  .sources-list .source-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: #94a3b8; border-bottom: 1px solid #1e2a4a; }
+  .sources-list .source-item:last-child { border-bottom: none; }
+  .sources-list .source-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="chat-sidebar">
+  <div class="chat-header">
+    <div class="sofia-dot"></div>
+    <span>Sofia — Online</span>
+    <span style="margin-left:auto; font-size:11px;">Powered by Gemini 2.5 Flash</span>
+  </div>
+  <div class="chat-messages">
+    <div class="msg sofia">
+      <div class="name">📊 Sofia</div>
+      ¡Hola! ¿Cómo te puedo ayudar hoy? Estoy lista para tu primera estrategia.
+    </div>
+    <div class="msg user">
+      Quiero enfocarme en NQ y Gold. ¿Qué esperas para el NQ hoy?
+    </div>
+    <div class="msg sofia">
+      <div class="name">📊 Sofia</div>
+      Para el NQ hoy veo un posible LONG si supera los 21,450, con soporte en 21,380. Hay sentimiento positivo por las noticias económicas.
+    </div>
+  </div>
+  <div class="chat-input">
+    <input type="text" placeholder="Habla con Sofia... (agrega estrategias, pregunta análisis, reporta resultados)">
+    <button>Enviar</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="hamburger" id="hamburger-menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <h1>📊 <span>Sofia</span> Trading Dashboard</h1>
+  <div class="status">
+    <span class="live">Market Open</span>
+    <span>Feb 13, 2026 — 9:55 PM EST</span>
+    <span>Model: Gemini 2.5 Flash</span>
+  </div>
+</div>
+
+<div class="main-grid" id="main-content">
+  <!-- Left Column: Strategies & Main Analysis -->
+  <div class="content-area">
+    <div class="card strategies-card">
+      <div class="section-title">📋 Estrategias Activas</div>
+      
+      <div class="strategy-item active">
+        <h4>NQ Breakout AM</h4>
+        <div class="meta">Nasdaq 100 · Sesión AM</div>
+        <div class="tag nq">NQ</div>
+        <div class="accuracy">
+          <div class="accuracy-bar"><div class="accuracy-fill high" style="width:78%"></div></div>
+          <span class="high">78%</span>
+        </div>
+      </div>
+      
+      <div class="strategy-item">
+        <h4>Gold News Play</h4>
+        <div class="meta">XAU/USD · Event-Driven</div>
+        <div class="tag gold">GOLD</div>
+        <div class="accuracy">
+          <div class="accuracy-bar"><div class="accuracy-fill med" style="width:67%"></div></div>
+          <span class="med">67%</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding:12px; border:1px dashed #1e2a4a; border-radius:8px; text-align:center; color:#64748b; font-size:13px; cursor:pointer;">
+        + Agregar Nueva Estrategia
+      </div>
+    </div>
+
+    <div class="card analysis-section" style="grid-column: 1 / 3;">
+      <div class="section-title">📈 Análisis del Día — Feb 13, 2026 (NQ)</div>
+      
+      <div class="prediction-box">
+        <div class="icon long">▲</div>
+        <div class="prediction-text">
+          <strong>PREDICCIÓN: LONG (COMPRA) en NQ</strong>
+          <div class="reason">
+            **Setup:** Consolidación pre-mercado sobre VWAP, DXY débil, Yields bajando. Sentimiento positivo tras datos de empleo mejores de lo esperado.
+            <br>**Entrada:** Por encima de 21,450 | **Stop:** Bajo 21,380 | **Target:** 21,550 / 21,620
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px;">🗞️ Noticias & Catalysts Relevantes</h3>
+      <div class="news-list">
+        <div class="news-item">
+          <div class="news-time">8:30 AM</div>
+          <div class="news-content">
+            **Initial Jobless Claims:** 215K vs 220K est. <span class="news-impact medium">MEDIO</span><br>
+            Mercado laboral más ajustado de lo esperado, soporta postura Fed hawkish, pero no afecta pre-mercado NQ.
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-time">10:00 AM</div>
+          <div class="news-content">
+            **U of Michigan Sentiment (Prelim):** 68.2 vs 65.0 est. <span class="news-impact high">ALTO</span><br>
+            Supera expectativas, confianza del consumidor en recuperación — positivo para tech stocks.
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-time">1:00 PM</div>
+          <div class="news-content">
+            **Fed Speaker: Waller** — habla sobre política monetaria <span class="news-impact high">ALTO</span><br>
+            Atención a cualquier indicio sobre el calendario de recortes de tasas; podría generar volatilidad.
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px;">📊 Niveles Clave — NQ</h3>
+      <div class="levels-grid">
+        <div class="level-item">
+          <div class="label">Resistencia 2</div>
+          <div class="value resistance">21,680</div>
+        </div>
+        <div class="level-item">
+          <div class="label">Resistencia 1</div>
+          <div class="value resistance">21,520</div>
+        </div>
+        <div class="level-item">
+          <div class="label">Pivote Principal</div>
+          <div class="value pivot">21,450</div>
+        </div>
+        <div class="level-item">
+          <div class="label">Soporte 1</div>
+          <div class="value support">21,380</div>
+        </div>
+        <div class="level-item">
+          <div class="label">Soporte 2</div>
+          <div class="value support">21,250</div>
+        </div>
+        <div class="level-item">
+          <div class="label">VWAP Hoy</div>
+          <div class="value pivot">21,435</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px;">📡 Fuentes de Datos</h3>
+      <div class="sources-list">
+        <div class="source-item"><div class="source-dot"></div> ForexFactory Calendar</div>
+        <div class="source-item"><div class="source-dot"></div> Investing.com (Data Económica)</div>
+        <div class="source-item"><div class="source-dot"></div> Reuters Markets (Noticias)</div>
+        <div class="source-item"><div class="source-dot"></div> CME FedWatch Tool (Probabilidad de Tasas)</div>
+        <div class="source-item"><div class="source-dot"></div> TradingView Data (Niveles Técnicos)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Scorecard & More -->
+  <div class="card scorecard-section">
+    <div class="section-title">🎯 Rendimiento Global</div>
+    
+    <div class="scorecard-grid">
+      <div class="stat-card">
+        <div class="number green">73%</div>
+        <div class="label">Win Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="number blue">142</div>
+        <div class="label">Total Calls</div>
+      </div>
+      <div class="stat-card">
+        <div class="number green">104</div>
+        <div class="label">Wins</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" style="color:#f87171;">38</div>
+        <div class="label">Losses</div>
+      </div>
+      <div class="stat-card streak-card">
+        <div class="number yellow">12 🔥</div>
+        <div class="label">Racha Actual</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;">🔄 Llamadas Recientes</h3>
+    <div class="recent-calls-list">
+      <div class="call-item">
+        <div class="call-icon win">✓</div>
+        <span>NQ Long +120pts</span>
+        <span class="call-date">Feb 12</span>
+      </div>
+      <div class="call-item">
+        <div class="call-icon win">✓</div>
+        <span>Gold Short +$18</span>
+        <span class="call-date">Feb 12</span>
+      </div>
+      <div class="call-item">
+        <div class="call-icon loss">✗</div>
+        <span>NQ Long -$70pts</span>
+        <span class="call-date">Feb 11</span>
+      </div>
+      <div class="call-item">
+        <div class="call-icon win">✓</div>
+        <span>NQ Short +85pts</span>
+        <span class="call-date">Feb 11</span>
+      </div>
+      <div class="call-item">
+        <div class="call-icon win">✓</div>
+        <span>Gold Long +$25</span>
+        <span class="call-date">Feb 10</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;">📚 Lecciones Aprendidas</h3>
+    <div class="news-list" style="font-size:12px; color:#94a3b8;">
+      <div class="news-item" style="padding-top:0;">
+        <div class="news-content">
+          **Feb 11:** No entrar en NQ breakouts falsos si DXY muestra fuerza inesperada, incluso con datos de empleo optimistas.
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-content">
+          **Feb 10:** Los discursos de Fed Governors tienen un impacto menor si la narrativa general del FOMC es clara. Esperar a los de la Mesa Directiva.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('hamburger-menu').addEventListener('click', function() {
+    document.body.classList.toggle('chat-open');
+    this.classList.toggle('active');
+  });
+</script>
+
+</body>
+</html>
