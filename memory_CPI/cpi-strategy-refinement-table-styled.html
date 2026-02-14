@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecciones Aprendidas - Refinamiento de Estrategia CPI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e; /* Fondo oscuro principal */
+            margin: 0;
+            padding: 30px; /* Más padding para el contenido */
+            color: #e0e0e0; /* Texto claro por defecto */
+            line-height: 1.6;
+        }
+        h1 {
+            color: #bbbbff; /* Un toque de púrpura/azul claro para títulos */
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 10px rgba(187, 187, 255, 0.4);
+        }
+        h2 {
+            color: #a0a0ff;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.8em;
+            letter-spacing: 0.03em;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate; /* Para que border-radius funcione */
+            border-spacing: 0;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); /* Sombra más fuerte para profundidad */
+            border-radius: 15px; /* Bordes más redondeados para toda la tabla */
+            overflow: hidden; /* Asegura que los bordes redondeados sean visibles */
+            background-color: #2a2a47; /* Fondo ligeramente más claro para el cuerpo de la tabla */
+        }
+        th {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0c2a5e 100%); /* Gradiente azul oscuro "super cool" */
+            color: #ffffff;
+            padding: 18px 25px; /* Más padding */
+            text-align: left;
+            font-weight: bold;
+            border: none; /* Quitamos bordes individuales para un look más limpio */
+            border-bottom: 2px solid #0a1f44; /* Borde inferior para separar cabecera */
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 1.2em;
+            white-space: nowrap; /* Evita que el texto del header se rompa */
+        }
+        th:first-child { border-top-left-radius: 15px; } /* Bordes redondeados para la cabecera */
+        th:last-child { border-top-right-radius: 15px; }
+
+        td {
+            padding: 15px 25px;
+            border: 1px solid #3a3a5e; /* Borde sutil que combine con el tema oscuro */
+            border-top: none; /* Quitamos borde superior para un look más unido */
+            text-align: left;
+            vertical-align: top;
+            color: #c0c0c0; /* Texto de contenido más claro */
+            font-size: 0.95em;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #212138; /* Franja más oscura para filas pares */
+        }
+        tbody tr:hover {
+            background-color: #38385c; /* Efecto hover más pronunciado */
+            transition: background-color 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        strong {
+            color: #8aff8a; /* Color vibrante para resaltar texto fuerte */
+        }
+        em {
+            color: #ffcc66; /* Color para énfasis ligero */
+        }
+        p {
+            margin: 20px auto;
+            max-width: 1000px;
+            text-align: left;
+            padding: 0 20px;
+            color: #d0d0d0;
+            font-size: 1.1em;
+        }
+        ul {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding-left: 40px;
+            list-style-type: disc;
+        }
+        ul li {
+            margin-bottom: 10px;
+            color: #d0d0d0;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 Lecciones Aprendidas del Backtest CPI y Refinamiento de Estrategia</h1>
+    <h2>Resumen de Lecciones Clave y Ajustes Estratégicos</h2>
+
+    <p>Aquí se consolida la información crucial del backtest de CPI (Febrero 2025 - Febrero 2026), destacando los fallos de la estrategia base y los filtros de decisión que implementaré de ahora en adelante.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fallo/Situación Observada (Fecha de Ejemplo)</th>
+                <th>Lección Clave Aprendida</th>
+                <th>Acción / Cómo lo Usaré para Futuras Decisiones (Filtros de Estrategia)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10 de abril de 2025 (CPI Cooler, NQ Bearish)</td>
+                <td>El Contexto Macro es Rey: Eventos disruptivos (ej. guerra arancelaria) pueden anular completamente la señal del CPI.</td>
+                <td>**Filtro de Ruido Macro:** Antes de cualquier trade CPI, evaluaré la presencia de "eventos superiores" activos (guerras comerciales, crisis geopolíticas). Si existen, aplicar "NO TRADE" o "EXTREMA PRECAUCIÓN". Monitorear VIX alto (>25-30) como señal de riesgo.</td>
+            </tr>
+            <tr>
+                <td>15 de julio de 2025 (CPI Hotter, NQ Flat/Bullish)</td>
+                <td>Ignorancia de la Inflación en Rallies Fuertes: El mercado puede ignorar CPIs calientes si hay un fuerte momentum alcista.</td>
+                <td>**Filtro de Momentum:** Evitar SHORTs por CPI caliente si NQ ha tenido un rally significativo (>5-10% en el último mes) con VIX bajo. Considerar "SKIP" o incluso LONG especulativo si el momentum es abrumadoramente alcista. Requerir confirmación de ruptura de tendencia para cualquier SHORT.</td>
+            </tr>
+            <tr>
+                <td>12 de agosto de 2025 (Core CPI Hotter, NQ Bullish)</td>
+                <td>Reafirmación del Momentum sobre Core CPI: La persistencia del momentum puede hacer que se ignore incluso la inflación "pegajosa" del core.</td>
+                <td>**Identificar "Modo de Mercado":** Evaluar si el mercado está en "modo preocupación por inflación" o "modo crecimiento/riesgo". Si es "risk-on" (Q3 2025), CPI caliente es precaución para SHORTs. Diversificar con sentimiento (flujos, analistas).</td>
+            </tr>
+            <tr>
+                <td>11 de septiembre de 2025 (CPI Hotter, NQ Bullish)</td>
+                <td>Persistencia del Régimen de Mercado: Una vez que un régimen se establece (ej. "risk-on"), puede persistir por meses, ignorando señales negativas.</td>
+                <td>**Criterios de "Ignorancia de Inflación":** Si NQ ha subido X% y el CPI caliente ha sido ignorado en los últimos 2-3 releases, el próximo CPI caliente es un **SKIP (para SHORTs)**. Aumentar el umbral de sorpresa para SHORTs en tendencias fuertes.</td>
+            </tr>
+            <tr>
+                <td>24 de octubre de 2025 (CPI Slightly Hotter, NQ Bullish)</td>
+                <td>Múltiples Narrativas Complejas (Shutdown + Momentum): La resolución de incertidumbre política puede dominar sobre datos económicos.</td>
+                <td>**Ponderación de Noticias Múltiples:** Analizar el calendario político (riesgos de shutdown, elecciones). La resolución de incertidumbres políticas puede generar "rallies de alivio" que anulan las señales del CPI.</td>
+            </tr>
+            <tr>
+                <td>13 de enero de 2026 (CPI Cooler, NQ Bearish)</td>
+                <td>"Buy the Rumor, Sell the News": Si el mercado ya descontó un resultado, la reacción puede ser opuesta (toma de ganancias).</td>
+                <td>**Filtro de "Pre-Release Rally":** Si NQ ha subido significativamente antes de un CPI "cool" esperado, reducir confianza en LONG o considerar "fade" (ir contra la reacción inicial) / "skip". Evaluar el posicionamiento y sentimiento del mercado.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>🧠 Cómo Pensaré el Próximo Mes (Estrategia Refinada)</h2>
+
+    <p>Para el próximo mes, mi proceso de decisión para los eventos de CPI será mucho más estratificado y menos dependiente de la simple sorpresa del dato. Integraré activamente los filtros aprendidos:</p>
+
+    <ul>
+        <li>**Evaluación de Contexto Macro Global:** Primero, analizaré si hay eventos geopolíticos o políticos (elecciones, decisiones de la Fed fuera de la inflación, riesgos de shutdown) que puedan eclipsar al CPI. Si el "ruido macro" es alto (ej. VIX elevado, titulares de alto impacto), la probabilidad de un "NO TRADE" para el CPI aumenta drásticamente.</li>
+        <li>**Análisis de Tendencia y Momentum del NQ:** Antes del dato, determinaré la fuerza y dirección de la tendencia del NQ.
+            <ul>
+                <li>Si hay un **fuerte momentum alcista** persistente (como el Q3 2025), seré muy cauto con los SHORTs por CPI caliente. La probabilidad de que el mercado "ignore" la mala noticia es alta. En estos casos, un CPI ligeramente caliente podría incluso ser un "fade" para un LONG si el sentimiento general es muy "risk-on".</li>
+                <li>Si NQ ha tenido un **rally significativo pre-CPI** (ej. >5% en la semana previa) y el CPI se espera "cooler", consideraré el riesgo de "buy the rumor, sell the news" y reduciré la confianza en un LONG o buscaré una confirmación de precio más estricta.</li>
+            </ul>
+        </li>
+        <li>**Magnitud y Tipo de Sorpresa del CPI:** Si el CPI es "cooler" (especialmente el core) y el contexto macro/momentum no es fuertemente adverso (no hay "ruido macro" ni "sell the news"), la confianza en un LONG será mayor. Para los CPIs "hotter", solo consideraré SHORTs si la sorpresa es **extremadamente significativa** (ej. >0.2% MoM de desviación) Y no estamos en un régimen de "ignorancia de inflación" con fuerte momentum alcista.</li>
+        <li>**Confirmación de Precio Post-Release:** Siempre esperaré una confirmación de la dirección del precio después del release en la vela de 1 minuto (o 5 minutos, si es posible obtener data de alta frecuencia en el futuro) antes de ejecutar. El rebote o la reversión inicial son tan importantes como el dato.</li>
+        <li>**Gestión de Riesgo Dinámica:** Ajustaré el tamaño de la posición y los stops basándome en la confianza del trade (alta confianza = mayor convicción, baja confianza = smaller size o skip).</li>
+    </ul>
+
+    <p>Este enfoque más holístico me permitirá tomar decisiones más informadas y evitar las trampas que identificamos en el backtest.</p>
+</body>
+</html>
