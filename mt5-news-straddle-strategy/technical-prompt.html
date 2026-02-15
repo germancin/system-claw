@@ -417,6 +417,9 @@
         <a href="technical-prompt.html" class="active">
             <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
         </a>
+        <a href="installation-guide.html">
+            <i data-lucide="download"></i> Guía de Instalación
+        </a>
     </div>
 
     <div class="container">
@@ -458,7 +461,8 @@
                             <td><span class="category-badge">Core</span></td>
                             <td><strong>Motor Principal</strong></td>
                             <td>Máquina de estados (State Machine) que gestiona el ciclo completo:
-                                <code>IDLE → ARMED → ORDERS_PLACED → TRADE_ACTIVE → DONE</code></td>
+                                <code>IDLE → ARMED → ORDERS_PLACED → TRADE_ACTIVE → DONE</code>
+                            </td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Timer</span></td>
@@ -504,12 +508,15 @@
             <ul class="summary-list">
                 <li><span class="tag tag-critical">CRÍTICO</span> Usar exclusivamente la API <code>CTrade</code> y las
                     clases estándar de MQL5 (<code>Trade/Trade.mqh</code>, <code>Trade/PositionInfo.mqh</code>,
-                    <code>Trade/OrderInfo.mqh</code>).</li>
+                    <code>Trade/OrderInfo.mqh</code>).
+                </li>
                 <li><span class="tag tag-critical">CRÍTICO</span> Validar SIEMPRE los resultados de
                     <code>OrderSend()</code> con <code>ResultRetcode()</code> y manejar cada código de error
-                    explícitamente.</li>
+                    explícitamente.
+                </li>
                 <li><span class="tag tag-critical">CRÍTICO</span> Normalizar todos los precios con
-                    <code>NormalizeDouble(price, _Digits)</code> antes de enviar órdenes.</li>
+                    <code>NormalizeDouble(price, _Digits)</code> antes de enviar órdenes.
+                </li>
                 <li><span class="tag tag-important">IMPORTANTE</span> Usar <code>input</code> variables para todos los
                     parámetros configurables (hora del evento, distancia en pips, trailing, TP).</li>
                 <li><span class="tag tag-important">IMPORTANTE</span> Implementar un Magic Number único para identificar
