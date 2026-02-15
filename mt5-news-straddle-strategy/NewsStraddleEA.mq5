@@ -50,6 +50,7 @@ bool          g_useTP           = false;   // Estado actual del toggle TP
 double        g_pipFactor       = 0;       // Factor de conversión de pips
 
 // Nombres de objetos UI
+const string  BG_PANEL          = "NewsEA_BgPanel";
 const string  BTN_ARM           = "NewsEA_BtnArm";
 const string  BTN_CANCEL        = "NewsEA_BtnCancel";
 const string  BTN_TP            = "NewsEA_BtnTP";
@@ -517,6 +518,25 @@ bool IsPositionOpen()
 //| SECTION 6: UI / Chart Objects                                     |
 //+------------------------------------------------------------------+
 
+//--- Crear el panel de fondo (rectángulo)
+void CreateBackgroundPanel(int x, int y, int width, int height)
+{
+   ObjectDelete(0, BG_PANEL);
+   ObjectCreate(0, BG_PANEL, OBJ_RECTANGLE_LABEL, 0, 0, 0);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_CORNER, CORNER_LEFT_UPPER);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_XDISTANCE, x);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YDISTANCE, y);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_XSIZE, width);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, height);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_BGCOLOR, C'25,25,35');      // Gris oscuro profesional
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_BORDER_TYPE, BORDER_FLAT);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_BORDER_COLOR, C'60,60,80'); // Borde sutil
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_WIDTH, 1);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_BACK, false);               // Al frente del chart
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_ZORDER, 50);                // Detrás de botones/labels pero delante del chart
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_SELECTABLE, false);
+}
+
 //--- Crear un botón en el gráfico
 void CreateButton(string name, string text, int x, int y, int width, int height, color bgColor, color txtColor)
 {
@@ -562,6 +582,12 @@ void InitUI()
    int btnH = 30;
    int baseX = 20;
    int baseY = 40;
+   int panelPadding = 10;
+   
+   // Panel de fondo PRIMERO (para que quede detrás de todo)
+   int panelWidth = 340;   // 3 botones + espaciado + padding
+   int panelHeight = 145;  // Altura total de botones + labels + padding
+   CreateBackgroundPanel(baseX - panelPadding, baseY - panelPadding, panelWidth, panelHeight);
    
    // Botones (Alineados arriba a la izquierda)
    CreateButton(BTN_ARM,    "▶ ARMAR",    baseX,       baseY, btnW, btnH, C'35,134,54',  clrWhite);
@@ -652,6 +678,7 @@ void UpdateUI()
 //--- Eliminar todos los objetos UI
 void DestroyUI()
 {
+   ObjectDelete(0, BG_PANEL);
    ObjectDelete(0, BTN_ARM);
    ObjectDelete(0, BTN_CANCEL);
    ObjectDelete(0, BTN_TP);
