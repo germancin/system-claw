@@ -274,24 +274,32 @@
                     <div class="step-number">3</div>
                     <div class="step-content">
                         <h3>Copiar el EA</h3>
-                        <p>En la ventana que se abrió, navega a la siguiente ruta: <br>
-                            <strong>MQL5 &rarr; Experts</strong>.
-                        </p>
-                        <p>Pega el archivo <code>NewsStraddleEA.mq5</code> dentro de esa carpeta.</p>
+                        <p>En la ventana que se abrió, navega a la siguiente ruta (generalmente es la carpeta de datos
+                            de MT5, pero si instalaste en la ruta por defecto suele ser):</p>
+                        <div class="code-snippet">C:\Program Files\MetaTrader 5\MQL5\Experts</div>
+                        <p style="margin-top: 10px;">Pega el archivo <code>NewsStraddleEA.mq5</code> dentro de esa
+                            carpeta.</p>
                     </div>
                 </div>
 
                 <div class="step-item">
                     <div class="step-number">4</div>
                     <div class="step-content">
-                        <h3>Compilar el EA</h3>
-                        <p>Regresa a MT5. En la ventana <strong>Navegador</strong> (si no la ves, presiona
-                            <code>Ctrl+N</code>), haz clic derecho en <strong>Asesores Expertos (Expert
-                                Advisors)</strong> y selecciona <strong>Actualizar (Refresh)</strong>.
-                        </p>
-                        <p>Doble clic sobre el EA para abrirlo en MetaEditor y presiona <strong>Compilar</strong> (o
-                            <code>F7</code>). Esto generará el archivo <code>.ex5</code> necesario.
-                        </p>
+                        <h3>Compilar el EA (Generar .ex5)</h3>
+                        <p>Para que el bot funcione, MetaTrader necesita transformarlo en un ejecutable:</p>
+                        <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-main);">
+                            <li>Presiona <strong>F4</strong> en MetaTrader 5 para abrir el <strong>MetaEditor</strong>.
+                            </li>
+                            <li>En la ventana "Navegador" del MetaEditor, abre la carpeta <code>Experts</code> y haz
+                                doble clic en <code>NewsStraddleEA.mq5</code>.</li>
+                            <li>Presiona el botón <strong>Compilar</strong> en la barra superior o presiona
+                                <strong>F7</strong>.</li>
+                            <li>Verifica en la pestaña "Errores" (abajo) que diga: <span class="highlight">0 errors, 0
+                                    warnings</span>.</li>
+                        </ul>
+                        <p>Regresa a MT5, ve a la ventana <strong>Navegador</strong> (Ctrl+N), haz clic derecho sobre
+                            "Asesores Expertos" y selecciona <strong>Actualizar (Refresh)</strong>. ¡El bot ya aparecerá
+                            listo!</p>
                     </div>
                 </div>
 
