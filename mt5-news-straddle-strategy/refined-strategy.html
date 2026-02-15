@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Especificación: MT5 News Straddle Strategy</title>
+    <title>Estrategia: Pre-News Stop-Limit Straddle (10s)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -148,7 +148,7 @@
         .summary-list li {
             position: relative;
             padding-left: 1.5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: var(--text-main);
         }
 
@@ -186,7 +186,7 @@
         }
 
         td {
-            padding: 1rem;
+            padding: 1.2rem 1rem;
             border-bottom: 1px solid var(--border-color);
             vertical-align: top;
         }
@@ -203,16 +203,17 @@
             color: #58a6ff;
             font-size: 0.75rem;
             font-weight: 600;
+            white-space: nowrap;
         }
 
-        .option-item {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 0.95rem;
-        }
-
-        .option-item strong {
+        .highlight {
             color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .dim {
+            color: var(--text-dim);
+            font-size: 0.9rem;
         }
 
         /* Mobile Version of Table */
@@ -261,33 +262,20 @@
             }
 
             td:nth-of-type(1)::before {
-                content: "Ref";
+                content: "Fase";
             }
 
             td:nth-of-type(2)::before {
-                content: "Categoría";
+                content: "Concepto";
             }
 
             td:nth-of-type(3)::before {
-                content: "Pregunta";
-            }
-
-            td:nth-of-type(4)::before {
-                content: "Opciones";
+                content: "Lógica / Detalle";
             }
 
             td:last-child {
                 border-bottom: none;
             }
-        }
-
-        .status-tag {
-            background-color: var(--success);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: bold;
         }
 
         footer {
@@ -306,147 +294,111 @@
     </button>
 
     <div class="menu-overlay" id="menuOverlay">
-        <a href="index.html" class="active">
+        <a href="index.html">
             <i data-lucide="layout"></i> Resumen General
         </a>
-        <a href="refined-strategy.html">
+        <a href="refined-strategy.html" class="active">
             <i data-lucide="target"></i> Estrategia Refinada (10s)
         </a>
     </div>
 
     <div class="container">
         <header>
-            <h1>MT5 News Straddle Strategy</h1>
-            <p class="subtitle">Definición de Lógica y Requerimientos de Automatización</p>
+            <h1>Pre-News Stop-Limit Straddle</h1>
+            <p class="subtitle">Estrategia Refinada: Precisión 10s + Trailing Activo</p>
         </header>
 
         <section class="card">
             <div class="card-title">
-                <i data-lucide="info"></i>
-                1) Resumen de la Idea (Para el Cliente)
+                <i data-lucide="target"></i>
+                Objetivo Estratégico
             </div>
-            <ul class="summary-list">
-                <li><strong>Objetivo:</strong> Automatizar una estrategia “pre-noticia” en MetaTrader 5 gestionada
-                    mediante un botón dinámico en el gráfico.</li>
-                <li><strong>Mecánica:</strong> El trader define la hora exacta de la noticia y una distancia X de
-                    seguridad.</li>
-                <li><strong>Acción Automática:</strong> 1 minuto antes del evento, el sistema coloca un "straddle" (Buy
-                    Stop y Sell Stop) a la distancia X del precio actual.</li>
-                <li><strong>Gestión de Trade:</strong> Al activarse una orden, se habilita el Trailing Stop (5 puntos) y
-                    se elimina automáticamente la orden contraria.</li>
-                <li><strong>Interfaz:</strong> Control total desde el gráfico (Armar/Cancelar) con reporte de estado
-                    interactivo.</li>
-            </ul>
+            <p>Capturar el impulso inicial de una noticia mediante órdenes <span class="highlight">Stop-Limit</span>
+                colocadas con precisión quirúrgica 10 segundos antes del evento, automatizando la protección de
+                ganancias sin objetivos fijos.</p>
         </section>
 
         <section class="card">
             <div class="card-title">
-                <i data-lucide="help-circle"></i>
-                2) Configuración Estratégica (Cuestionario)
+                <i data-lucide="layers"></i>
+                Especificación Técnica
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>Ref</th>
-                            <th>Categoría</th>
-                            <th>Pregunta / Decisión</th>
-                            <th>Opciones de Configuración</th>
+                            <th>Fase</th>
+                            <th>Concepto</th>
+                            <th>Lógica / Detalle Técnico</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>A</td>
-                            <td><span class="category-badge">Ejecución</span></td>
-                            <td>¿Tipo de orden pendiente preferida?</td>
-                            <td>
-                                <span class="option-item"><strong>A1:</strong> Buy Stop / Sell Stop (Ejecución
-                                    agresiva)</span>
-                                <span class="option-item"><strong>A2:</strong> Buy Stop Limit / Sell Stop Limit (Control
-                                    de slippage)</span>
-                            </td>
+                            <td><span class="category-badge">Configuración</span></td>
+                            <td><strong>Evento Maestro</strong></td>
+                            <td>Horario exacto definido por el usuario <span class="highlight">(HH:MM:SS)</span>.
+                                Sincronización de alta precisión con el servidor MT5.</td>
                         </tr>
                         <tr>
-                            <td>B</td>
-                            <td><span class="category-badge">Parámetros</span></td>
-                            <td>Definición de Distancia X</td>
-                            <td>
-                                <span class="option-item"><strong>B1:</strong> Points, Pips o Precio Exacto</span>
-                                <span class="option-item"><strong>B2:</strong> ¿X es simétrica para ambas
-                                    órdenes?</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>C</td>
                             <td><span class="category-badge">Timing</span></td>
-                            <td>Definición de "1 minuto antes"</td>
-                            <td>
-                                <span class="option-item"><strong>C1:</strong> Segundo 00 (HH:MM-1)</span>
-                                <span class="option-item"><strong>C2:</strong> 60 segundos exactos (Tick time)</span>
-                            </td>
+                            <td><strong>Lead Time (10s)</strong></td>
+                            <td>Colocación automática a los <span class="highlight">T-10 segundos</span>. <span
+                                    class="dim">Evita activaciones prematuras por volatilidad previa.</span></td>
                         </tr>
                         <tr>
-                            <td>D</td>
+                            <td><span class="category-badge">Órdenes</span></td>
+                            <td><strong>Stop-Limit (A2)</strong></td>
+                            <td>Dualidad de órdenes pendientes a distancia X pips (configurable). <span
+                                    class="dim">Control de slippage nativo mediante la arquitectura Limit.</span></td>
+                        </tr>
+                        <tr>
                             <td><span class="category-badge">Gestión</span></td>
-                            <td>Lógica de Trailing Stop (5 pts)</td>
-                            <td>
-                                <span class="option-item"><strong>D1:</strong> Clásico, Break-even +5 o Híbrido</span>
-                                <span class="option-item"><strong>D2:</strong> ¿Inicio inmediato o tras ganancia
-                                    mínima?</span>
-                            </td>
+                            <td><strong>Trailing Stop</strong></td>
+                            <td>Salida principal. El precio es seguido dinámicamente según la distancia configurada.
+                                <span class="highlight">No hay TP fijo por defecto.</span></td>
                         </tr>
                         <tr>
-                            <td>E</td>
-                            <td><span class="category-badge">Riesgo</span></td>
-                            <td>Protección Inicial (SL/TP)</td>
-                            <td>
-                                <span class="option-item"><strong>E1:</strong> ¿SL inicial al abrir?</span>
-                                <span class="option-item"><strong>E2:</strong> ¿Take Profit definido?</span>
-                            </td>
+                            <td><span class="category-badge">Interacción</span></td>
+                            <td><strong>Cancelación (F)</strong></td>
+                            <td>Instante de ejecución: <span class="highlight">Eliminación inmediata</span> de la orden
+                                contraria (Pendiente) para liberar margen y riesgo.</td>
                         </tr>
                         <tr>
-                            <td>F</td>
-                            <td><span class="category-badge">Opc. Contraria</span></td>
-                            <td>Cancelación de la Red</td>
-                            <td>
-                                <span class="option-item"><strong>F1:</strong> Inmediato, tras confirmación o tras
-                                    profit X</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>G</td>
-                            <td><span class="category-badge">Seguridad</span></td>
-                            <td>Filtros de Noticias</td>
-                            <td>
-                                <span class="option-item"><strong>G1:</strong> Límite de Spread máximo</span>
-                                <span class="option-item"><strong>G2:</strong> Expiración tras X min (si no
-                                    activa)</span>
-                                <span class="option-item"><strong>G3:</strong> Slippage máximo permitido</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>H</td>
-                            <td><span class="category-badge">UI/UX</span></td>
-                            <td>Controles en Pantalla</td>
-                            <td>
-                                <span class="option-item"><strong>H1:</strong> Armar/Cancelar vs
-                                    Armar/Cancelar/Manual</span>
-                                <span class="option-item"><strong>H2:</strong> Nivel de información (Full vs
-                                    Minimal)</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>I</td>
-                            <td><span class="category-badge">Avanzado</span></td>
-                            <td>Multi-ejecución</td>
-                            <td>
-                                <span class="option-item"><strong>I1:</strong> Símbolo único o Multi-símbolo</span>
-                                <span class="option-item"><strong>I2:</strong> Operaciones únicas o re-intentos</span>
-                            </td>
+                            <td><span class="category-badge">Opcionales</span></td>
+                            <td><strong>Take Profit (E)</strong></td>
+                            <td>Selector <span class="highlight">ON/OFF</span>. Si está activo, utiliza valor en pips;
+                                de lo contrario, solo gestión por trailing.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="cpu"></i>
+                Panel de Control (Inputs)
+            </div>
+            <ul class="summary-list">
+                <li><strong>Distancia de Entrada:</strong> Pips (Soporta decimales: 1.00, 15.00, etc.)</li>
+                <li><strong>Trailing Stop:</strong> Pips dinámicos para seguimiento de precio.</li>
+                <li><strong>Hora de Disparo:</strong> Programación 10s antes del evento noticia.</li>
+                <li><strong>Take Profit:</strong> Definición de salida fija (opcional vía toggle).</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="mouse-pointer-2"></i>
+                Interfaz del Gráfico (UI)
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="category-badge" style="background: var(--success); color: white;">ARMAR</span>
+                <span class="category-badge" style="background: #cf222e; color: white;">CANCELAR</span>
+                <span class="category-badge">TP ON/OFF</span>
+            </div>
+            <p class="dim" style="margin-top: 1rem;">Estado actual visible: Armado / Esperando / Trade Activo / Orden
+                Eliminada.</p>
         </section>
 
         <footer>
