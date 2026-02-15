@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Técnico: MT5 News Straddle EA (MQL5)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #00ffcc;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+            --row-hover: #21262d;
+            --success: #238636;
+            --warning: #d29922;
+            --danger: #cf222e;
+            --code-bg: #0d1117;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+        }
+
+        /* --- Global Hamburger Menu --- */
+        .menu-toggle {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 300px;
+            height: 100%;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            z-index: 999;
+            transition: left 0.3s ease;
+            padding: 5rem 2rem 2rem;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-overlay.active {
+            left: 0;
+        }
+
+        .menu-overlay a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .menu-overlay a:hover {
+            background: var(--row-hover);
+            color: var(--accent-color);
+        }
+
+        .menu-overlay a.active {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent-color);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-color);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin: 1.5rem 0 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        .prompt-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-block .section-label {
+            display: inline-block;
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .dim {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .warning {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .danger {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 255, 204, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: var(--accent-color);
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--row-hover);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tag-critical {
+            background: rgba(207, 34, 46, 0.15);
+            color: #f85149;
+        }
+
+        .tag-important {
+            background: rgba(210, 153, 34, 0.15);
+            color: #e3b341;
+        }
+
+        .tag-best {
+            background: rgba(35, 134, 54, 0.15);
+            color: #3fb950;
+        }
+
+        .summary-list {
+            list-style: none;
+        }
+
+        .summary-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .summary-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Fluid Table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: rgba(48, 54, 61, 0.5);
+        }
+
+        th {
+            padding: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background-color: var(--row-hover);
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: rgba(56, 139, 253, 0.15);
+            color: #58a6ff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 768px) {
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr {
+                margin-bottom: 1.5rem;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid var(--border-color);
+                position: relative;
+                padding-left: 45%;
+                min-height: 3rem;
+            }
+
+            td::before {
+                position: absolute;
+                left: 1rem;
+                width: 40%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: var(--text-dim);
+                font-size: 0.8rem;
+                text-transform: uppercase;
+            }
+
+            td:nth-of-type(1)::before {
+                content: "Módulo";
+            }
+
+            td:nth-of-type(2)::before {
+                content: "Responsabilidad";
+            }
+
+            td:nth-of-type(3)::before {
+                content: "Detalle";
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="menu-toggle" id="menuToggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="menu-overlay" id="menuOverlay">
+        <a href="index.html">
+            <i data-lucide="layout"></i> Resumen General
+        </a>
+        <a href="refined-strategy.html">
+            <i data-lucide="target"></i> Estrategia Refinada (10s)
+        </a>
+        <a href="technical-prompt.html" class="active">
+            <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
+        </a>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Prompt Técnico MQL5</h1>
+            <p class="subtitle">Especificación de Implementación del Expert Advisor (EA)</p>
+        </header>
+
+        <!-- INTRO CARD -->
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="info"></i>
+                Instrucciones de Uso
+            </div>
+            <p>Este es el prompt técnico listo para pasárselo a un programador MQL5 o a una IA generadora de código.
+                Copia el contenido completo del bloque inferior y utilízalo como especificación de desarrollo.</p>
+            <button class="copy-btn" id="copyPromptBtn" onclick="copyPrompt()">
+                <i data-lucide="copy"></i> Copiar Prompt Completo
+            </button>
+        </section>
+
+        <!-- ARCHITECTURE TABLE -->
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="boxes"></i>
+                Arquitectura Modular del EA
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Módulo</th>
+                            <th>Responsabilidad</th>
+                            <th>Detalle Técnico</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="category-badge">Core</span></td>
+                            <td><strong>Motor Principal</strong></td>
+                            <td>Máquina de estados (State Machine) que gestiona el ciclo completo:
+                                <code>IDLE → ARMED → ORDERS_PLACED → TRADE_ACTIVE → DONE</code></td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Timer</span></td>
+                            <td><strong>Controlador de Tiempo</strong></td>
+                            <td>Comparación <code>TimeCurrent()</code> vs hora del evento. Disparo a T-10 segundos con
+                                precisión de servidor.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Orders</span></td>
+                            <td><strong>Gestor de Órdenes</strong></td>
+                            <td>Colocación de Buy/Sell Stop-Limit via <code>CTrade</code>. Cancelación selectiva de la
+                                orden contraria.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Trailing</span></td>
+                            <td><strong>Motor de Trailing</strong></td>
+                            <td>Trailing Stop clásico por pips. Se activa inmediatamente al ejecutarse la orden.
+                                Modifica SL vía <code>PositionModify()</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">UI</span></td>
+                            <td><strong>Panel Gráfico</strong></td>
+                            <td>Botones ARMAR / CANCELAR / TP ON-OFF renderizados con <code>OBJ_BUTTON</code>. Feedback
+                                visual de estado.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Logger</span></td>
+                            <td><strong>Registro / Debug</strong></td>
+                            <td>Logging estructurado con <code>Print()</code> y comentarios on-chart para auditoría y
+                                depuración.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="shield-check"></i>
+                Mejores Prácticas Exigidas
+            </div>
+            <ul class="summary-list">
+                <li><span class="tag tag-critical">CRÍTICO</span> Usar exclusivamente la API <code>CTrade</code> y las
+                    clases estándar de MQL5 (<code>Trade/Trade.mqh</code>, <code>Trade/PositionInfo.mqh</code>,
+                    <code>Trade/OrderInfo.mqh</code>).</li>
+                <li><span class="tag tag-critical">CRÍTICO</span> Validar SIEMPRE los resultados de
+                    <code>OrderSend()</code> con <code>ResultRetcode()</code> y manejar cada código de error
+                    explícitamente.</li>
+                <li><span class="tag tag-critical">CRÍTICO</span> Normalizar todos los precios con
+                    <code>NormalizeDouble(price, _Digits)</code> antes de enviar órdenes.</li>
+                <li><span class="tag tag-important">IMPORTANTE</span> Usar <code>input</code> variables para todos los
+                    parámetros configurables (hora del evento, distancia en pips, trailing, TP).</li>
+                <li><span class="tag tag-important">IMPORTANTE</span> Implementar un Magic Number único para identificar
+                    las órdenes/posiciones del EA y no interferir con otras operaciones.</li>
+                <li><span class="tag tag-best">BEST PRACTICE</span> Arquitectura basada en State Machine para controlar
+                    el flujo y evitar condiciones de carrera.</li>
+                <li><span class="tag tag-best">BEST PRACTICE</span> Separar la lógica de UI del motor de trading. El
+                    panel solo lee y dispara estados, nunca ejecuta órdenes directamente.</li>
+                <li><span class="tag tag-best">BEST PRACTICE</span> Cleanup completo en <code>OnDeinit()</code>:
+                    eliminar objetos gráficos, cancelar órdenes pendientes del EA, liberar recursos.</li>
+            </ul>
+        </section>
+
+        <!-- THE PROMPT -->
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="terminal"></i>
+                Prompt de Implementación (Copiar Completo)
+            </div>
+
+            <div class="prompt-block" id="promptContent">
+                <span class="section-label">ROL Y CONTEXTO</span>
+                Eres un programador experto en MQL5 para MetaTrader 5. Tu especialidad es crear Expert Advisors (EAs) de
+                grado profesional, robustos, eficientes y seguros para operar en condiciones reales de mercado,
+                incluyendo eventos de alta volatilidad como noticias económicas.
+
+                <span class="section-label">OBJETIVO</span>
+                Desarrollar un Expert Advisor (EA) completo en MQL5 llamado <code>NewsStraddleEA</code> que implemente
+                la estrategia "Pre-News Stop-Limit Straddle (10s) + Trailing". El EA debe ser instalable directamente en
+                MT5, compilar sin errores ni warnings, y funcionar en cuentas demo y reales.
+
+                <span class="section-label">ESTRATEGIA (LÓGICA DE NEGOCIO)</span>
+                1. El usuario configura la hora exacta del evento/noticia en formato HH:MM:SS (hora del servidor MT5).
+                2. Exactamente 10 segundos antes del evento, el EA coloca automáticamente dos órdenes pendientes
+                Stop-Limit:
+                • <code>ORDER_TYPE_BUY_STOP_LIMIT</code> → a una distancia de X pips ARRIBA del precio actual (Ask).
+                • <code>ORDER_TYPE_SELL_STOP_LIMIT</code> → a una distancia de X pips ABAJO del precio actual (Bid).
+                3. Al ejecutarse cualquiera de las dos órdenes (se convierte en posición abierta):
+                • Se elimina INMEDIATAMENTE la orden contraria que quedó pendiente.
+                • Se activa el Trailing Stop con la distancia configurada en pips.
+                4. La posición se gestiona por Trailing Stop (salida principal). NO hay Take Profit por defecto.
+                5. Opcionalmente, el usuario puede activar un Take Profit fijo en pips mediante un toggle ON/OFF.
+
+                <span class="section-label">MÁQUINA DE ESTADOS (STATE MACHINE)</span>
+                El EA debe operar con los siguientes estados estrictos:
+
+                • <code>STATE_IDLE</code>: Esperando que el usuario presione ARMAR. No hay órdenes ni posiciones del EA.
+                • <code>STATE_ARMED</code>: El evento está programado. El EA espera a que falten 10 segundos para la
+                hora configurada.
+                • <code>STATE_ORDERS_PLACED</code>: Las órdenes Stop-Limit han sido colocadas. Monitorea ejecución.
+                • <code>STATE_TRADE_ACTIVE</code>: Una orden se ejecutó. La contraria fue eliminada. Trailing Stop
+                activo.
+                • <code>STATE_DONE</code>: La posición fue cerrada (por trailing, TP, o manualmente). Listo para
+                rearmar.
+
+                Transiciones:
+                IDLE → (botón ARMAR) → ARMED
+                ARMED → (T-10s alcanzado) → ORDERS_PLACED
+                ORDERS_PLACED → (orden ejecutada) → TRADE_ACTIVE
+                ORDERS_PLACED → (botón CANCELAR) → IDLE (eliminar pendientes)
+                TRADE_ACTIVE → (posición cerrada) → DONE
+                DONE → (botón ARMAR) → ARMED
+                Cualquier estado → (botón CANCELAR) → IDLE (cleanup total)
+
+                <span class="section-label">PARÁMETROS DE ENTRADA (input variables)</span>
+                <code>input string   InpNewsTime        = "08:30:00";   // Hora del evento (HH:MM:SS, hora del servidor)
+input double   InpEntryDistPips   = 15.0;         // Distancia de entrada en pips (soporta decimales: 0.01, 1.00, 15.00)
+input double   InpTrailingPips    = 5.0;          // Distancia del Trailing Stop en pips (soporta decimales)
+input bool     InpUseTP           = false;        // Usar Take Profit (ON/OFF)
+input double   InpTPPips          = 30.0;         // Take Profit en pips (solo si InpUseTP == true)
+input double   InpLotSize         = 0.01;         // Tamaño de lote
+input int      InpMagicNumber     = 202601;       // Magic Number único del EA
+input int      InpLeadTimeSeconds = 10;           // Segundos antes del evento para colocar órdenes</code>
+
+                <span class="section-label">CONVERSIÓN DE PIPS</span>
+                Implementar una función <code>PipsToPrice(double pips)</code> que convierta pips a la unidad de precio
+                del símbolo:
+                • Para pares Forex con 5 dígitos: 1 pip = 10 * _Point
+                • Para pares Forex con 3 dígitos (JPY): 1 pip = 10 * _Point
+                • Para índices/metales/CFDs con 2 dígitos: 1 pip = _Point
+                • Para otros: 1 pip = _Point
+                Usar <code>_Digits</code> para determinar automáticamente la conversión. NUNCA hardcodear el factor.
+
+                <span class="section-label">GESTIÓN DE ÓRDENES (módulo Orders)</span>
+                1. Usar la clase <code>CTrade</code> de <code>&lt;Trade/Trade.mqh&gt;</code> para TODAS las operaciones
+                de envío.
+                2. Configurar el Magic Number en el objeto CTrade:
+                <code>trade.SetExpertMagicNumber(InpMagicNumber)</code>.
+                3. Al colocar órdenes Stop-Limit:
+                • Buy Stop-Limit:
+                - stopPrice = Ask + PipsToPrice(InpEntryDistPips)
+                - limitPrice = stopPrice (mismo precio, ejecución al toque)
+                • Sell Stop-Limit:
+                - stopPrice = Bid - PipsToPrice(InpEntryDistPips)
+                - limitPrice = stopPrice
+                • Normalizar TODOS los precios: <code>NormalizeDouble(price, _Digits)</code>
+                • Validar el resultado:
+                <code>if(trade.ResultRetcode() != TRADE_RETCODE_DONE && trade.ResultRetcode() != TRADE_RETCODE_PLACED)</code>
+                • Guardar los tickets de ambas órdenes en variables globales del EA para referencia.
+                4. Al detectar que una orden se ejecutó (se convirtió en posición):
+                • Usar <code>HistoryDealGetInteger()</code> o escanear posiciones con <code>CPositionInfo</code>
+                filtrando por Magic Number.
+                • Eliminar inmediatamente la orden pendiente contraria con <code>trade.OrderDelete(ticket)</code>.
+                • Validar que la eliminación fue exitosa.
+
+                <span class="section-label">TRAILING STOP (módulo Trailing)</span>
+                Implementar trailing clásico:
+                1. En cada <code>OnTick()</code>, si el estado es <code>STATE_TRADE_ACTIVE</code>:
+                • Obtener la posición abierta del EA (filtrar por Magic Number y símbolo).
+                • Para posición BUY:
+                - Calcular nuevo SL = Bid - PipsToPrice(InpTrailingPips)
+                - Si el nuevo SL es mayor que el SL actual → mover SL con <code>trade.PositionModify()</code>
+                • Para posición SELL:
+                - Calcular nuevo SL = Ask + PipsToPrice(InpTrailingPips)
+                - Si el nuevo SL es menor que el SL actual (o SL actual == 0) → mover SL
+                2. El trailing se activa INMEDIATAMENTE al ejecutarse la orden (sin esperar ganancia mínima).
+                3. Si InpUseTP está activo, establecer el TP al momento de detectar la ejecución:
+                <code>trade.PositionModify(ticket, newSL, tpPrice)</code>.
+
+                <span class="section-label">INTERFAZ GRÁFICA (módulo UI)</span>
+                Crear botones directamente en el gráfico usando objetos <code>OBJ_BUTTON</code>:
+
+                Botones requeridos:
+                • <code>[ARMAR]</code> – Color verde (#238636). Programa el evento. Transición IDLE → ARMED.
+                • <code>[CANCELAR]</code> – Color rojo (#cf222e). Desarma todo, elimina pendientes. → IDLE.
+                • <code>[TP ON/OFF]</code> – Toggle. Color azul cuando está ON, gris cuando está OFF.
+
+                Panel de estado (usar <code>OBJ_LABEL</code> o <code>Comment()</code>):
+                • Mostrar: Estado actual | Hora del evento | Distancia (pips) | Trailing (pips) | TP (si aplica)
+                • Actualizar en cada tick o cambio de estado.
+
+                Para los botones:
+                • Posicionarlos en la esquina inferior derecha del gráfico (<code>CORNER_RIGHT_LOWER</code> o
+                coordenadas calculadas).
+                • Detectar clicks en <code>OnChartEvent()</code> con <code>CHARTEVENT_OBJECT_CLICK</code>.
+                • Después de procesar el click, resetear el estado del botón:
+                <code>ObjectSetInteger(0, btnName, OBJPROP_STATE, false)</code>.
+
+                <span class="section-label">HANDLERS PRINCIPALES</span>
+                <code>OnInit():</code>
+                • Parsear InpNewsTime a datetime del día actual.
+                • Inicializar estado a STATE_IDLE.
+                • Crear objetos UI (botones + labels).
+                • Configurar CTrade con Magic Number.
+                • Activar <code>EventSetMillisecondTimer(500)</code> para precisión de timing.
+
+                <code>OnTick():</code>
+                • Si STATE_ORDERS_PLACED: verificar si alguna orden se ejecutó (escanear posiciones por Magic).
+                • Si STATE_TRADE_ACTIVE: ejecutar lógica de Trailing Stop.
+                • Verificar si la posición sigue abierta; si fue cerrada → STATE_DONE.
+
+                <code>OnTimer():</code>
+                • Si STATE_ARMED: comparar <code>TimeCurrent()</code> con (eventTime - InpLeadTimeSeconds).
+                Si ya llegó el momento → colocar órdenes → STATE_ORDERS_PLACED.
+
+                <code>OnChartEvent():</code>
+                • Detectar clicks en botones ARMAR, CANCELAR, TP ON/OFF.
+                • Ejecutar transiciones de estado correspondientes.
+
+                <code>OnDeinit():</code>
+                • Eliminar TODOS los objetos gráficos creados por el EA.
+                • Si hay órdenes pendientes del EA → eliminarlas.
+                • <code>EventKillTimer()</code>.
+                • Imprimir log de cierre.
+
+                <span class="section-label">MANEJO DE ERRORES (OBLIGATORIO)</span>
+                • Cada llamada a <code>trade.OrderSend()</code>, <code>trade.OrderDelete()</code>,
+                <code>trade.PositionModify()</code> debe verificar <code>ResultRetcode()</code>.
+                • Implementar reintentos (máximo 3) con <code>Sleep(100)</code> entre intentos para errores transitorios
+                (TRADE_RETCODE_REQUOTE, TRADE_RETCODE_PRICE_OFF).
+                • Registrar TODOS los errores con <code>Print()</code> incluyendo: función, código de error,
+                descripción, precios involucrados.
+                • Si una orden no se puede colocar después de reintentos → informar en pantalla y transicionar a IDLE.
+
+                <span class="section-label">SEGURIDAD Y ROBUSTEZ</span>
+                • Filtrar SIEMPRE por Magic Number al buscar órdenes y posiciones. NUNCA operar sobre posiciones que no
+                sean del EA.
+                • Validar que el símbolo actual permite Stop-Limit orders:
+                <code>SymbolInfoInteger(_Symbol, SYMBOL_ORDER_MODE)</code>.
+                • Validar distancias mínimas del broker:
+                <code>SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)</code>.
+                • Verificar que <code>InpLotSize</code> está dentro de <code>SYMBOL_VOLUME_MIN</code> /
+                <code>SYMBOL_VOLUME_MAX</code> / <code>SYMBOL_VOLUME_STEP</code>.
+                • No aplicar filtros de spread ni slippage (confirmado: en noticias el slippage es impredecible y
+                depende del broker).
+
+                <span class="section-label">ESTRUCTURA DEL ARCHIVO</span>
+                Todo en un solo archivo <code>.mq5</code>. Organizar con secciones comentadas:
+                <code>//+------------------------------------------------------------------+
+//| NewsStraddleEA.mq5                                               |
+//| Pre-News Stop-Limit Straddle (10s) + Trailing                    |
+//+------------------------------------------------------------------+
+// SECTION 1: Includes & Inputs
+// SECTION 2: Global Variables & State Machine
+// SECTION 3: Utility Functions (PipsToPrice, ParseTime, etc.)
+// SECTION 4: Order Management
+// SECTION 5: Trailing Stop Logic
+// SECTION 6: UI / Chart Objects
+// SECTION 7: Event Handlers (OnInit, OnTick, OnTimer, OnChartEvent, OnDeinit)</code>
+
+                <span class="section-label">CRITERIOS DE ACEPTACIÓN</span>
+                ✅ Compila sin errores ni warnings en MetaEditor 5.
+                ✅ Las órdenes se colocan exactamente a T-10 segundos del evento.
+                ✅ Se colocan Buy Stop-Limit y Sell Stop-Limit a la distancia configurada.
+                ✅ Al ejecutarse una orden: Trailing Stop se activa + orden contraria se elimina inmediatamente.
+                ✅ TP no se usa por defecto, pero funciona correctamente cuando TP ON está activo.
+                ✅ Los botones ARMAR / CANCELAR / TP ON-OFF funcionan desde el gráfico.
+                ✅ El panel muestra estado, hora, y parámetros en tiempo real.
+                ✅ OnDeinit limpia todos los objetos y órdenes pendientes.
+                ✅ Todos los errores se manejan con reintentos y logs claros.
+                ✅ El EA no interfiere con otras posiciones u órdenes (filtro por Magic Number).
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 MT5 Strategy Spec | El Board</p>
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const menuToggle = document.getElementById('menuToggle');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        menuToggle.addEventListener('click', () => {
+            menuOverlay.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            if (menuOverlay.classList.contains('active')) {
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menuOverlay.contains(e.target) && !menuToggle.contains(e.target) && menuOverlay.classList.contains('active')) {
+                menuOverlay.classList.remove('active');
+                menuToggle.querySelector('i').setAttribute('data-lucide', 'menu');
+                lucide.createIcons();
+            }
+        });
+
+        function copyPrompt() {
+            const promptEl = document.getElementById('promptContent');
+            const text = promptEl.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyPromptBtn');
+                btn.classList.add('copied');
+                btn.innerHTML = '<i data-lucide="check"></i> ¡Copiado!';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '<i data-lucide="copy"></i> Copiar Prompt Completo';
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
