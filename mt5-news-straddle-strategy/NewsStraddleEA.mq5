@@ -479,7 +479,7 @@ void CreateButton(string name, string text, int x, int y, int width, int height,
 {
    ObjectDelete(0, name);
    ObjectCreate(0, name, OBJ_BUTTON, 0, 0, 0);
-   ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_RIGHT_LOWER);
+   ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
    ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);
    ObjectSetInteger(0, name, OBJPROP_YDISTANCE, y);
    ObjectSetInteger(0, name, OBJPROP_XSIZE, width);
@@ -492,6 +492,8 @@ void CreateButton(string name, string text, int x, int y, int width, int height,
    ObjectSetString(0, name, OBJPROP_FONT, "Arial Bold");
    ObjectSetInteger(0, name, OBJPROP_STATE, false);
    ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
+   ObjectSetInteger(0, name, OBJPROP_ZORDER, 100);
+   ObjectSetInteger(0, name, OBJPROP_BACK, false);
 }
 
 //--- Crear una etiqueta de texto
@@ -499,7 +501,7 @@ void CreateLabel(string name, string text, int x, int y, color txtColor, int fon
 {
    ObjectDelete(0, name);
    ObjectCreate(0, name, OBJ_LABEL, 0, 0, 0);
-   ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_RIGHT_LOWER);
+   ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
    ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);
    ObjectSetInteger(0, name, OBJPROP_YDISTANCE, y);
    ObjectSetString(0, name, OBJPROP_TEXT, text);
@@ -507,6 +509,7 @@ void CreateLabel(string name, string text, int x, int y, color txtColor, int fon
    ObjectSetInteger(0, name, OBJPROP_FONTSIZE, fontSize);
    ObjectSetString(0, name, OBJPROP_FONT, "Consolas");
    ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
+   ObjectSetInteger(0, name, OBJPROP_ZORDER, 100);
 }
 
 //--- Inicializar todos los objetos UI
@@ -514,21 +517,21 @@ void InitUI()
 {
    int btnW = 100;
    int btnH = 30;
-   int baseX = 320;
+   int baseX = 20;
    int baseY = 40;
    
-   // Botones
+   // Botones (Alineados arriba a la izquierda)
    CreateButton(BTN_ARM,    "▶ ARMAR",    baseX,       baseY, btnW, btnH, C'35,134,54',  clrWhite);
-   CreateButton(BTN_CANCEL, "■ CANCELAR", baseX - 110, baseY, btnW, btnH, C'207,34,46',  clrWhite);
-   CreateButton(BTN_TP,     "TP OFF",     baseX - 220, baseY, btnW, btnH, clrGray,       clrWhite);
+   CreateButton(BTN_CANCEL, "■ CANCELAR", baseX + 110, baseY, btnW, btnH, C'207,34,46',  clrWhite);
+   CreateButton(BTN_TP,     "TP OFF",     baseX + 220, baseY, btnW, btnH, clrGray,       clrWhite);
    
    // Labels
-   CreateLabel(LBL_TITLE,     "═══ NEWS STRADDLE EA ═══",            baseX, baseY + 110, clrGold, 11);
-   CreateLabel(LBL_STATE,     "Estado: " + StateToString(g_state),   baseX, baseY + 90,  clrWhite);
-   CreateLabel(LBL_EVENT,     "Evento: " + InpNewsTime,              baseX, baseY + 72,  clrSilver);
-   CreateLabel(LBL_COUNTDOWN, "",                                    baseX, baseY + 54,  clrYellow);
+   CreateLabel(LBL_TITLE,     "═══ NEWS STRADDLE EA ═══",            baseX, baseY + 40, clrGold, 11);
+   CreateLabel(LBL_STATE,     "Estado: " + StateToString(g_state),   baseX, baseY + 60,  clrWhite);
+   CreateLabel(LBL_EVENT,     "Evento: " + InpNewsTime,              baseX, baseY + 78,  clrSilver);
+   CreateLabel(LBL_COUNTDOWN, "",                                    baseX, baseY + 96,  clrYellow);
    CreateLabel(LBL_PARAMS,    StringFormat("Dist: %.1f pips | Trail: %.1f pips | Lot: %.2f",
-               InpEntryDistPips, InpTrailingPips, InpLotSize),       baseX, baseY + 36,  clrSilver);
+               InpEntryDistPips, InpTrailingPips, InpLotSize),       baseX, baseY + 114,  clrSilver);
    
    UpdateTPButton();
    ChartRedraw();
