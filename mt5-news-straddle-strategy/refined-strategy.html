@@ -262,16 +262,30 @@
                 text-transform: uppercase;
             }
 
-            td:nth-of-type(1)::before {
+            /* Tabla "Especificación Técnica" */
+            .table-wrapper:nth-of-type(1) td:nth-of-type(1)::before {
                 content: "Fase";
             }
 
-            td:nth-of-type(2)::before {
+            .table-wrapper:nth-of-type(1) td:nth-of-type(2)::before {
                 content: "Concepto";
             }
 
-            td:nth-of-type(3)::before {
+            .table-wrapper:nth-of-type(1) td:nth-of-type(3)::before {
                 content: "Lógica / Detalle";
+            }
+
+            /* Tabla "Adaptación Automática" */
+            .table-wrapper:nth-of-type(2) td:nth-of-type(1)::before {
+                content: "Característica";
+            }
+
+            .table-wrapper:nth-of-type(2) td:nth-of-type(2)::before {
+                content: "Nasdaq";
+            }
+
+            .table-wrapper:nth-of-type(2) td:nth-of-type(3)::before {
+                content: "BTC";
             }
 
             td:last-child {
@@ -393,6 +407,59 @@
                 <li><strong>Hora de Disparo:</strong> Programación 10s antes del evento noticia.</li>
                 <li><strong>Take Profit:</strong> Definición de salida fija (opcional vía toggle).</li>
             </ul>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="settings"></i>
+                Adaptación Automática: Nasdaq vs BTC
+            </div>
+            <p style="margin-bottom: 1.5rem;">El EA no tiene reglas hardcodeadas por instrumento. En su lugar, <span class="highlight">consulta al broker en tiempo real</span> y adapta su comportamiento automáticamente.</p>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Característica</th>
+                            <th>Nasdaq (NQ/US100)</th>
+                            <th>BTC (BTCUSD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Tipo de Orden</strong></td>
+                            <td><span class="highlight">Stop-Limit</span> <span class="dim">(preciso, control de slippage)</span></td>
+                            <td><span class="highlight">Buy/Sell Stop</span> <span class="dim">(fallback automático)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Volumen Mínimo</strong></td>
+                            <td>0.01 lotes <span class="dim">(micro lotes permitidos)</span></td>
+                            <td>0.1 - 1.0 lotes <span class="dim">(según broker)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Distancia Mínima</strong></td>
+                            <td>~5-10 pips <span class="dim">(stops level bajo)</span></td>
+                            <td>~50-100 pips <span class="dim">(stops level alto)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Detección</strong></td>
+                            <td colspan="2"><code>SymbolInfoInteger(_Symbol, SYMBOL_ORDER_MODE)</code><br>
+                            <code>SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN/MAX)</code><br>
+                            <code>SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0, 255, 204, 0.05); border-left: 3px solid var(--accent-color); border-radius: 6px;">
+                <p style="margin-bottom: 0.5rem;"><strong>🤖 Cómo funciona la adaptación:</strong></p>
+                <ul class="summary-list">
+                    <li>El EA pregunta al broker: <em>"¿Soportas Stop-Limit?"</em> → Usa el mejor tipo disponible</li>
+                    <li>Consulta: <em>"¿Cuál es tu volumen mínimo?"</em> → Valida y muestra límites en el panel</li>
+                    <li>Verifica: <em>"¿Cuál es tu stops level?"</em> → Advierte si la distancia configurada es insuficiente</li>
+                </ul>
+                <p class="dim" style="margin-top: 0.5rem;">Esta arquitectura permite operar cualquier instrumento sin modificar código.</p>
+            </div>
         </section>
 
         <section class="card">
