@@ -60,6 +60,7 @@ const string  LBL_PARAMS        = "NewsEA_LblParams";
 const string  LBL_TITLE         = "NewsEA_LblTitle";
 const string  LBL_COUNTDOWN     = "NewsEA_LblCountdown";
 const string  LBL_VOLINFO       = "NewsEA_LblVolInfo";
+const string  LBL_STOPSINFO     = "NewsEA_LblStopsInfo";
 
 // Constantes de reintentos
 const int     MAX_RETRIES       = 3;
@@ -194,13 +195,24 @@ bool PlaceStraddleOrders()
    double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
    double dist = PipsToPrice(InpEntryDistPips);
    
-   // Buy Stop-Limit: stopPrice y limitPrice arriba del Ask
-   double buyStopPrice  = NormalizeDouble(ask + dist, _Digits);
-   double buyLimitPrice = buyStopPrice;  // Ejecución al toque
+   // Validar que la distancia es suficiente según stops level del broker
+   int stopsLevel = (int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
+   double minDist = stopsLevel * _Point;
    
-   // Sell Stop-Limit: stopPrice y limitPrice abajo del Bid
+   if(dist < minDist && stopsLevel > 0)
+   {
+      Print("[WARNING] Distancia configurada (", dist, ") menor que stops level del broker (", minDist, ")");
+      Print("[WARNING] Ajustando distancia automáticamente a ", minDist, " + 10% margen");
+      dist = minDist * 1.1;  // Agregar 10% de margen de seguridad
+   }
+   
+   // Buy Stop: stopPrice arriba del Ask
+   double buyStopPrice  = NormalizeDouble(ask + dist, _Digits);
+   double buyLimitPrice = buyStopPrice;  // Para Stop-Limit (si aplica)
+   
+   // Sell Stop: stopPrice abajo del Bid
    double sellStopPrice  = NormalizeDouble(bid - dist, _Digits);
-   double sellLimitPrice = sellStopPrice;  // Ejecución al toque
+   double sellLimitPrice = sellStopPrice;  // Para Stop-Limit (si aplica)
    
    // SL y TP iniciales (0 = sin SL/TP al colocar la orden pendiente)
    double sl = 0;
@@ -596,9 +608,13 @@ void InitUI()
    double maxLot  = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
    double stepLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
    
+   // Obtener stops level del broker
+   int stopsLevel = (int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
+   double stopsLevelPrice = stopsLevel * _Point;
+   
    // Panel de fondo PRIMERO (para que quede detrás de todo)
    int panelWidth = 340;   // 3 botones + espaciado + padding
-   int panelHeight = 163;  // Altura total de botones + labels + padding (aumentado por nuevo label)
+   int panelHeight = 181;  // Altura total de botones + labels + padding (aumentado por 2 labels)
    CreateBackgroundPanel(baseX - panelPadding, baseY - panelPadding, panelWidth, panelHeight);
    
    // Botones (Alineados arriba a la izquierda)
@@ -614,10 +630,32 @@ void InitUI()
    CreateLabel(LBL_PARAMS,    StringFormat("Dist: %.1f pips | Trail: %.1f pips | Lot: %.2f",
                InpEntryDistPips, InpTrailingPips, InpLotSize),       baseX, baseY + 114,  clrSilver);
    
-   // Info de volumen del broker (NUEVO)
+   // Info de volumen del broker
    string volInfo = StringFormat("Broker: Min lot %.2f | Max %.2f | Step %.2f", minLot, maxLot, stepLot);
    color volColor = (InpLotSize < minLot || InpLotSize > maxLot) ? clrRed : C'100,200,100';  // Rojo si inválido, verde si ok
    CreateLabel(LBL_VOLINFO,   volInfo,                               baseX, baseY + 132, volColor, 8);
+   
+   // Info de stops level del broker (CRÍTICO para distancia de órdenes)
+   double minDistPrice = PipsToPrice(InpEntryDistPips);
+   string stopsInfo;
+   color stopsColor;
+   
+   if(stopsLevel == 0)
+   {
+      stopsInfo = "Stops Level: 0 (sin restricción de distancia)";
+      stopsColor = C'100,200,100';  // Verde
+   }
+   else
+   {
+      stopsInfo = StringFormat("Stops Level: %d pts (%.5f en precio) - Min dist requerida", stopsLevel, stopsLevelPrice);
+      
+      // Color según si la distancia configurada es suficiente
+      if(minDistPrice < stopsLevelPrice)
+         stopsColor = clrRed;  // Rojo: distancia insuficiente
+      else
+         stopsColor = C'100,200,100';  // Verde: distancia ok
+   }
+   CreateLabel(LBL_STOPSINFO, stopsInfo,                             baseX, baseY + 150, stopsColor, 8);
    
    UpdateTPButton();
    ChartRedraw();
@@ -705,6 +743,7 @@ void DestroyUI()
    ObjectDelete(0, LBL_TITLE);
    ObjectDelete(0, LBL_COUNTDOWN);
    ObjectDelete(0, LBL_VOLINFO);
+   ObjectDelete(0, LBL_STOPSINFO);
    ChartRedraw();
 }
 
@@ -751,15 +790,29 @@ int OnInit()
    EventSetMillisecondTimer(500);
    
    // Validaciones (no-fatales: warnings + fallback)
-   if(!ValidateSymbolOrderMode())
+   bool symbolSupportsStopLimit = ValidateSymbolOrderMode();
+   int stopsLevel = (int)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL);
+   
+   Print("[INFO] Broker SYMBOL_TRADE_STOPS_LEVEL: ", stopsLevel, " points (", stopsLevel * _Point, " en precio)");
+   
+   // Decisión: usar Stop-Limit SOLO si:
+   // 1. El símbolo lo soporta, Y
+   // 2. El stops level es 0 o muy bajo (permite limitPrice = stopPrice)
+   if(!symbolSupportsStopLimit)
    {
       Print("[WARNING] Símbolo no soporta Stop-Limit. Usando Buy Stop / Sell Stop como fallback.");
+      g_useStopLimit = false;
+   }
+   else if(stopsLevel > 100)  // Si stops level > 100 points, Stop-Limit es problemático
+   {
+      Print("[WARNING] SYMBOL_TRADE_STOPS_LEVEL muy alto (", stopsLevel, "). Stop-Limit requiere separación stop/limit.");
+      Print("[INFO] Usando Buy Stop / Sell Stop para evitar errores de 'Invalid Price'.");
       g_useStopLimit = false;
    }
    else
    {
       g_useStopLimit = true;
-      Print("[INFO] Símbolo soporta Stop-Limit. Modo óptimo activado.");
+      Print("[INFO] Símbolo soporta Stop-Limit y stops level es bajo. Modo óptimo activado.");
    }
    
    if(!ValidateLotSize())
