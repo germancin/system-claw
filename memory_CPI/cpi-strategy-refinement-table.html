@@ -1,42 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
 
-<table border="1" style="width:100%; border-collapse: collapse;">
-    <thead>
-        <tr>
-            <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Fallo/Situación Observada (Fecha de Ejemplo)</th>
-            <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Lección Clave Aprendida</th>
-            <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Acción / Cómo lo Usaré para Futuras Decisiones (Filtros de Estrategia)</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">10 de abril de 2025 (CPI Cooler, NQ Bearish)</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">El Contexto Macro es Rey: Eventos disruptivos (ej. guerra arancelaria) pueden anular completamente la señal del CPI.</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">**Filtro de Ruido Macro:** Antes de cualquier trade CPI, evaluaré la presencia de "eventos superiores" activos (guerras comerciales, crisis geopolíticas). Si existen, aplicar "NO TRADE" o "EXTREMA PRECAUCIÓN". Monitorear VIX alto (>25-30) como señal de riesgo.</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">15 de julio de 2025 (CPI Hotter, NQ Flat/Bullish)</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Ignorancia de la Inflación en Rallies Fuertes: El mercado puede ignorar CPIs calientes si hay un fuerte momentum alcista.</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">**Filtro de Momentum:** Evitar SHORTs por CPI caliente si NQ ha tenido un rally significativo (>5-10% en el último mes) con VIX bajo. Considerar "SKIP" o incluso LONG especulativo si el momentum es abrumadoramente alcista. Requerir confirmación de ruptura de tendencia para cualquier SHORT.</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">12 de agosto de 2025 (Core CPI Hotter, NQ Bullish)</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Reafirmación del Momentum sobre Core CPI: La persistencia del momentum puede hacer que se ignore incluso la inflación "pegajosa" del core.</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">**Identificar "Modo de Mercado":** Evaluar si el mercado está en "modo preocupación por inflación" o "modo crecimiento/riesgo". Si es "risk-on" (Q3 2025), CPI caliente es precaución para SHORTs. Diversificar con sentimiento (flujos, analistas).</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">11 de septiembre de 2025 (CPI Hotter, NQ Bullish)</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Persistencia del Régimen de Mercado: Una vez que un régimen se establece (ej. "risk-on"), puede persistir por meses, ignorando señales negativas.</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">**Criterios de "Ignorancia de Inflación":** Si NQ ha subido X% y el CPI caliente ha sido ignorado en los últimos 2-3 releases, el próximo CPI caliente es un **SKIP (para SHORTs)**. Aumentar el umbral de sorpresa para SHORTs en tendencias fuertes.</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">24 de octubre de 2025 (CPI Slightly Hotter, NQ Bullish)</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Múltiples Narrativas Complejas (Shutdown + Momentum): La resolución de incertidumbre política puede dominar sobre datos económicos.</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">**Ponderación de Noticias Múltiples:** Analizar el calendario político (riesgos de shutdown, elecciones). La resolución de incertidumbres políticas puede generar "rallies de alivio" que anulan las señales del CPI.</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">13 de enero de 2026 (CPI Cooler, NQ Bearish)</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">"Buy the Rumor, Sell the News": Si el mercado ya descontó un resultado, la reacción puede ser opuesta (toma de ganancias).</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">**Filtro de "Pre-Release Rally":** Si NQ ha subido significativamente antes de un CPI "cool" esperado, reducir confianza en LONG o considerar "fade" (ir contra la reacción inicial) / "skip". Evaluar el posicionamiento y sentimiento del mercado.</td>
-        </tr>
-    </tbody>
-</table>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPI Strategy Refinement</title>
+    <style>
+        :root {
+            --bg-color: #0a0e17;
+            --card-bg: #131a2e;
+            --border-color: #1e2a4a;
+            --header-text: #ffffff;
+            --body-text: #cbd5e1;
+            --accent-gold: #f59e0b;
+            --bullish-green: #4ade80;
+            --bearish-red: #f87171;
+            --info-blue: #60a5fa;
+            --warning-yellow: #fbbf24;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--body-text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-section h2 {
+            font-size: 20px;
+            color: var(--header-text);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-section span {
+            color: var(--accent-gold);
+        }
+
+        .responsive-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        .responsive-table th {
+            background: #1a2240;
+            padding: 16px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-gold);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .responsive-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .responsive-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .responsive-table tr:hover {
+            background: #1e2a4a;
+            transition: background 0.2s ease;
+        }
+
+        .date-cell {
+            font-weight: 600;
+            color: var(--header-text);
+            white-space: nowrap;
+        }
+
+        .lesson-cell {
+            font-weight: 500;
+        }
+
+        .action-cell {
+            background: rgba(30, 42, 74, 0.3);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .badge.bullish {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--bullish-green);
+        }
+
+        .badge.bearish {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--bearish-red);
+        }
+
+        .badge.neutral {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--info-blue);
+        }
+
+        .highlights {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        /* Mobile Version - Cards */
+        @media screen and (max-width: 768px) {
+            .responsive-table thead {
+                display: none;
+            }
+
+            .responsive-table,
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .responsive-table tr {
+                margin-bottom: 20px;
+                border-bottom: 4px solid var(--border-color);
+            }
+
+            .responsive-table td {
+                padding: 16px;
+                position: relative;
+                padding-left: 35%;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .responsive-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 16px;
+                width: 30%;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: var(--accent-gold);
+                top: 18px;
+            }
+
+            .action-cell {
+                border-left: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>📊 <span>CPI</span> Strategy Refinement</h2>
+        </div>
+
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Evento / Fecha</th>
+                    <th style="width: 35%;">Lección Aprendida</th>
+                    <th style="width: 45%;">Filtro de Estrategia / Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Evento / Fecha">
+                        <div class="badge neutral">NQ Bearish</div>
+                        <div class="date-cell">10 de abril, 2025</div>
+                        <div style="font-size: 12px; opacity: 0.7;">CPI Cooler</div>
+                    </td>
+                    <td data-label="Lección Aprendida" class="lesson-cell">
+                        <span class="highlights">El Contexto Macro es Rey:</span> Eventos disruptivos (ej. guerra
+                        arancelaria) pueden anular completamente la señal del CPI.
+                    </td>
+                    <td data-label="Acción" class="action-cell">
+                        <strong>Filtro de Ruido Macro:</strong> Evaluar "eventos superiores" activos. Si existen, <span
+                            style="color: var(--bearish-red)">"NO TRADE"</span> o Extrema Precaución. Monitorear <span
+                            class="highlights">VIX > 25-30</span>.
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Evento / Fecha">
+                        <div class="badge bullish">NQ Bullish</div>
+                        <div class="date-cell">15 de julio, 2025</div>
+                        <div style="font-size: 12px; opacity: 0.7;">CPI Hotter</div>
+                    </td>
+                    <td data-label="Lección Aprendida" class="lesson-cell">
+                        <span class="highlights">Ignorancia de Inflación:</span> El mercado puede ignorar CPIs calientes
+                        si hay un fuerte momentum alcista pre-existente.
+                    </td>
+                    <td data-label="Acción" class="action-cell">
+                        <strong>Filtro de Momentum:</strong> Evitar SHORTs si NQ subió <span
+                            class="highlights">>5-10%</span> mes previo con VIX bajo. Considerar SKIP o incluso LONG
+                        especulativo si el momentum es abrumador.
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Evento / Fecha">
+                        <div class="badge bullish">NQ Bullish</div>
+                        <div class="date-cell">12 de agosto, 2025</div>
+                        <div style="font-size: 12px; opacity: 0.7;">Core CPI Hotter</div>
+                    </td>
+                    <td data-label="Lección Aprendida" class="lesson-cell">
+                        <span class="highlights">Persistencia de Momentum:</span> La inercia del mercado puede absorber
+                        incluso la inflación "pegajosa" (Core).
+                    </td>
+                    <td data-label="Acción" class="action-cell">
+                        <strong>Modo de Mercado:</strong> Identificar si estamos en "Preocupación Inflación" o "Modo
+                        Crecimiento". Si es Risk-On, CPI caliente es precaución, no señal de venta inmediata.
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Evento / Fecha">
+                        <div class="badge bullish">NQ Bullish</div>
+                        <div class="date-cell">11 de septiembre, 2025</div>
+                        <div style="font-size: 12px; opacity: 0.7;">CPI Hotter</div>
+                    </td>
+                    <td data-label="Lección Aprendida" class="lesson-cell">
+                        <span class="highlights">Establecimiento de Régimen:</span> Una vez que un régimen se establece,
+                        ignora señales negativas sistemáticamente.
+                    </td>
+                    <td data-label="Acción" class="action-cell">
+                        <strong>Criterios de Omisión:</strong> Si el CPI caliente ha sido ignorado 2-3 veces, el próximo
+                        es un <span style="color: var(--warning-yellow)">SKIP para SHORTs</span>. Aumentar el umbral de
+                        sorpresa requerido.
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Evento / Fecha">
+                        <div class="badge bullish">NQ Bullish</div>
+                        <div class="date-cell">24 de octubre, 2025</div>
+                        <div style="font-size: 12px; opacity: 0.7;">CPI Slightly Hotter</div>
+                    </td>
+                    <td data-label="Lección Aprendida" class="lesson-cell">
+                        <span class="highlights">Narrativas Complejas:</span> La resolución de incertidumbre política
+                        (Shutdown) domina sobre datos económicos.
+                    </td>
+                    <td data-label="Acción" class="action-cell">
+                        <strong>Ponderación Política:</strong> Analizar calendario extra-económico. Los "rallies de
+                        alivio" políticos tienen prioridad sobre la sorpresa inflacionaria.
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Evento / Fecha">
+                        <div class="badge bearish">NQ Bearish</div>
+                        <div class="date-cell">13 de enero, 2026</div>
+                        <div style="font-size: 12px; opacity: 0.7;">CPI Cooler</div>
+                    </td>
+                    <td data-label="Lección Aprendida" class="lesson-cell">
+                        <span class="highlights">Buy the Rumor, Sell the News:</span> Si el resultado esperado ya está
+                        descontado, la reacción real será toma de ganancias.
+                    </td>
+                    <td data-label="Acción" class="action-cell">
+                        <strong>Filtro Pre-Release:</strong> Si hubo rally previo al CPI, reducir confianza en LONG.
+                        Evaluar posicionamiento saturado antes del release.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>
