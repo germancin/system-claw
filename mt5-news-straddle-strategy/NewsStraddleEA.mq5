@@ -59,6 +59,7 @@ const string  LBL_EVENT         = "NewsEA_LblEvent";
 const string  LBL_PARAMS        = "NewsEA_LblParams";
 const string  LBL_TITLE         = "NewsEA_LblTitle";
 const string  LBL_COUNTDOWN     = "NewsEA_LblCountdown";
+const string  LBL_VOLINFO       = "NewsEA_LblVolInfo";
 
 // Constantes de reintentos
 const int     MAX_RETRIES       = 3;
@@ -145,9 +146,13 @@ bool ValidateLotSize()
    double maxLot  = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
    double stepLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
    
+   Print("[INFO] Broker volume limits: Min=", minLot, " Max=", maxLot, " Step=", stepLot);
+   Print("[INFO] Your lot size: ", InpLotSize);
+   
    if(InpLotSize < minLot || InpLotSize > maxLot)
    {
-      Print("[ERROR] LotSize ", InpLotSize, " fuera de rango [", minLot, " - ", maxLot, "]");
+      Print("[WARNING] LotSize ", InpLotSize, " fuera de rango [", minLot, " - ", maxLot, "]");
+      Print("[WARNING] El EA puede fallar al colocar órdenes. Ajuste el tamaño de lote.");
       return false;
    }
    
@@ -157,6 +162,8 @@ bool ValidateLotSize()
    {
       Print("[WARNING] LotSize ", InpLotSize, " no es múltiplo de ", stepLot, ". Ajustar.");
    }
+   
+   Print("[OK] LotSize válido para este broker.");
    return true;
 }
 
@@ -584,9 +591,14 @@ void InitUI()
    int baseY = 40;
    int panelPadding = 10;
    
+   // Obtener info de volumen del broker
+   double minLot  = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN);
+   double maxLot  = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX);
+   double stepLot = SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_STEP);
+   
    // Panel de fondo PRIMERO (para que quede detrás de todo)
    int panelWidth = 340;   // 3 botones + espaciado + padding
-   int panelHeight = 145;  // Altura total de botones + labels + padding
+   int panelHeight = 163;  // Altura total de botones + labels + padding (aumentado por nuevo label)
    CreateBackgroundPanel(baseX - panelPadding, baseY - panelPadding, panelWidth, panelHeight);
    
    // Botones (Alineados arriba a la izquierda)
@@ -601,6 +613,11 @@ void InitUI()
    CreateLabel(LBL_COUNTDOWN, "",                                    baseX, baseY + 96,  clrYellow);
    CreateLabel(LBL_PARAMS,    StringFormat("Dist: %.1f pips | Trail: %.1f pips | Lot: %.2f",
                InpEntryDistPips, InpTrailingPips, InpLotSize),       baseX, baseY + 114,  clrSilver);
+   
+   // Info de volumen del broker (NUEVO)
+   string volInfo = StringFormat("Broker: Min lot %.2f | Max %.2f | Step %.2f", minLot, maxLot, stepLot);
+   color volColor = (InpLotSize < minLot || InpLotSize > maxLot) ? clrRed : C'100,200,100';  // Rojo si inválido, verde si ok
+   CreateLabel(LBL_VOLINFO,   volInfo,                               baseX, baseY + 132, volColor, 8);
    
    UpdateTPButton();
    ChartRedraw();
@@ -687,6 +704,7 @@ void DestroyUI()
    ObjectDelete(0, LBL_PARAMS);
    ObjectDelete(0, LBL_TITLE);
    ObjectDelete(0, LBL_COUNTDOWN);
+   ObjectDelete(0, LBL_VOLINFO);
    ChartRedraw();
 }
 
