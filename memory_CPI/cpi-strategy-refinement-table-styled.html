@@ -66,9 +66,10 @@
             /* Borde inferior para separar cabecera */
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            font-size: 1.2em;
-            white-space: nowrap;
-            /* Evita que el texto del header se rompa */
+            font-size: 1.1em;
+            /* Se permite que el texto se ajuste para que la tabla sea fluida */
+            white-space: normal;
+            word-wrap: break-word;
         }
 
         th:first-child {
@@ -91,6 +92,7 @@
             color: #c0c0c0;
             /* Texto de contenido más claro */
             font-size: 0.95em;
+            word-break: break-word;
         }
 
         tbody tr:nth-child(even) {
