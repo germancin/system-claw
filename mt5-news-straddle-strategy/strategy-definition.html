@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificación: MT5 News Straddle Strategy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #00ffcc;
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+            --row-hover: #21262d;
+            --success: #238636;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-color);
+        }
+
+        .summary-list {
+            list-style: none;
+        }
+
+        .summary-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .summary-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Fluid Table Implementation */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: rgba(48, 54, 61, 0.5);
+        }
+
+        th {
+            padding: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background-color: var(--row-hover);
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: rgba(56, 139, 253, 0.15);
+            color: #58a6ff;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .option-item {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .option-item strong {
+            color: var(--accent-color);
+        }
+
+        /* Mobile Version of Table */
+        @media screen and (max-width: 768px) {
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr {
+                margin-bottom: 1.5rem;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid var(--border-color);
+                position: relative;
+                padding-left: 45%;
+                min-height: 3rem;
+            }
+
+            td::before {
+                position: absolute;
+                left: 1rem;
+                width: 40%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: var(--text-dim);
+                font-size: 0.8rem;
+                text-transform: uppercase;
+            }
+
+            td:nth-of-type(1)::before {
+                content: "Ref";
+            }
+
+            td:nth-of-type(2)::before {
+                content: "Categoría";
+            }
+
+            td:nth-of-type(3)::before {
+                content: "Pregunta";
+            }
+
+            td:nth-of-type(4)::before {
+                content: "Opciones";
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
+        }
+
+        .status-tag {
+            background-color: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>MT5 News Straddle Strategy</h1>
+            <p class="subtitle">Definición de Lógica y Requerimientos de Automatización</p>
+        </header>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="info"></i>
+                1) Resumen de la Idea (Para el Cliente)
+            </div>
+            <ul class="summary-list">
+                <li><strong>Objetivo:</strong> Automatizar una estrategia “pre-noticia” en MetaTrader 5 gestionada
+                    mediante un botón dinámico en el gráfico.</li>
+                <li><strong>Mecánica:</strong> El trader define la hora exacta de la noticia y una distancia X de
+                    seguridad.</li>
+                <li><strong>Acción Automática:</strong> 1 minuto antes del evento, el sistema coloca un "straddle" (Buy
+                    Stop y Sell Stop) a la distancia X del precio actual.</li>
+                <li><strong>Gestión de Trade:</strong> Al activarse una orden, se habilita el Trailing Stop (5 puntos) y
+                    se elimina automáticamente la orden contraria.</li>
+                <li><strong>Interfaz:</strong> Control total desde el gráfico (Armar/Cancelar) con reporte de estado
+                    interactivo.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="help-circle"></i>
+                2) Configuración Estratégica (Cuestionario)
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ref</th>
+                            <th>Categoría</th>
+                            <th>Pregunta / Decisión</th>
+                            <th>Opciones de Configuración</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>A</td>
+                            <td><span class="category-badge">Ejecución</span></td>
+                            <td>¿Tipo de orden pendiente preferida?</td>
+                            <td>
+                                <span class="option-item"><strong>A1:</strong> Buy Stop / Sell Stop (Ejecución
+                                    agresiva)</span>
+                                <span class="option-item"><strong>A2:</strong> Buy Stop Limit / Sell Stop Limit (Control
+                                    de slippage)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td><span class="category-badge">Parámetros</span></td>
+                            <td>Definición de Distancia X</td>
+                            <td>
+                                <span class="option-item"><strong>B1:</strong> Points, Pips o Precio Exacto</span>
+                                <span class="option-item"><strong>B2:</strong> ¿X es simétrica para ambas
+                                    órdenes?</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>C</td>
+                            <td><span class="category-badge">Timing</span></td>
+                            <td>Definición de "1 minuto antes"</td>
+                            <td>
+                                <span class="option-item"><strong>C1:</strong> Segundo 00 (HH:MM-1)</span>
+                                <span class="option-item"><strong>C2:</strong> 60 segundos exactos (Tick time)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>D</td>
+                            <td><span class="category-badge">Gestión</span></td>
+                            <td>Lógica de Trailing Stop (5 pts)</td>
+                            <td>
+                                <span class="option-item"><strong>D1:</strong> Clásico, Break-even +5 o Híbrido</span>
+                                <span class="option-item"><strong>D2:</strong> ¿Inicio inmediato o tras ganancia
+                                    mínima?</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>E</td>
+                            <td><span class="category-badge">Riesgo</span></td>
+                            <td>Protección Inicial (SL/TP)</td>
+                            <td>
+                                <span class="option-item"><strong>E1:</strong> ¿SL inicial al abrir?</span>
+                                <span class="option-item"><strong>E2:</strong> ¿Take Profit definido?</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>F</td>
+                            <td><span class="category-badge">Opc. Contraria</span></td>
+                            <td>Cancelación de la Red</td>
+                            <td>
+                                <span class="option-item"><strong>F1:</strong> Inmediato, tras confirmación o tras
+                                    profit X</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>G</td>
+                            <td><span class="category-badge">Seguridad</span></td>
+                            <td>Filtros de Noticias</td>
+                            <td>
+                                <span class="option-item"><strong>G1:</strong> Límite de Spread máximo</span>
+                                <span class="option-item"><strong>G2:</strong> Expiración tras X min (si no
+                                    activa)</span>
+                                <span class="option-item"><strong>G3:</strong> Slippage máximo permitido</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>H</td>
+                            <td><span class="category-badge">UI/UX</span></td>
+                            <td>Controles en Pantalla</td>
+                            <td>
+                                <span class="option-item"><strong>H1:</strong> Armar/Cancelar vs
+                                    Armar/Cancelar/Manual</span>
+                                <span class="option-item"><strong>H2:</strong> Nivel de información (Full vs
+                                    Minimal)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td><span class="category-badge">Avanzado</span></td>
+                            <td>Multi-ejecución</td>
+                            <td>
+                                <span class="option-item"><strong>I1:</strong> Símbolo único o Multi-símbolo</span>
+                                <span class="option-item"><strong>I2:</strong> Operaciones únicas o re-intentos</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 MT5 Strategy Spec | Generado por Antigravity</p>
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
