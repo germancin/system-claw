@@ -6,7 +6,6 @@
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
 #property version   "1.00"
-#property strict
 #property description "Pre-News Stop-Limit Straddle EA with Trailing Stop"
 #property description "Places Buy/Sell Stop-Limit orders before news events"
 
@@ -63,6 +62,9 @@ const string  LBL_COUNTDOWN     = "NewsEA_LblCountdown";
 // Constantes de reintentos
 const int     MAX_RETRIES       = 3;
 const int     RETRY_SLEEP_MS    = 100;
+
+// Fallback: usar Stop orders si Stop-Limit no está disponible
+bool          g_useStopLimit    = true;    // true = Stop-Limit, false = Stop (fallback)
 
 //+------------------------------------------------------------------+
 //| SECTION 3: Utility Functions                                      |
@@ -200,24 +202,54 @@ bool PlaceStraddleOrders()
    Print("[INFO] Buy Stop-Limit: Stop=", buyStopPrice, " Limit=", buyLimitPrice);
    Print("[INFO] Sell Stop-Limit: Stop=", sellStopPrice, " Limit=", sellLimitPrice);
    
-   // --- Colocar Buy Stop-Limit con reintentos
+   // Determinar tipo de orden según soporte del broker
+   ENUM_ORDER_TYPE buyType, sellType;
+   string orderMode;
+   
+   if(g_useStopLimit)
+   {
+      buyType  = ORDER_TYPE_BUY_STOP_LIMIT;
+      sellType = ORDER_TYPE_SELL_STOP_LIMIT;
+      orderMode = "Stop-Limit";
+   }
+   else
+   {
+      buyType  = ORDER_TYPE_BUY_STOP;
+      sellType = ORDER_TYPE_SELL_STOP;
+      orderMode = "Stop (fallback)";
+   }
+   
+   Print("[INFO] Modo de órdenes: ", orderMode);
+   
+   // --- Colocar Buy order con reintentos
    bool buyPlaced = false;
    for(int i = 0; i < MAX_RETRIES; i++)
    {
-      g_trade.OrderOpen(_Symbol, ORDER_TYPE_BUY_STOP_LIMIT, InpLotSize,
-                        buyLimitPrice, buyStopPrice, sl, tp,
-                        ORDER_TIME_GTC, 0, "NewsEA Buy SL");
+      bool result = false;
+      
+      if(g_useStopLimit)
+      {
+         result = g_trade.OrderOpen(_Symbol, buyType, InpLotSize,
+                           buyLimitPrice, buyStopPrice, sl, tp,
+                           ORDER_TIME_GTC, 0, "NewsEA Buy");
+      }
+      else
+      {
+         // Buy Stop: solo necesita el precio de activación
+         result = g_trade.BuyStop(InpLotSize, buyStopPrice, _Symbol, sl, tp,
+                          ORDER_TIME_GTC, 0, "NewsEA Buy");
+      }
       
       uint retcode = g_trade.ResultRetcode();
       if(retcode == TRADE_RETCODE_DONE || retcode == TRADE_RETCODE_PLACED)
       {
          g_buyOrderTicket = g_trade.ResultOrder();
-         Print("[OK] Buy Stop-Limit colocada. Ticket: ", g_buyOrderTicket);
+         Print("[OK] Buy ", orderMode, " colocada. Ticket: ", g_buyOrderTicket);
          buyPlaced = true;
          break;
       }
       
-      Print("[RETRY ", i+1, "/", MAX_RETRIES, "] Buy Stop-Limit falló. Code: ", retcode,
+      Print("[RETRY ", i+1, "/", MAX_RETRIES, "] Buy falló. Code: ", retcode,
             " Desc: ", g_trade.ResultRetcodeDescription());
       
       if(retcode != TRADE_RETCODE_REQUOTE && retcode != TRADE_RETCODE_PRICE_OFF)
@@ -228,28 +260,39 @@ bool PlaceStraddleOrders()
    
    if(!buyPlaced)
    {
-      Print("[ERROR] No se pudo colocar Buy Stop-Limit después de ", MAX_RETRIES, " intentos");
+      Print("[ERROR] No se pudo colocar Buy después de ", MAX_RETRIES, " intentos");
       return false;
    }
    
-   // --- Colocar Sell Stop-Limit con reintentos
+   // --- Colocar Sell order con reintentos
    bool sellPlaced = false;
    for(int i = 0; i < MAX_RETRIES; i++)
    {
-      g_trade.OrderOpen(_Symbol, ORDER_TYPE_SELL_STOP_LIMIT, InpLotSize,
-                        sellLimitPrice, sellStopPrice, sl, tp,
-                        ORDER_TIME_GTC, 0, "NewsEA Sell SL");
+      bool result = false;
+      
+      if(g_useStopLimit)
+      {
+         result = g_trade.OrderOpen(_Symbol, sellType, InpLotSize,
+                           sellLimitPrice, sellStopPrice, sl, tp,
+                           ORDER_TIME_GTC, 0, "NewsEA Sell");
+      }
+      else
+      {
+         // Sell Stop: solo necesita el precio de activación
+         result = g_trade.SellStop(InpLotSize, sellStopPrice, _Symbol, sl, tp,
+                           ORDER_TIME_GTC, 0, "NewsEA Sell");
+      }
       
       uint retcode = g_trade.ResultRetcode();
       if(retcode == TRADE_RETCODE_DONE || retcode == TRADE_RETCODE_PLACED)
       {
          g_sellOrderTicket = g_trade.ResultOrder();
-         Print("[OK] Sell Stop-Limit colocada. Ticket: ", g_sellOrderTicket);
+         Print("[OK] Sell ", orderMode, " colocada. Ticket: ", g_sellOrderTicket);
          sellPlaced = true;
          break;
       }
       
-      Print("[RETRY ", i+1, "/", MAX_RETRIES, "] Sell Stop-Limit falló. Code: ", retcode,
+      Print("[RETRY ", i+1, "/", MAX_RETRIES, "] Sell falló. Code: ", retcode,
             " Desc: ", g_trade.ResultRetcodeDescription());
       
       if(retcode != TRADE_RETCODE_REQUOTE && retcode != TRADE_RETCODE_PRICE_OFF)
@@ -260,7 +303,7 @@ bool PlaceStraddleOrders()
    
    if(!sellPlaced)
    {
-      Print("[ERROR] No se pudo colocar Sell Stop-Limit. Eliminando Buy pendiente...");
+      Print("[ERROR] No se pudo colocar Sell. Eliminando Buy pendiente...");
       DeleteOrderSafe(g_buyOrderTicket);
       g_buyOrderTicket = 0;
       return false;
@@ -637,17 +680,46 @@ int OnInit()
    InitPipFactor();
    Print("[INIT] PipFactor: ", g_pipFactor, " | 1 pip = ", PipsToPrice(1.0), " en precio");
    
-   // Validaciones
+   // Configurar CTrade primero
+   g_trade.SetExpertMagicNumber(InpMagicNumber);
+   g_trade.SetDeviationInPoints(50);  // Slippage amplio para noticias
+   
+   // Detectar filling mode soportado por el broker
+   long fillType = SymbolInfoInteger(_Symbol, SYMBOL_FILLING_MODE);
+   if((fillType & SYMBOL_FILLING_IOC) != 0)
+      g_trade.SetTypeFilling(ORDER_FILLING_IOC);
+   else if((fillType & SYMBOL_FILLING_FOK) != 0)
+      g_trade.SetTypeFilling(ORDER_FILLING_FOK);
+   else
+      g_trade.SetTypeFilling(ORDER_FILLING_RETURN);
+   
+   Print("[INIT] Filling mode: ", fillType);
+   
+   // Estado inicial
+   g_state = STATE_IDLE;
+   g_useTP = InpUseTP;
+   
+   // UI PRIMERO — siempre visible sin importar validaciones
+   InitUI();
+   
+   // Timer de 500ms para precisión
+   EventSetMillisecondTimer(500);
+   
+   // Validaciones (no-fatales: warnings + fallback)
    if(!ValidateSymbolOrderMode())
    {
-      Print("[FATAL] Símbolo no soporta Stop-Limit. EA desactivado.");
-      return INIT_FAILED;
+      Print("[WARNING] Símbolo no soporta Stop-Limit. Usando Buy Stop / Sell Stop como fallback.");
+      g_useStopLimit = false;
+   }
+   else
+   {
+      g_useStopLimit = true;
+      Print("[INFO] Símbolo soporta Stop-Limit. Modo óptimo activado.");
    }
    
    if(!ValidateLotSize())
    {
-      Print("[FATAL] LotSize inválido. EA desactivado.");
-      return INIT_FAILED;
+      Print("[WARNING] LotSize puede no ser válido. Revise configuración.");
    }
    
    if(!ValidateStopsLevel(InpEntryDistPips))
@@ -659,25 +731,12 @@ int OnInit()
    g_eventTime = ParseEventTime(InpNewsTime);
    if(g_eventTime == 0)
    {
-      Print("[FATAL] No se pudo parsear la hora del evento.");
-      return INIT_FAILED;
+      Print("[WARNING] No se pudo parsear la hora del evento. Use formato HH:MM:SS");
    }
-   Print("[INIT] Evento programado para: ", TimeToString(g_eventTime, TIME_SECONDS));
-   
-   // Configurar CTrade
-   g_trade.SetExpertMagicNumber(InpMagicNumber);
-   g_trade.SetDeviationInPoints(50);  // Slippage amplio para noticias
-   g_trade.SetTypeFilling(ORDER_FILLING_IOC);
-   
-   // Estado inicial
-   g_state = STATE_IDLE;
-   g_useTP = InpUseTP;
-   
-   // UI
-   InitUI();
-   
-   // Timer de 500ms para precisión
-   EventSetMillisecondTimer(500);
+   else
+   {
+      Print("[INIT] Evento programado para: ", TimeToString(g_eventTime, TIME_SECONDS));
+   }
    
    Print("[INIT] EA listo. Presione ARMAR para programar el evento.");
    Print("═══════════════════════════════════════════════");
