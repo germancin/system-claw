@@ -795,28 +795,32 @@ int OnInit()
    
    Print("[INFO] Broker SYMBOL_TRADE_STOPS_LEVEL: ", stopsLevel, " points (", stopsLevel * _Point, " en precio)");
    
-   // Detectar si es crypto (Bitcoin, Ethereum, etc.)
+   // Detectar si es crypto o índice (NAS100, US30, etc.)
    string symbolUpper = _Symbol;
    StringToUpper(symbolUpper);
    bool isCrypto = (StringFind(symbolUpper, "BTC") >= 0 || 
                     StringFind(symbolUpper, "ETH") >= 0 || 
-                    StringFind(symbolUpper, "CRYPTO") >= 0 ||
-                    StringFind(symbolUpper, "XRP") >= 0 ||
-                    StringFind(symbolUpper, "LTC") >= 0);
+                    StringFind(symbolUpper, "CRYPTO") >= 0);
+   
+   bool isIndex = (StringFind(symbolUpper, "NAS") >= 0 || 
+                   StringFind(symbolUpper, "US100") >= 0 || 
+                   StringFind(symbolUpper, "US30") >= 0 || 
+                   StringFind(symbolUpper, "GER40") >= 0 ||
+                   StringFind(symbolUpper, "USTEC") >= 0);
    
    // Decisión: usar Stop-Limit SOLO si:
    // 1. El símbolo lo soporta, Y
-   // 2. NO es crypto (crypto siempre usa Stop), Y
+   // 2. NO es crypto ni índice (estos prefieren Stop normal), Y
    // 3. El stops level es bajo
    if(!symbolSupportsStopLimit)
    {
       Print("[WARNING] Símbolo no soporta Stop-Limit. Usando Buy Stop / Sell Stop como fallback.");
       g_useStopLimit = false;
    }
-   else if(isCrypto)
+   else if(isCrypto || isIndex)
    {
-      Print("[INFO] Símbolo crypto detectado (", _Symbol, "). Forzando Buy Stop / Sell Stop.");
-      Print("[INFO] Razón: Brokers crypto raramente soportan Stop-Limit correctamente.");
+      Print("[INFO] Símbolo crypto o índice detectado (", _Symbol, "). Forzando Buy Stop / Sell Stop.");
+      Print("[INFO] Razón: Mayor compatibilidad con brokers (evita 'Invalid Price').");
       g_useStopLimit = false;
    }
    else if(stopsLevel > 100)  // Si stops level > 100 points, Stop-Limit es problemático
