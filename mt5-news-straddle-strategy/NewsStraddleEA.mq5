@@ -222,49 +222,25 @@ bool PlaceStraddleOrders()
    Print("[INFO] Buy Stop-Limit: Stop=", buyStopPrice, " Limit=", buyLimitPrice);
    Print("[INFO] Sell Stop-Limit: Stop=", sellStopPrice, " Limit=", sellLimitPrice);
    
-   // Determinar tipo de orden según soporte del broker
-   ENUM_ORDER_TYPE buyType, sellType;
-   string orderMode;
+   // Determinar tipo de orden (Forzamos Stop tradicional para máxima compatibilidad)
+   ENUM_ORDER_TYPE buyType = ORDER_TYPE_BUY_STOP;
+   ENUM_ORDER_TYPE sellType = ORDER_TYPE_SELL_STOP;
    
-   if(g_useStopLimit)
-   {
-      buyType  = ORDER_TYPE_BUY_STOP_LIMIT;
-      sellType = ORDER_TYPE_SELL_STOP_LIMIT;
-      orderMode = "Stop-Limit";
-   }
-   else
-   {
-      buyType  = ORDER_TYPE_BUY_STOP;
-      sellType = ORDER_TYPE_SELL_STOP;
-      orderMode = "Stop (fallback)";
-   }
-   
-   Print("[INFO] Modo de órdenes: ", orderMode);
+   Print("[INFO] Modo de órdenes: Stop (Standard)");
    
    // --- Colocar Buy order con reintentos
    bool buyPlaced = false;
    for(int i = 0; i < MAX_RETRIES; i++)
    {
-      bool result = false;
-      
-      if(g_useStopLimit)
-      {
-         result = g_trade.OrderOpen(_Symbol, buyType, InpLotSize,
-                           buyLimitPrice, buyStopPrice, sl, tp,
-                           ORDER_TIME_GTC, 0, "NewsEA Buy");
-      }
-      else
-      {
-         // Buy Stop: solo necesita el precio de activación
-         result = g_trade.BuyStop(InpLotSize, buyStopPrice, _Symbol, sl, tp,
-                          ORDER_TIME_GTC, 0, "NewsEA Buy");
-      }
+      // Buy Stop: solo necesita el precio de activación
+      bool result = g_trade.BuyStop(InpLotSize, buyStopPrice, _Symbol, sl, tp,
+                       ORDER_TIME_GTC, 0, "NewsEA Buy");
       
       uint retcode = g_trade.ResultRetcode();
       if(retcode == TRADE_RETCODE_DONE || retcode == TRADE_RETCODE_PLACED)
       {
          g_buyOrderTicket = g_trade.ResultOrder();
-         Print("[OK] Buy ", orderMode, " colocada. Ticket: ", g_buyOrderTicket);
+         Print("[OK] Buy Stop colocada. Ticket: ", g_buyOrderTicket);
          buyPlaced = true;
          break;
       }
@@ -288,26 +264,15 @@ bool PlaceStraddleOrders()
    bool sellPlaced = false;
    for(int i = 0; i < MAX_RETRIES; i++)
    {
-      bool result = false;
-      
-      if(g_useStopLimit)
-      {
-         result = g_trade.OrderOpen(_Symbol, sellType, InpLotSize,
-                           sellLimitPrice, sellStopPrice, sl, tp,
-                           ORDER_TIME_GTC, 0, "NewsEA Sell");
-      }
-      else
-      {
-         // Sell Stop: solo necesita el precio de activación
-         result = g_trade.SellStop(InpLotSize, sellStopPrice, _Symbol, sl, tp,
-                           ORDER_TIME_GTC, 0, "NewsEA Sell");
-      }
+      // Sell Stop: solo necesita el precio de activación
+      bool result = g_trade.SellStop(InpLotSize, sellStopPrice, _Symbol, sl, tp,
+                        ORDER_TIME_GTC, 0, "NewsEA Sell");
       
       uint retcode = g_trade.ResultRetcode();
       if(retcode == TRADE_RETCODE_DONE || retcode == TRADE_RETCODE_PLACED)
       {
          g_sellOrderTicket = g_trade.ResultOrder();
-         Print("[OK] Sell ", orderMode, " colocada. Ticket: ", g_sellOrderTicket);
+         Print("[OK] Sell Stop colocada. Ticket: ", g_sellOrderTicket);
          sellPlaced = true;
          break;
       }
