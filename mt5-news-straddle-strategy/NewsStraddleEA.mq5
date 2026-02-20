@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.06       |
-//|      Update: FORCED ZERO SL UNTIL TP TOUCHED + FIX TP SEND       |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.07       |
+//|      Update: STRICT RULE - Trailing ONLY if TP is ON & TOUCHED   |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.06"
+#property version   "1.07"
 
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
@@ -28,7 +28,7 @@ CPositionInfo g_posInfo;
 COrderInfo g_orderInfo;
 datetime g_eventTime = 0; ulong g_buyOrderTicket = 0; ulong g_sellOrderTicket = 0; ulong g_positionTicket = 0;
 bool g_useTP = false; double g_pipFactor = 0;
-bool g_tpReached = false; // Flag crítica para saber si ya tocamos el TP una vez
+bool g_tpReached = false; 
 
 const string BG_PANEL="Bg", BTN_ARM="Arm", BTN_CANCEL="Can", BTN_TP="Tp", LBL_STATE="St", LBL_COUNT="Co";
 
@@ -45,7 +45,6 @@ bool PlaceStraddleOrders() {
    double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK), bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
    double dist=PipsToPrice(InpEntryDistPips);
    double bS=NormalizeDouble(ask+dist,_Digits), sS=NormalizeDouble(bid-dist,_Digits);
-   // Órdenes sin SL ni TP (se ponen al abrir la posición)
    if(!g_trade.BuyStop(InpLotSize,bS,_Symbol,0,0)) return false;
    g_buyOrderTicket=g_trade.ResultOrder();
    if(!g_trade.SellStop(InpLotSize,sS,_Symbol,0,0)) { g_trade.OrderDelete(g_buyOrderTicket); return false; }
@@ -58,39 +57,44 @@ void SetTakeProfitOnly() {
    if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
    double tpD=PipsToPrice(InpTPPips), openP=g_posInfo.PriceOpen();
    double tp=(g_posInfo.PositionType()==POSITION_TYPE_BUY)?openP+tpD:openP-tpD;
-   // MANDAR EL TP SOLO. El SL se queda en 0.
    g_trade.PositionModify(g_positionTicket, 0, NormalizeDouble(tp,_Digits));
 }
 
 void ApplyTrailingStop() {
    if(g_positionTicket==0 || !g_posInfo.SelectByTicket(g_positionTicket)) return;
    
+   // --- REGLA DE ORO v1.07 ---
+   // 1. Si el botón de TP está en OFF, el Trailing Stop ESTÁ MUERTO. No hace ni verga.
+   if(!g_useTP) {
+      if(g_posInfo.StopLoss() != 0) g_trade.PositionModify(g_positionTicket, 0, 0); // Limpiar SL por si acaso
+      return;
+   }
+
    double curSL=g_posInfo.StopLoss(), openP=g_posInfo.PriceOpen(), trailD=PipsToPrice(InpTrailingPips), curTP=g_posInfo.TakeProfit();
    
-   // SI NO HAY TP DEFINIDO (BOTON OFF), NO HACEMOS NI VERGA.
+   // 2. Si el botón está en ON pero todavía no tocamos la meta (TP), el Trailing sigue muerto.
    if(curTP == 0) return; 
 
    if(g_posInfo.PositionType()==POSITION_TYPE_BUY) {
       double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
-      // REGLA: Si el precio todavía no ha llegado al TP, el SL debe seguir siendo 0.
-      if(!g_tpReached && bid >= curTP) g_tpReached = true; 
-      
-      if(!g_tpReached) {
-         if(curSL != 0) g_trade.PositionModify(g_positionTicket, 0, curTP); // FORZAR SL 0 SI EL BROKER PONE ALGO
-         return;
+      if(!g_tpReached && bid >= curTP) {
+         g_tpReached = true;
+         Print("[SISTEMA] TP Alcanzado. Activando Trailing Stop ahora.");
       }
       
-      // SOLO SI YA TOCAMOS EL TP, ACTIVAMOS TRAILING
+      if(!g_tpReached) return;
+      
+      // 3. SOLO AQUÍ SE ACTIVA EL TRAILING
       double newSL=NormalizeDouble(bid-trailD,_Digits);
       if(newSL>curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    } else {
       double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK);
-      if(!g_tpReached && ask <= curTP) g_tpReached = true;
-
-      if(!g_tpReached) {
-         if(curSL != 0) g_trade.PositionModify(g_positionTicket, 0, curTP);
-         return;
+      if(!g_tpReached && ask <= curTP) {
+         g_tpReached = true;
+         Print("[SISTEMA] TP Alcanzado. Activando Trailing Stop ahora.");
       }
+
+      if(!g_tpReached) return;
 
       double newSL=NormalizeDouble(ask+trailD,_Digits);
       if(newSL<curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
@@ -124,7 +128,7 @@ void OnTimer() { if(g_state==STATE_ARMED && TimeCurrent()>=g_eventTime-InpLeadTi
 void OnChartEvent(const int id,const long &l,const double &d,const string &s) {
    if(id==CHARTEVENT_OBJECT_CLICK) {
       if(s==BTN_ARM) { g_eventTime=ParseEventTime(InpNewsTime); g_state=STATE_ARMED; }
-      if(s==BTN_TP) { g_useTP=!g_useTP; ObjectSetString(0,BTN_TP,OBJPROP_TEXT,g_useTP?"TP ON":"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_BGCOLOR,g_useTP?C'30,100,200':clrGray); if(g_state==STATE_TRADE_ACTIVE) SetTakeProfitOnly(); }
+      if(s==BTN_TP) { g_useTP=!g_useTP; ObjectSetString(0,BTN_TP,OBJPROP_TEXT,g_useTP?"TP ON":"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_BGCOLOR,g_useTP?C'30,100,200':clrGray); if(g_state==STATE_TRADE_ACTIVE) { if(g_useTP) SetTakeProfitOnly(); else g_trade.PositionModify(g_positionTicket, 0, 0); } }
    }
 }
 void OnDeinit(const int r) { ObjectsDeleteAll(0); EventKillTimer(); }
