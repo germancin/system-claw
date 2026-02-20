@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.07       |
-//|      Update: STRICT RULE - Trailing ONLY if TP is ON & TOUCHED   |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.08       |
+//|      Update: TOTAL SL BAN. ZERO SL AT ALL TIMES UNLESS TP REACHED|
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.07"
+#property version   "1.08"
 
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
@@ -41,10 +41,13 @@ datetime ParseEventTime(string t) {
    dt.sec=(int)p.Size()>=3?(int)StringToInteger(p[2]):0; return StructToTime(dt);
 }
 
+// 1. LAS ORDENES SALEN CON CERO SL Y CERO TP
 bool PlaceStraddleOrders() {
    double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK), bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
    double dist=PipsToPrice(InpEntryDistPips);
    double bS=NormalizeDouble(ask+dist,_Digits), sS=NormalizeDouble(bid-dist,_Digits);
+   
+   // Explicitamente mandamos 0 en SL y 0 en TP en las ordenes pendientes
    if(!g_trade.BuyStop(InpLotSize,bS,_Symbol,0,0)) return false;
    g_buyOrderTicket=g_trade.ResultOrder();
    if(!g_trade.SellStop(InpLotSize,sS,_Symbol,0,0)) { g_trade.OrderDelete(g_buyOrderTicket); return false; }
@@ -52,50 +55,55 @@ bool PlaceStraddleOrders() {
    return true;
 }
 
+// 2. SOLO SE PONE TP SI EL BOTON ESTA ON. EL SL SE MANDA COMO CERO.
 void SetTakeProfitOnly() {
    if(g_positionTicket==0 || !g_useTP) return;
    if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
    double tpD=PipsToPrice(InpTPPips), openP=g_posInfo.PriceOpen();
    double tp=(g_posInfo.PositionType()==POSITION_TYPE_BUY)?openP+tpD:openP-tpD;
+   
+   // FORZAMOS SL A 0 AL MODIFICAR LA POSICION
    g_trade.PositionModify(g_positionTicket, 0, NormalizeDouble(tp,_Digits));
 }
 
 void ApplyTrailingStop() {
    if(g_positionTicket==0 || !g_posInfo.SelectByTicket(g_positionTicket)) return;
    
-   // --- REGLA DE ORO v1.07 ---
-   // 1. Si el botón de TP está en OFF, el Trailing Stop ESTÁ MUERTO. No hace ni verga.
+   // REGLA ABSOLUTA v1.08: Si TP esta OFF, nos aseguramos que el SL sea 0 y salimos.
    if(!g_useTP) {
-      if(g_posInfo.StopLoss() != 0) g_trade.PositionModify(g_positionTicket, 0, 0); // Limpiar SL por si acaso
+      if(g_posInfo.StopLoss() != 0) g_trade.PositionModify(g_positionTicket, 0, 0);
       return;
    }
 
-   double curSL=g_posInfo.StopLoss(), openP=g_posInfo.PriceOpen(), trailD=PipsToPrice(InpTrailingPips), curTP=g_posInfo.TakeProfit();
+   double curSL=g_posInfo.StopLoss(), curTP=g_posInfo.TakeProfit();
    
-   // 2. Si el botón está en ON pero todavía no tocamos la meta (TP), el Trailing sigue muerto.
-   if(curTP == 0) return; 
+   // Si el TP desaparecio pero el boton esta ON, lo reponemos con SL 0
+   if(curTP == 0) { SetTakeProfitOnly(); return; }
 
    if(g_posInfo.PositionType()==POSITION_TYPE_BUY) {
       double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
-      if(!g_tpReached && bid >= curTP) {
-         g_tpReached = true;
-         Print("[SISTEMA] TP Alcanzado. Activando Trailing Stop ahora.");
+      if(!g_tpReached && bid >= curTP) g_tpReached = true;
+      
+      // SI NO HA TOCADO EL TP, EL SL DEBE SER CERO. SI HAY ALGO, LO BORRAMOS.
+      if(!g_tpReached) {
+         if(curSL != 0) g_trade.PositionModify(g_positionTicket, 0, curTP);
+         return;
       }
       
-      if(!g_tpReached) return;
-      
-      // 3. SOLO AQUÍ SE ACTIVA EL TRAILING
+      // SOLO DESPUES DEL TP ACTIVAMOS EL TRAILING
+      double trailD=PipsToPrice(InpTrailingPips);
       double newSL=NormalizeDouble(bid-trailD,_Digits);
       if(newSL>curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    } else {
       double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK);
-      if(!g_tpReached && ask <= curTP) {
-         g_tpReached = true;
-         Print("[SISTEMA] TP Alcanzado. Activando Trailing Stop ahora.");
+      if(!g_tpReached && ask <= curTP) g_tpReached = true;
+
+      if(!g_tpReached) {
+         if(curSL != 0) g_trade.PositionModify(g_positionTicket, 0, curTP);
+         return;
       }
 
-      if(!g_tpReached) return;
-
+      double trailD=PipsToPrice(InpTrailingPips);
       double newSL=NormalizeDouble(ask+trailD,_Digits);
       if(newSL<curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    }
