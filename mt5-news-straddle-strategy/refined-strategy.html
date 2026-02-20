@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estrategia: Pre-News Stop-Limit Straddle (10s)</title>
+    <title>Estrategia: Pre-News Straddle (v1.03)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -313,39 +313,37 @@
             <i data-lucide="layout"></i> Resumen General
         </a>
         <a href="refined-strategy.html" class="active">
-            <i data-lucide="target"></i> Estrategia Refinada (10s)
+            <i data-lucide="target"></i> Estrategia Refinada (v1.03)
         </a>
         <a href="technical-prompt.html">
             <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
         </a>
-        <a href="installation-guide.html">
         <a href="how-to-use.html">
-            <i data-lucide="play-circle"></i> Cómo Usar el EA
+            <i data-lucide="book-open"></i> Cómo Usar el EA
         </a>
+        <a href="installation-guide.html">
             <i data-lucide="download"></i> Guía de Instalación
         </a>
     </div>
 
     <div class="container">
         <header>
-            <h1>Pre-News Stop-Limit Straddle</h1>
-            <p class="subtitle">Estrategia Refinada: Precisión 10s + Trailing Activo</p>
+            <h1>Pre-News Straddle v1.03</h1>
+            <p class="subtitle">Estrategia de Supervivencia: Libertad de Precio + Protección Inteligente</p>
         </header>
 
-        <section class="card">
+        <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
-                <i data-lucide="target"></i>
-                Objetivo Estratégico
+                <i data-lucide="zap"></i>
+                Filosofía v1.03: "Cero SL Inicial"
             </div>
-            <p>Capturar el impulso inicial de una noticia mediante órdenes <span class="highlight">Stop-Limit</span>
-                colocadas con precisión quirúrgica 10 segundos antes del evento, automatizando la protección de
-                ganancias sin objetivos fijos.</p>
+            <p>La noticia causa latigazos violentos. Poner un Stop Loss pegado al precio al entrar es suicidio. La v1.03 elimina el SL inicial para que el precio respire y solo activa la protección cuando el trade ya está en verde.</p>
         </section>
 
         <section class="card">
             <div class="card-title">
                 <i data-lucide="layers"></i>
-                Especificación Técnica
+                Especificación Técnica v1.03
             </div>
             <div class="table-wrapper">
                 <table>
@@ -358,138 +356,27 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="category-badge">Configuración</span></td>
-                            <td><strong>Evento Maestro</strong></td>
-                            <td>Horario exacto definido por el usuario <span class="highlight">(HH:MM:SS)</span>.
-                                Sincronización de alta precisión con el servidor MT5.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="category-badge">Timing</span></td>
-                            <td><strong>Lead Time (10s)</strong></td>
-                            <td>Colocación automática a los <span class="highlight">T-10 segundos</span>. <span
-                                    class="dim">Evita activaciones prematuras por volatilidad previa.</span></td>
-                        </tr>
-                        <tr>
                             <td><span class="category-badge">Órdenes</span></td>
-                            <td><strong>Stop-Limit (A2)</strong></td>
-                            <td>Dualidad de órdenes pendientes a distancia X pips (configurable). <span
-                                    class="dim">Control de slippage nativo mediante la arquitectura Limit.</span></td>
+                            <td><strong>Standard Stops</strong></td>
+                            <td>Forzamos <span class="highlight">Buy/Sell Stop</span>. Eliminamos Stop-Limit para garantizar ejecución 100% y evitar errores de precio.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Entrada</span></td>
+                            <td><strong>SL Fantasma</strong></td>
+                            <td>Entrada con <span class="highlight">SL = 0</span>. El precio tiene libertad total para el latigazo inicial de la noticia.</td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Gestión</span></td>
-                            <td><strong>Trailing Stop</strong></td>
-                            <td>Salida principal. El precio es seguido dinámicamente según la distancia configurada.
-                                <span class="highlight">No hay TP fijo por defecto.</span>
-                            </td>
+                            <td><strong>Smart Trailing</strong></td>
+                            <td>La línea roja de SL solo aparece cuando el precio avanza a favor <span class="highlight">> 15 pips</span>.</td>
                         </tr>
                         <tr>
-                            <td><span class="category-badge">Interacción</span></td>
-                            <td><strong>Cancelación (F)</strong></td>
-                            <td>Instante de ejecución: <span class="highlight">Eliminación inmediata</span> de la orden
-                                contraria (Pendiente) para liberar margen y riesgo.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="category-badge">Opcionales</span></td>
-                            <td><strong>Take Profit (E)</strong></td>
-                            <td>Selector <span class="highlight">ON/OFF</span>. Si está activo, utiliza valor en pips;
-                                de lo contrario, solo gestión por trailing.</td>
+                            <td><span class="category-badge">Salida</span></td>
+                            <td><strong>Independencia TP</strong></td>
+                            <td>El botón TP solo gestiona la meta de ganancia. No interfiere con el SL ni con el Trailing.</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-        </section>
-
-        <section class="card">
-            <div class="card-title">
-                <i data-lucide="cpu"></i>
-                Panel de Control (Inputs)
-            </div>
-            <ul class="summary-list">
-                <li><strong>Distancia de Entrada:</strong> Pips (Soporta decimales: 1.00, 15.00, etc.)</li>
-                <li><strong>Trailing Stop:</strong> Pips dinámicos para seguimiento de precio.</li>
-                <li><strong>Hora de Disparo:</strong> Programación 10s antes del evento noticia.</li>
-                <li><strong>Take Profit:</strong> Definición de salida fija (opcional vía toggle).</li>
-            </ul>
-        </section>
-
-        <section class="card">
-            <div class="card-title">
-                <i data-lucide="settings"></i>
-                Adaptación Automática: Nasdaq vs BTC
-            </div>
-            <p style="margin-bottom: 1.5rem;">El EA no tiene reglas hardcodeadas por instrumento. En su lugar, <span class="highlight">consulta al broker en tiempo real</span> y adapta su comportamiento automáticamente.</p>
-            
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Característica</th>
-                            <th>Nasdaq (NQ/US100)</th>
-                            <th>BTC (BTCUSD)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Tipo de Orden</strong></td>
-                            <td><span class="highlight">Stop-Limit</span> <span class="dim">(preciso, control de slippage)</span></td>
-                            <td><span class="highlight">Buy/Sell Stop</span> <span class="dim">(fallback automático)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Volumen Mínimo</strong></td>
-                            <td>0.01 lotes <span class="dim">(micro lotes permitidos)</span></td>
-                            <td>0.1 - 1.0 lotes <span class="dim">(según broker)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Distancia Mínima</strong></td>
-                            <td>~5-10 pips <span class="dim">(stops level bajo)</span></td>
-                            <td>~50-100 pips <span class="dim">(stops level alto)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Detección</strong></td>
-                            <td colspan="2"><code>SymbolInfoInteger(_Symbol, SYMBOL_ORDER_MODE)</code><br>
-                            <code>SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MIN/MAX)</code><br>
-                            <code>SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL)</code></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0, 255, 204, 0.05); border-left: 3px solid var(--accent-color); border-radius: 6px;">
-                <p style="margin-bottom: 0.5rem;"><strong>🤖 Cómo funciona la adaptación:</strong></p>
-                <ul class="summary-list">
-                    <li>El EA pregunta al broker: <em>"¿Soportas Stop-Limit?"</em> → Usa el mejor tipo disponible</li>
-                    <li>Consulta: <em>"¿Cuál es tu volumen mínimo?"</em> → Valida y muestra límites en el panel</li>
-                    <li>Verifica: <em>"¿Cuál es tu stops level?"</em> → Advierte si la distancia configurada es insuficiente</li>
-                </ul>
-                <p class="dim" style="margin-top: 0.5rem;">Esta arquitectura permite operar cualquier instrumento sin modificar código.</p>
-            </div>
-        </section>
-
-        <section class="card">
-            <div class="card-title">
-                <i data-lucide="shield-check"></i>
-                Mecanismos de Seguridad y Supervivencia
-            </div>
-            <p>El EA incluye lógica de auto-adaptación para evitar que el broker rechace órdenes durante noticias de alta volatilidad.</p>
-            
-            <div class="accordion-item" style="margin-top: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
-                <button class="accordion-header" style="width: 100%; padding: 1rem; background: var(--row-hover); border: none; color: var(--accent-color); text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600;">
-                    <i data-lucide="book-open" style="width: 18px;"></i>
-                    User Story: El Trader vs. La "Regla Secreta" del Broker
-                    <i data-lucide="chevron-down" style="margin-left: auto; width: 18px;" class="chevron-icon"></i>
-                </button>
-                <div class="accordion-content" style="padding: 0; max-height: 0; transition: max-height 0.3s ease-out; background: rgba(255,255,255,0.02); overflow: hidden;">
-                    <div style="padding: 1.5rem;">
-                        <ul class="summary-list">
-                            <li><strong>Situación:</strong> El trader quiere entrar en BTCUSD si el precio se mueve <span class="highlight">$15</span>.</li>
-                            <li><strong>El Conflicto:</strong> El broker tiene un <code>STOPS_LEVEL</code> de <span class="highlight">$50</span>. Cualquier orden a menos de $50 es rechazada inmediatamente.</li>
-                            <li><strong>Antes:</strong> El EA intentaba poner la orden a $15, el broker devolvía error <span class="dim">"Invalid Price"</span> y el EA se apagaba. El trader perdía la oportunidad.</li>
-                            <li><strong>Ahora (Supervivencia):</strong> El EA detecta el límite de $50, advierte al trader en el panel (color Rojo) y ajusta automáticamente la orden al mínimo permitido (<span class="highlight">$50 + margen</span>).</li>
-                            <li><strong>Resultado:</strong> La orden se ejecuta. El trader entra un poco más tarde, pero <strong>SÍ entra</strong> en el trade de la noticia en lugar de quedar fuera por un error técnico.</li>
-                        </ul>
-                        <p class="dim" style="margin-top: 1rem; font-style: italic;">* Nota: El trader mantiene el control visual. Si el panel está en ROJO, se recomienda ajustar los inputs manualmente hasta que cambie a VERDE.</p>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -498,38 +385,20 @@
                 <i data-lucide="mouse-pointer-2"></i>
                 Interfaz del Gráfico (UI)
             </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <span class="category-badge" style="background: var(--success); color: white;">ARMAR</span>
-                <span class="category-badge" style="background: #cf222e; color: white;">CANCELAR</span>
-                <span class="category-badge">TP ON/OFF</span>
-            </div>
-            <p class="dim" style="margin-top: 1rem;">Estado actual visible: Armado / Esperando / Trade Activo / Orden
-                Eliminada.</p>
+            <ul class="summary-list">
+                <li><strong>▶ ARMAR:</strong> Sincroniza y espera a T-10s.</li>
+                <li><strong>■ CANCELAR:</strong> Limpieza total de órdenes y posiciones.</li>
+                <li><strong>TP ON/OFF:</strong> Activa/Desactiva la meta de salida fija.</li>
+            </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | El Board</p>
+            <p>&copy; 2026 MT5 Strategy Spec | El Board v1.03</p>
         </footer>
     </div>
 
     <script>
         lucide.createIcons();
-
-        // Accordion Logic
-        const accordionHeader = document.querySelector('.accordion-header');
-        const accordionContent = document.querySelector('.accordion-content');
-        const chevron = document.querySelector('.chevron-icon');
-
-        accordionHeader.addEventListener('click', () => {
-            const isOpen = accordionContent.style.maxHeight !== '0px' && accordionContent.style.maxHeight !== '';
-            if (isOpen) {
-                accordionContent.style.maxHeight = '0px';
-                chevron.style.transform = 'rotate(0deg)';
-            } else {
-                accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
-                chevron.style.transform = 'rotate(180deg)';
-            }
-        });
 
         const menuToggle = document.getElementById('menuToggle');
         const menuOverlay = document.getElementById('menuOverlay');
@@ -545,7 +414,6 @@
             lucide.createIcons();
         });
 
-        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!menuOverlay.contains(e.target) && !menuToggle.contains(e.target) && menuOverlay.classList.contains('active')) {
                 menuOverlay.classList.remove('active');

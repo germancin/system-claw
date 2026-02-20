@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cómo Usar: NewsStraddleEA</title>
+    <title>Cómo Usar: NewsStraddleEA v1.03</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -429,9 +429,23 @@
 
     <div class="container">
         <header>
-            <h1>Cómo Usar el EA</h1>
-            <p class="subtitle">Guía paso a paso para operar con NewsStraddleEA en Nasdaq y BTCUSD</p>
+            <h1>Cómo Usar el EA v1.03</h1>
+            <p class="subtitle">Guía definitiva para operar noticias sin errores de precio ni sacadas falsas</p>
         </header>
+
+        <!-- NOVEDADES V1.03 -->
+        <section class="card" style="border: 2px solid var(--accent-color);">
+            <div class="card-title">
+                <i data-lucide="shield-check"></i>
+                Novedades Críticas v1.03 (Protección de Latigazo)
+            </div>
+            <p style="margin-bottom: 1rem;">Hemos actualizado el EA para que sea más robusto contra la volatilidad extrema inicial de las noticias.</p>
+            <ul class="summary-list">
+                <li><span class="highlight">SL Inicial Cero:</span> Al entrar al mercado, el EA NO pone Stop Loss. Esto evita que el latigazo inicial te saque en pérdida antes de que el movimiento real empiece.</li>
+                <li><span class="highlight">Trailing "Headroom":</span> La línea roja (SL) solo aparece cuando ya vas ganando terreno.</li>
+                <li><span class="highlight">Adiós al "Invalid Price":</span> Forzamos órdenes Stop estándar para que funcionen 100% en Nasdaq y Crypto.</li>
+            </ul>
+        </section>
 
         <!-- QUICK START -->
         <section class="card">
@@ -442,25 +456,22 @@
             <div class="step-item">
                 <div class="step-number">1</div>
                 <div class="step-content">
-                    <h3>Carga el EA en el gráfico</h3>
-                    <p>Arrastra <code>NewsStraddleEA</code> desde el Navigator al gráfico del símbolo que quieras operar
-                        (Nasdaq o BTCUSD). Configura los inputs según la tabla de abajo.</p>
+                    <h3>Carga el EA y Configura</h3>
+                    <p>Arrastra <code>NewsStraddleEA</code> al gráfico. Configura <code>InpNewsTime</code> con la hora exacta de la noticia (Hora del Servidor).</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">2</div>
                 <div class="step-content">
                     <h3>Presiona ▶ ARMAR</h3>
-                    <p>El EA entra en modo <span class="highlight">ARMED</span> y espera automáticamente hasta T-10
-                        segundos antes de la hora configurada. Verás un countdown en el panel.</p>
+                    <p>El EA entra en modo <span class="highlight">ARMED</span>. Verás el contador ⏱ T-MM:SS. El EA pondrá las trampas a T-10 segundos.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">3</div>
                 <div class="step-content">
-                    <h3>El EA hace el resto</h3>
-                    <p>Coloca las órdenes automáticamente → detecta ejecución → activa trailing stop → elimina la orden
-                        contraria. Tú solo observas.</p>
+                    <h3>Deja que el precio respire</h3>
+                    <p>Al entrar, no verás Stop Loss. No te asustes. El EA espera a que el precio corra a tu favor para poner la protección automáticamente.</p>
                 </div>
             </div>
         </section>
@@ -469,138 +480,58 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="settings"></i>
-                Configuración Recomendada por Instrumento
+                Configuración v1.03
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>Parámetro</th>
-                            <th>Nasdaq (NQ/US100/NAS100)</th>
-                            <th>BTCUSD (Bitcoin)</th>
+                            <th>Nasdaq (NQ)</th>
+                            <th>BTCUSD</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Distancia de entrada</strong></td>
-                            <td><span class="highlight">15.0</span> pips <span class="dim">(≈ $15 en precio)</span></td>
-                            <td><span class="highlight">5000.0</span> pips <span class="dim">(≈ $50 en precio)</span>
-                            </td>
+                            <td><strong>Distancia Entrada</strong></td>
+                            <td><span class="highlight">15.0</span> pips</td>
+                            <td><span class="highlight">5000.0</span> pips</td>
                         </tr>
                         <tr>
                             <td><strong>Trailing Stop</strong></td>
-                            <td><span class="highlight">5.0</span> pips</td>
-                            <td><span class="highlight">2000.0</span> pips <span class="dim">(≈ $20)</span></td>
+                            <td><span class="highlight">15.0</span> pips <span class="dim">(Mínimo sugerido)</span></td>
+                            <td><span class="highlight">2000.0</span> pips</td>
                         </tr>
                         <tr>
-                            <td><strong>Tamaño de lote</strong></td>
-                            <td><span class="highlight">0.01</span> <span class="dim">(micro lote)</span></td>
-                            <td><span class="highlight">0.1</span> <span class="dim">(mínimo en la mayoría de
-                                    brokers)</span></td>
+                            <td><strong>Botón TP</strong></td>
+                            <td><span class="category-badge">OFF</span> <span class="dim">(Dejar correr)</span></td>
+                            <td><span class="category-badge">OFF</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Take Profit</strong></td>
-                            <td>OFF <span class="dim">(trailing gestiona la salida)</span></td>
-                            <td>OFF <span class="dim">(trailing gestiona la salida)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Lead Time</strong></td>
-                            <td>10 segundos</td>
-                            <td>10 segundos</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Tipo de orden (automático)</strong></td>
-                            <td><span class="category-badge"
-                                    style="background: var(--success); color: white;">Stop-Limit</span></td>
-                            <td><span class="category-badge" style="background: #cf222e; color: white;">Buy/Sell Stop
-                                    (Fallback)</span></td>
+                            <td><strong>Tipo de Orden</strong></td>
+                            <td><span class="highlight">Buy/Sell Stop</span></td>
+                            <td><span class="highlight">Buy/Sell Stop</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
-            <div class="warning-box">
-                <i data-lucide="alert-triangle"></i>
-                <span><strong>Importante:</strong> El EA detecta automáticamente el volumen mínimo y el stops level de
-                    tu broker. Si tu configuración es inválida, el panel lo mostrará en <strong
-                        style="color: #ff7b72;">ROJO</strong>. Ajusta los inputs hasta que se ponga en <strong
-                        style="color: #7ee787;">VERDE</strong>.</span>
-            </div>
         </section>
 
-        <!-- DIFERENCIA CRÍTICA: NASDAQ vs BTC -->
+        <!-- GESTIÓN DE SALIDAS -->
         <section class="card">
             <div class="card-title">
-                <i data-lucide="alert-circle"></i>
-                Diferencia Crítica: Nasdaq vs BTCUSD
+                <i data-lucide="external-link"></i>
+                Gestión de Salidas (TP vs Trailing)
             </div>
-            <p style="margin-bottom: 1rem;">El EA se comporta de forma diferente según el instrumento. Esto es
-                <strong>automático</strong> — no necesitas configurar nada, pero es importante entender por qué.</p>
-
+            
             <div class="info-box">
-                <p><strong>🟢 Nasdaq (NQ/US100) → Usa órdenes Stop-Limit</strong></p>
-                <p class="dim" style="margin-top: 0.5rem;">Una orden <strong>Stop-Limit</strong> le dice al broker:
-                    <em>"Si el precio llega a 18,000, pon una orden de compra, pero SOLO si el precio es 18,000 o
-                        mejor"</em>.</p>
-                <ul class="summary-list" style="margin-top: 0.5rem;">
-                    <li><strong>Ventaja:</strong> Control total del precio. No pagas más de lo que quieres.</li>
-                    <li><strong>Riesgo:</strong> Si el precio salta muy rápido, la orden puede no ejecutarse.</li>
-                    <li><strong>Ideal para:</strong> Nasdaq, que es líquido y ordenado.</li>
-                </ul>
+                <p><strong>🛡️ Trailing Stop (Automático):</strong></p>
+                <p class="dim">Es tu guardaespaldas. Solo aparece cuando vas ganando. Si el Nasdaq sube 50 puntos y luego cae 15, el Trailing te saca con 35 puntos de ganancia.</p>
             </div>
 
-            <div class="danger-box" style="margin-top: 1.5rem;">
-                <p><strong>🔴 BTCUSD (Bitcoin) → Usa órdenes Buy/Sell Stop</strong></p>
-                <p style="margin-top: 0.5rem; color: var(--text-main);">Una orden <strong>Stop</strong> le dice al
-                    broker: <em>"Si el precio llega a $70,000, cómprame A LO QUE SEA"</em>.</p>
-                <ul class="summary-list" style="margin-top: 0.5rem;">
-                    <li><strong>Por qué no Stop-Limit:</strong> Los brokers de crypto <strong>no soportan</strong>
-                        Stop-Limit correctamente. El broker reporta que sí, pero luego rechaza la orden con "Invalid
-                        Price".</li>
-                    <li><strong>Riesgo:</strong> Slippage — puedes entrar a un precio ligeramente diferente al esperado.
-                    </li>
-                    <li><strong>Ventaja:</strong> La orden SIEMPRE se ejecuta. No te quedas fuera del trade.</li>
-                </ul>
-            </div>
-
-            <!-- Collapsible: User Story -->
-            <div class="accordion-item">
-                <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <i data-lucide="book-open" style="width: 18px;"></i>
-                    User Story: ¿Por qué BTC no acepta Stop-Limit?
-                    <i data-lucide="chevron-down" style="margin-left: auto; width: 18px;" class="chevron-icon"></i>
-                </button>
-                <div class="accordion-content">
-                    <div style="padding: 1.5rem;">
-                        <p style="margin-bottom: 1rem;">Imagina que el precio de BTC es un <strong>tren bala</strong>
-                            que viene a toda velocidad durante una noticia.</p>
-
-                        <p><strong>Con Stop-Limit (lo que intenta hacer):</strong></p>
-                        <p class="dim">Le dices al broker: "Si BTC llega a $70,000, cómprame pero SOLO a $70,000 o
-                            mejor". El tren pasa por $70,000 y en 1 milisegundo ya está en $70,100. Tu orden se queda
-                            esperando un tren que ya se fue. <strong>Resultado: No entras.</strong></p>
-
-                        <p style="margin-top: 1rem;"><strong>Con Buy Stop (lo que realmente hace):</strong></p>
-                        <p class="dim">Le dices al broker: "Si BTC llega a $70,000, cómprame YA". El tren pasa por
-                            $70,000 y te sube aunque esté en $70,050. Pagaste $50 extra, pero <strong>estás dentro del
-                                trade</strong>.</p>
-
-                        <p style="margin-top: 1rem;"><strong>El problema técnico:</strong></p>
-                        <ul class="summary-list">
-                            <li>El broker reporta <code>SYMBOL_TRADE_STOPS_LEVEL = 5</code> (muy bajo), sugiriendo que
-                                Stop-Limit debería funcionar.</li>
-                            <li>PERO internamente, el broker rechaza la orden con <strong>"Invalid Price"</strong>.</li>
-                            <li>El EA detecta que es un símbolo crypto (BTC, ETH, XRP, LTC) y <strong>automáticamente
-                                    usa Buy/Sell Stop</strong> para evitar este error.</li>
-                        </ul>
-
-                        <div class="warning-box" style="margin-top: 1rem;">
-                            <i data-lucide="info"></i>
-                            <span>No necesitas hacer nada. El EA se adapta solo. Solo recuerda que en BTC puedes tener
-                                slippage, lo cual es normal en noticias.</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="info-box" style="margin-top: 1rem; border-left-color: #30669e;">
+                <p><strong>🎯 Take Profit (Botón TP):</strong></p>
+                <p class="dim">Si lo pones en <span class="highlight">ON</span>, el EA pone una meta fija (ej. 30 pips). Úsalo solo si tienes un objetivo claro de ganancia rápida y no quieres arriesgarte a un retroceso.</p>
             </div>
         </section>
 
@@ -608,123 +539,31 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="monitor"></i>
-                Guía del Panel (UI en el Gráfico)
+                Guía del Panel
             </div>
-            <p style="margin-bottom: 1.5rem;">El EA muestra un panel en la esquina superior izquierda del gráfico con
-                toda la información en tiempo real.</p>
-
-            <div class="step-item">
-                <div class="step-number"
-                    style="background: var(--success); border-color: var(--success); color: white;">▶</div>
-                <div class="step-content">
-                    <h3>Botón ARMAR</h3>
-                    <p>Programa el evento. El EA entra en modo ARMED y espera hasta T-10 segundos antes de la hora
-                        configurada. Solo funciona en estado IDLE o DONE.</p>
-                </div>
-            </div>
-
-            <div class="step-item">
-                <div class="step-number" style="background: var(--danger); border-color: var(--danger); color: white;">■
-                </div>
-                <div class="step-content">
-                    <h3>Botón CANCELAR</h3>
-                    <p>Detiene todo inmediatamente. Elimina órdenes pendientes, desarma el EA y regresa a IDLE. Funciona
-                        desde cualquier estado.</p>
-                </div>
-            </div>
-
-            <div class="step-item">
-                <div class="step-number" style="background: #30669e; border-color: #30669e; color: white;">TP</div>
-                <div class="step-content">
-                    <h3>Botón TP ON/OFF</h3>
-                    <p>Toggle para activar/desactivar el Take Profit fijo. Si se activa durante un trade activo, aplica
-                        el TP inmediatamente. Si se desactiva, lo remueve.</p>
-                </div>
-            </div>
-
-            <h3 style="color: var(--accent-color); margin-top: 1.5rem; margin-bottom: 1rem;">Indicadores del Panel</h3>
             <ul class="summary-list">
-                <li><strong>Estado:</strong> IDLE → ARMED → ORDERS PLACED → TRADE ACTIVE → DONE</li>
-                <li><strong>Countdown:</strong> Muestra <code>⏱ T-MM:SS</code> cuando está en ARMED</li>
-                <li><strong>P/L:</strong> Muestra ganancia/pérdida en tiempo real durante TRADE ACTIVE</li>
-                <li><strong>Broker Min lot:</strong> <span style="color: #7ee787;">Verde</span> = tu lote es válido |
-                    <span style="color: #ff7b72;">Rojo</span> = lote inválido</li>
-                <li><strong>Stops Level:</strong> <span style="color: #7ee787;">Verde</span> = distancia suficiente |
-                    <span style="color: #ff7b72;">Rojo</span> = distancia insuficiente</li>
+                <li><strong>Estado:</strong> IDLE → ARMED → ORDERS PLACED → TRADE ACTIVE</li>
+                <li><strong>Botón ARMAR:</strong> Activa el contador para la noticia.</li>
+                <li><strong>Botón CANCELAR:</strong> Borra todo y vuelve a la seguridad.</li>
+                <li><strong>Botón TP:</strong> Cambia entre "Dejar Correr" o "Meta Fija".</li>
             </ul>
-        </section>
-
-        <!-- STATE MACHINE -->
-        <section class="card">
-            <div class="card-title">
-                <i data-lucide="git-branch"></i>
-                Ciclo de Vida del EA (State Machine)
-            </div>
-
-            <div class="step-item">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h3>IDLE — Esperando</h3>
-                    <p>El EA está cargado pero no hace nada. Espera que presiones <strong>▶ ARMAR</strong>.</p>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h3>ARMED — Programado</h3>
-                    <p>El EA cuenta regresivamente hasta T-10s antes de la noticia. Si la hora ya pasó, reprograma para
-                        el día siguiente.</p>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h3>ORDERS PLACED — Órdenes Colocadas</h3>
-                    <p>Se colocaron Buy Stop y Sell Stop (o Stop-Limit en Nasdaq). El EA monitorea cuál se ejecuta
-                        primero.</p>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-number">4</div>
-                <div class="step-content">
-                    <h3>TRADE ACTIVE — Trade en Curso</h3>
-                    <p>Una orden se ejecutó. La contraria fue eliminada. El <strong>Trailing Stop</strong> se activa
-                        inmediatamente y sigue el precio en cada tick.</p>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-number">5</div>
-                <div class="step-content">
-                    <h3>DONE — Completado</h3>
-                    <p>La posición se cerró (por trailing, TP, o manualmente). El EA está listo para ser armado de
-                        nuevo.</p>
-                </div>
-            </div>
         </section>
 
         <!-- TIPS -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="lightbulb"></i>
-                Tips y Mejores Prácticas
+                Tips de "El Board"
             </div>
             <ul class="summary-list">
-                <li><strong>Prueba en demo primero.</strong> Siempre verifica que tu broker acepta las órdenes antes de
-                    usar dinero real.</li>
-                <li><strong>Verifica los indicadores del panel.</strong> Si algo está en ROJO, ajústalo antes de armar.
-                </li>
-                <li><strong>No interfieras durante TRADE ACTIVE.</strong> El trailing stop maneja la salida. Si cierras
-                    manualmente, el EA detectará que la posición se cerró.</li>
-                <li><strong>En BTC, espera más slippage.</strong> Es normal durante noticias. El trailing se adapta
-                    automáticamente.</li>
-                <li><strong>Usa la hora del SERVIDOR, no tu hora local.</strong> Verifica la hora del servidor MT5 en la
-                    esquina superior derecha del gráfico.</li>
-                <li><strong>Algo Trading debe estar en VERDE.</strong> Si está en rojo, el EA no puede operar.</li>
+                <li><strong>No uses Trailing < 10 pips:</strong> El Nasdaq es muy volátil y te sacará en breakeven antes de tiempo.</li>
+                <li><strong>Hora del Servidor:</strong> Asegúrate de que <code>InpNewsTime</code> coincida con el reloj de tu MT5.</li>
+                <li><strong>Noticias de alto impacto:</strong> Como el PCE de hoy, el latigazo inicial es normal. Confía en el "SL Inicial Cero".</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | El Board</p>
+            <p>&copy; 2026 MT5 Strategy Spec | El Board v1.03</p>
         </footer>
     </div>
 
