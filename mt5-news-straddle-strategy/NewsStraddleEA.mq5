@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.05       |
-//|      Update: Trailing ONLY activates AFTER price hits TP level   |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.06       |
+//|      Update: FORCED ZERO SL UNTIL TP TOUCHED + FIX TP SEND       |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.05"
+#property version   "1.06"
 
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
@@ -28,6 +28,7 @@ CPositionInfo g_posInfo;
 COrderInfo g_orderInfo;
 datetime g_eventTime = 0; ulong g_buyOrderTicket = 0; ulong g_sellOrderTicket = 0; ulong g_positionTicket = 0;
 bool g_useTP = false; double g_pipFactor = 0;
+bool g_tpReached = false; // Flag crítica para saber si ya tocamos el TP una vez
 
 const string BG_PANEL="Bg", BTN_ARM="Arm", BTN_CANCEL="Can", BTN_TP="Tp", LBL_STATE="St", LBL_COUNT="Co";
 
@@ -44,6 +45,7 @@ bool PlaceStraddleOrders() {
    double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK), bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
    double dist=PipsToPrice(InpEntryDistPips);
    double bS=NormalizeDouble(ask+dist,_Digits), sS=NormalizeDouble(bid-dist,_Digits);
+   // Órdenes sin SL ni TP (se ponen al abrir la posición)
    if(!g_trade.BuyStop(InpLotSize,bS,_Symbol,0,0)) return false;
    g_buyOrderTicket=g_trade.ResultOrder();
    if(!g_trade.SellStop(InpLotSize,sS,_Symbol,0,0)) { g_trade.OrderDelete(g_buyOrderTicket); return false; }
@@ -56,7 +58,8 @@ void SetTakeProfitOnly() {
    if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
    double tpD=PipsToPrice(InpTPPips), openP=g_posInfo.PriceOpen();
    double tp=(g_posInfo.PositionType()==POSITION_TYPE_BUY)?openP+tpD:openP-tpD;
-   g_trade.PositionModify(g_positionTicket, g_posInfo.StopLoss(), NormalizeDouble(tp,_Digits));
+   // MANDAR EL TP SOLO. El SL se queda en 0.
+   g_trade.PositionModify(g_positionTicket, 0, NormalizeDouble(tp,_Digits));
 }
 
 void ApplyTrailingStop() {
@@ -64,19 +67,31 @@ void ApplyTrailingStop() {
    
    double curSL=g_posInfo.StopLoss(), openP=g_posInfo.PriceOpen(), trailD=PipsToPrice(InpTrailingPips), curTP=g_posInfo.TakeProfit();
    
-   // LA REGLA CHUCHA: Solo se activa si el precio toca o supera el nivel del Take Profit
-   if(curTP == 0) return; // Si no hay TP definido, no hay trailing según tu regla
+   // SI NO HAY TP DEFINIDO (BOTON OFF), NO HACEMOS NI VERGA.
+   if(curTP == 0) return; 
 
    if(g_posInfo.PositionType()==POSITION_TYPE_BUY) {
       double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
-      if(bid < curTP) return; // SI NO TOCA EL TP, NO PONEMOS NI VERGA
+      // REGLA: Si el precio todavía no ha llegado al TP, el SL debe seguir siendo 0.
+      if(!g_tpReached && bid >= curTP) g_tpReached = true; 
       
+      if(!g_tpReached) {
+         if(curSL != 0) g_trade.PositionModify(g_positionTicket, 0, curTP); // FORZAR SL 0 SI EL BROKER PONE ALGO
+         return;
+      }
+      
+      // SOLO SI YA TOCAMOS EL TP, ACTIVAMOS TRAILING
       double newSL=NormalizeDouble(bid-trailD,_Digits);
       if(newSL>curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    } else {
       double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK);
-      if(ask > curTP) return; // SI NO TOCA EL TP, NO PONEMOS NI VERGA
-      
+      if(!g_tpReached && ask <= curTP) g_tpReached = true;
+
+      if(!g_tpReached) {
+         if(curSL != 0) g_trade.PositionModify(g_positionTicket, 0, curTP);
+         return;
+      }
+
       double newSL=NormalizeDouble(ask+trailD,_Digits);
       if(newSL<curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    }
@@ -95,14 +110,14 @@ int OnInit() { InitPipFactor(); g_trade.SetExpertMagicNumber(InpMagicNumber); g_
 void OnTick() {
    if(g_state==STATE_ORDERS_PLACED) {
       for(int i=PositionsTotal()-1;i>=0;i--) if(g_posInfo.SelectByIndex(i) && g_posInfo.Magic()==InpMagicNumber) {
-         g_positionTicket=g_posInfo.Ticket(); g_state=STATE_TRADE_ACTIVE;
+         g_positionTicket=g_posInfo.Ticket(); g_state=STATE_TRADE_ACTIVE; g_tpReached = false;
          if(g_posInfo.PositionType()==POSITION_TYPE_BUY) g_trade.OrderDelete(g_sellOrderTicket); else g_trade.OrderDelete(g_buyOrderTicket);
          if(g_useTP) SetTakeProfitOnly();
       }
    }
    if(g_state==STATE_TRADE_ACTIVE) {
       if(g_posInfo.SelectByTicket(g_positionTicket)) ApplyTrailingStop();
-      else { g_state=STATE_IDLE; g_positionTicket=0; }
+      else { g_state=STATE_IDLE; g_positionTicket=0; g_tpReached = false; }
    }
 }
 void OnTimer() { if(g_state==STATE_ARMED && TimeCurrent()>=g_eventTime-InpLeadTimeSeconds) { if(PlaceStraddleOrders()) g_state=STATE_ORDERS_PLACED; else g_state=STATE_IDLE; } }
