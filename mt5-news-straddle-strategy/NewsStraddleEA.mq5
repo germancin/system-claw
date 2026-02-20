@@ -1,6 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|                    Pre-News Stop-Limit Straddle (10s) + Trailing |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.01       |
+//|      Update: Forced Buy/Sell Stop for Nasdaq/BTC compatibility   |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
