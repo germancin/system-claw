@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.03       |
-//|      Update: Removed SL from TP logic + Zero Initial SL          |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.04       |
+//|      Update: Fixed TP visibility + Persistent TP logic           |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.03"
+#property version   "1.04"
 
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
@@ -56,23 +56,31 @@ void SetTakeProfitOnly() {
    if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
    double tpD=PipsToPrice(InpTPPips), openP=g_posInfo.PriceOpen();
    double tp=(g_posInfo.PositionType()==POSITION_TYPE_BUY)?openP+tpD:openP-tpD;
-   // IMPORTANTE: Solo modificamos TP, dejamos el SL como esté (0 o lo que diga el Trailing)
-   g_trade.PositionModify(g_positionTicket, g_posInfo.StopLoss(), NormalizeDouble(tp,_Digits));
+   // IMPORTANTE: Asegurar que el TP se envíe correctamente al broker
+   if(!g_trade.PositionModify(g_positionTicket, g_posInfo.StopLoss(), NormalizeDouble(tp,_Digits))) {
+      Print("[ERROR] No se pudo poner el TP: ", g_trade.ResultRetcodeDescription());
+   } else {
+      Print("[OK] TP puesto en: ", tp);
+   }
 }
 
 void ApplyTrailingStop() {
    if(g_positionTicket==0 || !g_posInfo.SelectByTicket(g_positionTicket)) return;
-   double curSL=g_posInfo.StopLoss(), openP=g_posInfo.PriceOpen(), trailD=PipsToPrice(InpTrailingPips), newSL=0;
+   double curSL=g_posInfo.StopLoss(), openP=g_posInfo.PriceOpen(), trailD=PipsToPrice(InpTrailingPips), curTP=g_posInfo.TakeProfit(), newSL=0;
+   
+   // Si el TP desapareció y debería estar puesto, lo reponemos
+   if(g_useTP && curTP == 0) SetTakeProfitOnly();
+
    if(g_posInfo.PositionType()==POSITION_TYPE_BUY) {
       double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
-      if(bid < openP + trailD) return; // Esperar a que el precio avance para poner SL
+      if(bid < openP + trailD) return; 
       newSL=NormalizeDouble(bid-trailD,_Digits);
-      if(newSL>curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, g_posInfo.TakeProfit());
+      if(newSL>curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    } else {
       double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK);
       if(ask > openP - trailD) return;
       newSL=NormalizeDouble(ask+trailD,_Digits);
-      if(newSL<curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, g_posInfo.TakeProfit());
+      if(newSL<curSL || curSL==0) g_trade.PositionModify(g_positionTicket, newSL, curTP);
    }
 }
 
@@ -81,11 +89,12 @@ void InitUI() {
    ObjectSetInteger(0,BG_PANEL,OBJPROP_BGCOLOR,C'25,25,35'); ObjectSetInteger(0,BG_PANEL,OBJPROP_XDISTANCE,20); ObjectSetInteger(0,BG_PANEL,OBJPROP_YDISTANCE,40);
    ObjectCreate(0,BTN_ARM,OBJ_BUTTON,0,0,0); ObjectSetString(0,BTN_ARM,OBJPROP_TEXT,"▶ ARMAR"); ObjectSetInteger(0,BTN_ARM,OBJPROP_XDISTANCE,30); ObjectSetInteger(0,BTN_ARM,OBJPROP_YDISTANCE,50);
    ObjectSetInteger(0,BTN_ARM,OBJPROP_XSIZE,100); ObjectSetInteger(0,BTN_ARM,OBJPROP_YSIZE,30);
-   ObjectCreate(0,BTN_TP,OBJ_BUTTON,0,0,0); ObjectSetString(0,BTN_TP,OBJPROP_TEXT,"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_XDISTANCE,240); ObjectSetInteger(0,BTN_TP,OBJPROP_YDISTANCE,50);
+   ObjectCreate(0,BTN_TP,OBJ_BUTTON,0,0,0); ObjectSetString(0,BTN_TP,OBJPROP_TEXT,InpUseTP?"TP ON":"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_XDISTANCE,240); ObjectSetInteger(0,BTN_TP,OBJPROP_YDISTANCE,50);
    ObjectSetInteger(0,BTN_TP,OBJPROP_XSIZE,80); ObjectSetInteger(0,BTN_TP,OBJPROP_YSIZE,30);
+   if(InpUseTP) { g_useTP=true; ObjectSetInteger(0,BTN_TP,OBJPROP_BGCOLOR,C'30,100,200'); }
 }
 
-int OnInit() { InitPipFactor(); g_trade.SetExpertMagicNumber(InpMagicNumber); InitUI(); EventSetMillisecondTimer(500); return INIT_SUCCEEDED; }
+int OnInit() { InitPipFactor(); g_trade.SetExpertMagicNumber(InpMagicNumber); g_useTP=InpUseTP; InitUI(); EventSetMillisecondTimer(500); return INIT_SUCCEEDED; }
 void OnTick() {
    if(g_state==STATE_ORDERS_PLACED) {
       for(int i=PositionsTotal()-1;i>=0;i--) if(g_posInfo.SelectByIndex(i) && g_posInfo.Magic()==InpMagicNumber) {
@@ -103,7 +112,7 @@ void OnTimer() { if(g_state==STATE_ARMED && TimeCurrent()>=g_eventTime-InpLeadTi
 void OnChartEvent(const int id,const long &l,const double &d,const string &s) {
    if(id==CHARTEVENT_OBJECT_CLICK) {
       if(s==BTN_ARM) { g_eventTime=ParseEventTime(InpNewsTime); g_state=STATE_ARMED; }
-      if(s==BTN_TP) { g_useTP=!g_useTP; ObjectSetString(0,BTN_TP,OBJPROP_TEXT,g_useTP?"TP ON":"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_BGCOLOR,g_useTP?C'30,100,200':clrGray); }
+      if(s==BTN_TP) { g_useTP=!g_useTP; ObjectSetString(0,BTN_TP,OBJPROP_TEXT,g_useTP?"TP ON":"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_BGCOLOR,g_useTP?C'30,100,200':clrGray); if(g_state==STATE_TRADE_ACTIVE) SetTakeProfitOnly(); }
    }
 }
 void OnDeinit(const int r) { ObjectsDeleteAll(0,"NewsEA"); EventKillTimer(); }
