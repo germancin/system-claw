@@ -35,7 +35,5 @@ void SetVirtualTP()
    double tp     = (g_posInfo.PositionType() == POSITION_TYPE_BUY) ? openP + tpD : openP - tpD;
    g_virtualTP   = NormalizeDouble(tp, _Digits);
 
-   // Dibujar línea verde en el chart (NO mandar al broker)
-   DrawVirtualTP(g_virtualTP);
-   Print("[VIRTUAL TP] Línea dibujada en ", g_virtualTP);
+   Print("[VIRTUAL TP] Calculado en ", g_virtualTP, " (solo monitoreo interno, sin línea)");
 }

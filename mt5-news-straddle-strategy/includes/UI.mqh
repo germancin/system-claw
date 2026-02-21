@@ -94,23 +94,6 @@ void UpdateUI()
    ChartRedraw();
 }
 
-void DrawVirtualTP(double price)
-{
-   ObjectDelete(0, LINE_VIRTUAL_TP);
-   ObjectCreate(0, LINE_VIRTUAL_TP, OBJ_HLINE, 0, 0, price);
-   ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_COLOR, clrLime);
-   ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_STYLE, STYLE_DASHDOT);
-   ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_WIDTH, 2);
-   ObjectSetString(0, LINE_VIRTUAL_TP, OBJPROP_TEXT, "Virtual TP");
-   ChartRedraw();
-}
-
-void DeleteVirtualTP()
-{
-   ObjectDelete(0, LINE_VIRTUAL_TP);
-   ChartRedraw();
-}
-
 void CleanupUI()
 {
    ObjectDelete(0, BG_PANEL);
@@ -121,5 +104,4 @@ void CleanupUI()
    ObjectDelete(0, "NewsEA_Event");
    ObjectDelete(0, "NewsEA_Params");
    ObjectDelete(0, "NewsEA_Rule");
-   DeleteVirtualTP();
 }

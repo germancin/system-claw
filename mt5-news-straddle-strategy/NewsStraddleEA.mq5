@@ -140,9 +140,6 @@ void OnChartEvent(const int id, const long &l, const double &d, const string &s)
       g_sellOrderTicket = 0;
       g_virtualTP = 0;
       
-      // Borrar línea TP Virtual
-      DeleteVirtualTP();
-      
       Print("[CANCEL] Todo cancelado y reseteado");
    }
 }

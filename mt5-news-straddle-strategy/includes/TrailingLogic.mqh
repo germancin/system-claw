@@ -35,9 +35,6 @@ void ManageTrade()
             
             g_trade.PositionModify(g_positionTicket, breakeven, 0);
             Print("[VIRTUAL TP] Tocado en BUY. SL en breakeven+buffer: ", breakeven);
-            
-            // Cambiar línea a amarillo para indicar que se activó
-            ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_COLOR, clrYellow);
          }
       }
       else  // SELL
@@ -54,8 +51,6 @@ void ManageTrade()
             
             g_trade.PositionModify(g_positionTicket, breakeven, 0);
             Print("[VIRTUAL TP] Tocado en SELL. SL en breakeven-buffer: ", breakeven);
-            
-            ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_COLOR, clrYellow);
          }
       }
       
