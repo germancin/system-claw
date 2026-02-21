@@ -1,12 +1,13 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.08       |
-//|      Update: NUCLEAR SL BAN + Filling Mode Fix + Forced SL=0    |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.09       |
+//|      v1.08: Nuclear SL ban + Filling Mode + ForceSLZero          |
+//|      v1.09: Restored full UI panel (labels, countdown, colors)   |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.08"
+#property version   "1.09"
 
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
