@@ -10,6 +10,8 @@ bool PlaceStraddleOrders()
    double bS   = NormalizeDouble(ask + dist, _Digits);
    double sS   = NormalizeDouble(bid - dist, _Digits);
 
+   Print("[ORDERS] Ask=", ask, " Bid=", bid, " Dist=", dist, " BuyStop=", bS, " SellStop=", sS, " Digits=", _Digits, " Point=", _Point, " PipFactor=", g_pipFactor);
+
    // Órdenes limpias: SL=0, TP=0
    if(!g_trade.BuyStop(InpLotSize, bS, _Symbol, 0, 0)) return false;
    g_buyOrderTicket = g_trade.ResultOrder();
