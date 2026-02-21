@@ -59,7 +59,7 @@ void InitUI()
    // Buttons
    CreateButton(BTN_ARM,    "▶ ARMAR",     baseX,       baseY, 100, 30, C'35,134,54',  clrWhite);
    CreateButton(BTN_CANCEL, "■ CANCELAR",  baseX + 110, baseY, 100, 30, C'207,34,46',  clrWhite);
-   CreateButton(BTN_TP,     "TP OFF",      baseX + 220, baseY, 100, 30, clrGray,       clrWhite);
+   CreateButton(BTN_TP, g_useTP ? "TP ON" : "TP OFF", baseX + 220, baseY, 100, 30, g_useTP ? C'30,100,200' : clrGray, clrWhite);
 
    // Labels
    CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.10 ═══",     baseX, baseY + 40,  clrGold, 11);
