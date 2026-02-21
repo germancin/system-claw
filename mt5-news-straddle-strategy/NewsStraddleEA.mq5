@@ -1,8 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
 //|      Pre-News Straddle (Standard Stops) + Trailing | v1.09       |
-//|      v1.08: Nuclear SL ban + Filling Mode + ForceSLZero          |
-//|      v1.09: Restored full UI panel (labels, countdown, colors)   |
+//|      Update: Restored full UI panel (labels, countdown, colors)  |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
