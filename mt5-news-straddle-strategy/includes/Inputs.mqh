@@ -7,6 +7,6 @@ input double InpEntryDistPips     = 1000.0;         // Distancia de entrada en p
 input double InpTrailingPips      = 1000.0;         // Distancia del Trailing Stop en pips
 input bool   InpUseTP             = false;        // Usar Take Profit (ON/OFF)
 input double InpTPPips            = 1000;        // Take Profit en pips
-input double InpLotSize           = 0.05;         // Tamaño de lote
+input double InpLotSize           = 0.10;         // Tamaño de lote
 input int    InpMagicNumber       = 202601;       // Magic Number único
 input int    InpLeadTimeSeconds   = 10;           // Segundos antes del evento para colocar órdenes
