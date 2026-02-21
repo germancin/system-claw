@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.09       |
-//|      Update: Restored full UI panel (labels, countdown, colors)  |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.10       |
+//|      Update: Removed ForceSLZero. Respects manual SL.            |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.09"
+#property version   "1.10"
 
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
@@ -52,37 +52,6 @@ bool PlaceStraddleOrders() {
    return true;
 }
 
-//+------------------------------------------------------------------+
-//| FORCE SL TO ZERO - The nuclear option                             |
-//| This function ONLY sets SL=0, preserving whatever TP exists       |
-//+------------------------------------------------------------------+
-void ForceSLZero()
-{
-   if(g_positionTicket == 0) return;
-   if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
-   double currentSL = g_posInfo.StopLoss();
-   double currentTP = g_posInfo.TakeProfit();
-   
-   if(currentSL != 0)
-   {
-      Print("[NUCLEAR] SL detectado en ", currentSL, " — FORZANDO A CERO");
-      for(int i = 0; i < 5; i++)
-      {
-         if(g_trade.PositionModify(g_positionTicket, 0, currentTP))
-         {
-            if(g_trade.ResultRetcode() == TRADE_RETCODE_DONE)
-            {
-               Print("[NUCLEAR] SL eliminado exitosamente");
-               return;
-            }
-         }
-         Print("[NUCLEAR] Reintento ", i+1, " Code: ", g_trade.ResultRetcode());
-         Sleep(50);
-      }
-      Print("[NUCLEAR] FALLO al eliminar SL después de 5 intentos");
-   }
-}
-
 void SetTakeProfitOnly() {
    if(g_positionTicket==0 || !g_useTP) return;
    if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
@@ -90,46 +59,24 @@ void SetTakeProfitOnly() {
    double tp=(g_posInfo.PositionType()==POSITION_TYPE_BUY)?openP+tpD:openP-tpD;
    double tpNorm = NormalizeDouble(tp,_Digits);
    
-   Print("[TP] Poniendo TP en ", tpNorm, " con SL=0");
-   
-   for(int i = 0; i < 5; i++)
-   {
-      if(g_trade.PositionModify(g_positionTicket, 0, tpNorm))
-      {
-         if(g_trade.ResultRetcode() == TRADE_RETCODE_DONE)
-         {
-            Print("[TP] TP puesto exitosamente. Verificando SL...");
-            // INMEDIATAMENTE verificar que el SL siga en 0
-            ForceSLZero();
-            return;
-         }
-      }
-      Print("[TP] Reintento ", i+1, " Code: ", g_trade.ResultRetcode());
-      Sleep(50);
-   }
+   // Pone TP con SL=0. UNA sola vez.
+   if(g_trade.PositionModify(g_positionTicket, 0, tpNorm))
+      Print("[TP] TP puesto en ", tpNorm);
+   else
+      Print("[TP] Error al poner TP: ", g_trade.ResultRetcodeDescription());
 }
 
 void ManageTrade() {
    if(g_positionTicket==0 || !g_posInfo.SelectByTicket(g_positionTicket)) return;
    
-   // ============================================================
-   // REGLA 1: Si TP está OFF → SL debe ser 0 SIEMPRE. Punto.
-   // ============================================================
-   if(!g_useTP)
-   {
-      ForceSLZero();
-      return;
-   }
+   // Si TP está OFF → El EA no toca nada. Tú controlas manualmente.
+   if(!g_useTP) return;
 
-   // ============================================================
-   // REGLA 2: TP está ON. Asegurar que el TP esté puesto.
-   // ============================================================
+   // Si TP está ON pero no se ha puesto aún, ponerlo
    double curTP = g_posInfo.TakeProfit();
    if(curTP == 0) { SetTakeProfitOnly(); return; }
 
-   // ============================================================
-   // REGLA 3: ¿Ya tocó el TP? Solo entonces nace el Trailing.
-   // ============================================================
+   // ¿Ya tocó el TP? Solo entonces nace el Trailing.
    if(g_posInfo.PositionType()==POSITION_TYPE_BUY) {
       double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
       if(!g_tpReached && bid >= curTP) {
@@ -144,18 +91,10 @@ void ManageTrade() {
       }
    }
 
-   // ============================================================
-   // REGLA 4: Si NO ha tocado TP → FORZAR SL=0. No importa qué.
-   // ============================================================
-   if(!g_tpReached)
-   {
-      ForceSLZero();
-      return;
-   }
+   // Si NO ha tocado TP → No hacemos nada. Respetamos SL manual si existe.
+   if(!g_tpReached) return;
 
-   // ============================================================
-   // REGLA 5: SOLO AQUÍ NACE EL TRAILING (después de tocar TP)
-   // ============================================================
+   // SOLO AQUÍ NACE EL TRAILING (después de tocar TP)
    double curSL=g_posInfo.StopLoss(), trailD=PipsToPrice(InpTrailingPips);
    
    if(g_posInfo.PositionType()==POSITION_TYPE_BUY) {
@@ -305,9 +244,8 @@ void OnTick() {
          Print("[ENTRY] Posición detectada. Ticket: ", g_positionTicket);
          if(g_posInfo.PositionType()==POSITION_TYPE_BUY) g_trade.OrderDelete(g_sellOrderTicket); else g_trade.OrderDelete(g_buyOrderTicket);
          
-         // Poner TP si está ON, y FORZAR SL=0 inmediatamente
+         // Poner TP si está ON. No tocamos SL.
          if(g_useTP) SetTakeProfitOnly();
-         ForceSLZero(); // SIEMPRE forzar SL=0 al entrar
       }
    }
    if(g_state==STATE_TRADE_ACTIVE) {
@@ -334,12 +272,11 @@ void OnChartEvent(const int id,const long &l,const double &d,const string &s) {
          ObjectSetInteger(0,BTN_TP,OBJPROP_BGCOLOR,g_useTP?C'30,100,200':clrGray);
          if(g_state==STATE_TRADE_ACTIVE) {
             if(g_useTP) {
-               SetTakeProfitOnly();  // Pone TP con SL=0
-               ForceSLZero();        // DOBLE SEGURO: forzar SL=0 otra vez
+               SetTakeProfitOnly();
             } else {
-               // Quitar todo
-               g_trade.PositionModify(g_positionTicket, 0, 0);
-               ForceSLZero();        // TRIPLE SEGURO
+               // Quitar TP, dejar SL como esté (manual o 0)
+               double keepSL = g_posInfo.SelectByTicket(g_positionTicket) ? g_posInfo.StopLoss() : 0;
+               g_trade.PositionModify(g_positionTicket, keepSL, 0);
             }
          }
       }
