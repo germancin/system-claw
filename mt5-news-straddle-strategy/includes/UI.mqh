@@ -3,9 +3,7 @@
 //+------------------------------------------------------------------+
 
 const string BG_PANEL  = "NewsEA_BgPanel";
-const string BTN_ARM   = "NewsEA_BtnArm";
 const string BTN_CANCEL= "NewsEA_BtnCancel";
-const string BTN_TP    = "NewsEA_BtnTP";
 const string LBL_STATE = "NewsEA_LblState";
 const string LBL_COUNT = "NewsEA_LblCountdown";
 
@@ -57,9 +55,7 @@ void InitUI()
    ObjectSetInteger(0, BG_PANEL, OBJPROP_ZORDER, 50);
 
    // Buttons
-   CreateButton(BTN_ARM,    "SUBMIT",     baseX,       baseY, 100, 30, C'35,134,54',  clrWhite);
-   CreateButton(BTN_CANCEL, "CANCEL",  baseX + 110, baseY, 100, 30, C'207,34,46',  clrWhite);
-   CreateButton(BTN_TP, g_useTP ? "TP ON" : "TP OFF", baseX + 220, baseY, 100, 30, g_useTP ? C'30,100,200' : clrGray, clrWhite);
+   CreateButton(BTN_CANCEL, "CANCEL ALL", baseX + 110, baseY, 120, 35, C'207,34,46', clrWhite);
 
    // Labels
    CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.10 ═══",     baseX, baseY + 40,  clrGold, 11);
@@ -101,9 +97,7 @@ void UpdateUI()
 void CleanupUI()
 {
    ObjectDelete(0, BG_PANEL);
-   ObjectDelete(0, BTN_ARM);
    ObjectDelete(0, BTN_CANCEL);
-   ObjectDelete(0, BTN_TP);
    ObjectDelete(0, LBL_STATE);
    ObjectDelete(0, LBL_COUNT);
    ObjectDelete(0, "NewsEA_Title");
