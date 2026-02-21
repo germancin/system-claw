@@ -175,13 +175,105 @@ void ManageTrade() {
    }
 }
 
-void InitUI() {
-   ObjectCreate(0,BG_PANEL,OBJ_RECTANGLE_LABEL,0,0,0); ObjectSetInteger(0,BG_PANEL,OBJPROP_XSIZE,340); ObjectSetInteger(0,BG_PANEL,OBJPROP_YSIZE,150);
-   ObjectSetInteger(0,BG_PANEL,OBJPROP_BGCOLOR,C'25,25,35'); ObjectSetInteger(0,BG_PANEL,OBJPROP_XDISTANCE,20); ObjectSetInteger(0,BG_PANEL,OBJPROP_YDISTANCE,40);
-   ObjectCreate(0,BTN_ARM,OBJ_BUTTON,0,0,0); ObjectSetString(0,BTN_ARM,OBJPROP_TEXT,"▶ ARMAR"); ObjectSetInteger(0,BTN_ARM,OBJPROP_XDISTANCE,30); ObjectSetInteger(0,BTN_ARM,OBJPROP_YDISTANCE,50);
-   ObjectSetInteger(0,BTN_ARM,OBJPROP_XSIZE,100); ObjectSetInteger(0,BTN_ARM,OBJPROP_YSIZE,30);
-   ObjectCreate(0,BTN_TP,OBJ_BUTTON,0,0,0); ObjectSetString(0,BTN_TP,OBJPROP_TEXT,"TP OFF"); ObjectSetInteger(0,BTN_TP,OBJPROP_XDISTANCE,240); ObjectSetInteger(0,BTN_TP,OBJPROP_YDISTANCE,50);
-   ObjectSetInteger(0,BTN_TP,OBJPROP_XSIZE,80); ObjectSetInteger(0,BTN_TP,OBJPROP_YSIZE,30);
+void CreateButton(string name, string text, int x, int y, int width, int height, color bgColor, color txtColor)
+{
+   ObjectDelete(0, name);
+   ObjectCreate(0, name, OBJ_BUTTON, 0, 0, 0);
+   ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);
+   ObjectSetInteger(0, name, OBJPROP_YDISTANCE, y);
+   ObjectSetInteger(0, name, OBJPROP_XSIZE, width);
+   ObjectSetInteger(0, name, OBJPROP_YSIZE, height);
+   ObjectSetString(0, name, OBJPROP_TEXT, text);
+   ObjectSetString(0, name, OBJPROP_FONT, "Arial Bold");
+   ObjectSetInteger(0, name, OBJPROP_FONTSIZE, 9);
+   ObjectSetInteger(0, name, OBJPROP_BGCOLOR, bgColor);
+   ObjectSetInteger(0, name, OBJPROP_COLOR, txtColor);
+   ObjectSetInteger(0, name, OBJPROP_BORDER_COLOR, bgColor);
+   ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
+   ObjectSetInteger(0, name, OBJPROP_ZORDER, 100);
+}
+
+void CreateLabel(string name, string text, int x, int y, color txtColor, int fontSize = 9)
+{
+   ObjectDelete(0, name);
+   ObjectCreate(0, name, OBJ_LABEL, 0, 0, 0);
+   ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);
+   ObjectSetInteger(0, name, OBJPROP_YDISTANCE, y);
+   ObjectSetString(0, name, OBJPROP_TEXT, text);
+   ObjectSetString(0, name, OBJPROP_FONT, "Consolas");
+   ObjectSetInteger(0, name, OBJPROP_FONTSIZE, fontSize);
+   ObjectSetInteger(0, name, OBJPROP_COLOR, txtColor);
+   ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
+}
+
+string StateToString(ENUM_EA_STATE state)
+{
+   switch(state)
+   {
+      case STATE_IDLE:           return("IDLE - Esperando ARMAR");
+      case STATE_ARMED:          return("ARMED - Esperando T-" + IntegerToString(InpLeadTimeSeconds) + "s");
+      case STATE_ORDERS_PLACED:  return("ORDERS PLACED - Monitoreando");
+      case STATE_TRADE_ACTIVE:   return("TRADE ACTIVE - Trailing ON");
+      case STATE_DONE:           return("DONE - Listo para rearmar");
+      default:                   return("UNKNOWN");
+   }
+}
+
+void InitUI()
+{
+   int baseX = 20, baseY = 40;
+   
+   // Background Panel
+   ObjectDelete(0, BG_PANEL);
+   ObjectCreate(0, BG_PANEL, OBJ_RECTANGLE_LABEL, 0, 0, 0);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_XDISTANCE, baseX - 10);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YDISTANCE, baseY - 10);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_XSIZE, 340);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, 181);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_BGCOLOR, C'25,25,35');
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_BORDER_COLOR, C'60,60,80');
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_CORNER, CORNER_LEFT_UPPER);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_ZORDER, 50);
+   
+   // Buttons
+   CreateButton(BTN_ARM, "▶ ARMAR", baseX, baseY, 100, 30, C'35,134,54', clrWhite);
+   CreateButton(BTN_CANCEL, "■ CANCELAR", baseX + 110, baseY, 100, 30, C'207,34,46', clrWhite);
+   CreateButton(BTN_TP, "TP OFF", baseX + 220, baseY, 100, 30, clrGray, clrWhite);
+   
+   // Labels
+   CreateLabel("NewsEA_Title", "═══ NEWS STRADDLE EA v1.08 ═══", baseX, baseY + 40, clrGold, 11);
+   CreateLabel(LBL_STATE, "Estado: IDLE", baseX, baseY + 62, clrWhite, 9);
+   CreateLabel("NewsEA_Event", "Evento: " + InpNewsTime, baseX, baseY + 80, clrSilver, 9);
+   CreateLabel(LBL_COUNT, "", baseX, baseY + 98, clrYellow, 9);
+   CreateLabel("NewsEA_Params", StringFormat("Dist: %.1f | Trail: %.1f | TP: %.1f pips", InpEntryDistPips, InpTrailingPips, InpTPPips), baseX, baseY + 116, C'100,200,255', 8);
+   CreateLabel("NewsEA_Rule", "Regla: SL=0 hasta que TP sea tocado", baseX, baseY + 134, C'255,200,100', 8);
+   
+   ChartRedraw();
+}
+
+void UpdateUI()
+{
+   ObjectSetString(0, LBL_STATE, OBJPROP_TEXT, "Estado: " + StateToString(g_state));
+   
+   if(g_state == STATE_ARMED && g_eventTime > 0)
+   {
+      long secs = (long)(g_eventTime - TimeCurrent());
+      if(secs > 0)
+         ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, StringFormat("⏱ T-%02d:%02d", (int)(secs/60), (int)(secs%60)));
+      else
+         ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, "⏱ COLOCANDO ORDENES...");
+   }
+   else if(g_state == STATE_TRADE_ACTIVE)
+   {
+      string tpStatus = g_tpReached ? "TRAILING ACTIVO" : (g_useTP ? "Esperando TP..." : "SIN TP - Libre");
+      ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, tpStatus);
+   }
+   else
+   {
+      ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, "");
+   }
+   
+   ChartRedraw();
 }
 
 int OnInit() {
@@ -229,11 +321,13 @@ void OnTimer() {
       if(PlaceStraddleOrders()) g_state=STATE_ORDERS_PLACED;
       else g_state=STATE_IDLE;
    }
+   UpdateUI();
 }
 
 void OnChartEvent(const int id,const long &l,const double &d,const string &s) {
    if(id==CHARTEVENT_OBJECT_CLICK) {
-      if(s==BTN_ARM) { g_eventTime=ParseEventTime(InpNewsTime); g_state=STATE_ARMED; }
+      if(s==BTN_ARM) { g_eventTime=ParseEventTime(InpNewsTime); g_state=STATE_ARMED; Print("[UI] ARMADO para ", InpNewsTime); }
+      if(s==BTN_CANCEL) { g_trade.OrderDelete(g_buyOrderTicket); g_trade.OrderDelete(g_sellOrderTicket); g_state=STATE_IDLE; g_positionTicket=0; g_tpReached=false; Print("[UI] CANCELADO"); }
       if(s==BTN_TP) {
          g_useTP=!g_useTP;
          ObjectSetString(0,BTN_TP,OBJPROP_TEXT,g_useTP?"TP ON":"TP OFF");
@@ -252,4 +346,4 @@ void OnChartEvent(const int id,const long &l,const double &d,const string &s) {
    }
 }
 
-void OnDeinit(const int r) { ObjectsDeleteAll(0); EventKillTimer(); }
+void OnDeinit(const int r) { ObjectsDeleteAll(0, "NewsEA"); ObjectDelete(0, BG_PANEL); ObjectDelete(0, BTN_ARM); ObjectDelete(0, BTN_CANCEL); ObjectDelete(0, BTN_TP); ObjectDelete(0, LBL_STATE); ObjectDelete(0, LBL_COUNT); EventKillTimer(); }
