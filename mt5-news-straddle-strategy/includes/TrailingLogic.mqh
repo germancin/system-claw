@@ -1,11 +1,11 @@
 //+------------------------------------------------------------------+
 //| TrailingLogic.mqh — Gestión del trade activo y trailing stop      |
 //|                                                                    |
-//| REGLAS:                                                            |
+//| NUEVA LÓGICA (v1.11 - TP VIRTUAL):                                |
 //|   - Si TP OFF → El EA no toca nada. Control manual.               |
-//|   - Si TP ON  → Solo pone TP. No toca SL.                        |
-//|   - Si TP ON y precio toca TP → Nace el Trailing Stop.           |
-//|   - SL manual del usuario NUNCA se borra.                         |
+//|   - Si TP ON  → Dibuja línea verde (TP Virtual). NO va al broker.|
+//|   - Cuando precio toca TP Virtual → Pone SL breakeven + buffer.   |
+//|   - Desde ahí activa Trailing Stop para seguir subiendo.          |
 //+------------------------------------------------------------------+
 
 void ManageTrade()
@@ -15,34 +15,55 @@ void ManageTrade()
    // Si TP está OFF → El EA no toca nada. Tú controlas manualmente.
    if(!g_useTP) return;
 
-   // Si TP está ON pero no se ha puesto aún, ponerlo
-   double curTP = g_posInfo.TakeProfit();
-   if(curTP == 0) { SetTakeProfitOnly(); return; }
+   // Si TP Virtual no se ha dibujado aún, hacerlo
+   if(g_virtualTP == 0) { SetVirtualTP(); return; }
 
-   // ¿Ya tocó el TP? Solo entonces nace el Trailing.
-   if(g_posInfo.PositionType() == POSITION_TYPE_BUY)
+   // Detectar si el precio tocó el TP Virtual
+   if(!g_tpReached)
    {
-      double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
-      if(!g_tpReached && bid >= curTP)
+      if(g_posInfo.PositionType() == POSITION_TYPE_BUY)
       {
-         g_tpReached = true;
-         Print("[TRAILING] TP ALCANZADO en BUY. Activando trailing ahora.");
+         double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+         if(bid >= g_virtualTP)
+         {
+            g_tpReached = true;
+            
+            // Poner SL en breakeven + buffer (5000 pips = $50 para BTC)
+            double openP = g_posInfo.PriceOpen();
+            double buffer = PipsToPrice(5000);  // $50 buffer para spread
+            double breakeven = NormalizeDouble(openP + buffer, _Digits);
+            
+            g_trade.PositionModify(g_positionTicket, breakeven, 0);
+            Print("[VIRTUAL TP] Tocado en BUY. SL en breakeven+buffer: ", breakeven);
+            
+            // Cambiar línea a amarillo para indicar que se activó
+            ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_COLOR, clrYellow);
+         }
       }
-   }
-   else
-   {
-      double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
-      if(!g_tpReached && ask <= curTP)
+      else  // SELL
       {
-         g_tpReached = true;
-         Print("[TRAILING] TP ALCANZADO en SELL. Activando trailing ahora.");
+         double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+         if(ask <= g_virtualTP)
+         {
+            g_tpReached = true;
+            
+            // Poner SL en breakeven - buffer
+            double openP = g_posInfo.PriceOpen();
+            double buffer = PipsToPrice(5000);
+            double breakeven = NormalizeDouble(openP - buffer, _Digits);
+            
+            g_trade.PositionModify(g_positionTicket, breakeven, 0);
+            Print("[VIRTUAL TP] Tocado en SELL. SL en breakeven-buffer: ", breakeven);
+            
+            ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_COLOR, clrYellow);
+         }
       }
+      
+      // Si NO ha tocado TP virtual → esperamos
+      if(!g_tpReached) return;
    }
 
-   // Si NO ha tocado TP → No hacemos nada. Respetamos SL manual si existe.
-   if(!g_tpReached) return;
-
-   // SOLO AQUÍ NACE EL TRAILING (después de tocar TP)
+   // TRAILING ACTIVO (después de tocar TP Virtual)
    double curSL  = g_posInfo.StopLoss();
    double trailD = PipsToPrice(InpTrailingPips);
 
@@ -50,9 +71,9 @@ void ManageTrade()
    {
       double bid   = SymbolInfoDouble(_Symbol, SYMBOL_BID);
       double newSL = NormalizeDouble(bid - trailD, _Digits);
-      if(newSL > curSL || curSL == 0)
+      if(newSL > curSL)
       {
-         g_trade.PositionModify(g_positionTicket, newSL, curTP);
+         g_trade.PositionModify(g_positionTicket, newSL, 0);
          Print("[TRAILING] BUY SL movido a ", newSL);
       }
    }
@@ -60,9 +81,9 @@ void ManageTrade()
    {
       double ask   = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
       double newSL = NormalizeDouble(ask + trailD, _Digits);
-      if(newSL < curSL || curSL == 0)
+      if(newSL < curSL)
       {
-         g_trade.PositionModify(g_positionTicket, newSL, curTP);
+         g_trade.PositionModify(g_positionTicket, newSL, 0);
          Print("[TRAILING] SELL SL movido a ", newSL);
       }
    }

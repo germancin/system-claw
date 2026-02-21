@@ -25,7 +25,7 @@ bool PlaceStraddleOrders()
    return true;
 }
 
-void SetTakeProfitOnly()
+void SetVirtualTP()
 {
    if(g_positionTicket == 0 || !g_useTP) return;
    if(!g_posInfo.SelectByTicket(g_positionTicket)) return;
@@ -33,11 +33,9 @@ void SetTakeProfitOnly()
    double tpD    = PipsToPrice(InpTPPips);
    double openP  = g_posInfo.PriceOpen();
    double tp     = (g_posInfo.PositionType() == POSITION_TYPE_BUY) ? openP + tpD : openP - tpD;
-   double tpNorm = NormalizeDouble(tp, _Digits);
+   g_virtualTP   = NormalizeDouble(tp, _Digits);
 
-   // Pone TP con SL=0. UNA sola vez.
-   if(g_trade.PositionModify(g_positionTicket, 0, tpNorm))
-      Print("[TP] TP puesto en ", tpNorm);
-   else
-      Print("[TP] Error al poner TP: ", g_trade.ResultRetcodeDescription());
+   // Dibujar línea verde en el chart (NO mandar al broker)
+   DrawVirtualTP(g_virtualTP);
+   Print("[VIRTUAL TP] Línea dibujada en ", g_virtualTP);
 }

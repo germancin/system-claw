@@ -58,13 +58,13 @@ void InitUI()
    CreateButton(BTN_CANCEL, "CANCEL ALL", baseX + 110, baseY, 120, 35, C'207,34,46', clrWhite);
 
    // Labels
-   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.10 ═══",     baseX, baseY + 40,  clrGold, 11);
+   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.12 ═══",     baseX, baseY + 40,  clrGold, 11);
    CreateLabel(LBL_STATE,       "Estado: IDLE",                        baseX, baseY + 62,  clrWhite, 9);
    CreateLabel("NewsEA_Event",  "Evento: " + InpNewsTime,             baseX, baseY + 80,  clrSilver, 9);
    CreateLabel(LBL_COUNT,       "",                                    baseX, baseY + 98,  clrYellow, 9);
    CreateLabel("NewsEA_Params", StringFormat("Dist: %.1f | Trail: %.1f | TP: %.1f pips",
                InpEntryDistPips, InpTrailingPips, InpTPPips),          baseX, baseY + 116, C'100,200,255', 8);
-   CreateLabel("NewsEA_Rule",   "Regla: Trailing solo tras tocar TP",  baseX, baseY + 134, C'255,200,100', 8);
+   CreateLabel("NewsEA_Rule",   "TP Virtual -> Breakeven+50 -> Trailing",  baseX, baseY + 134, C'255,200,100', 8);
 
    ChartRedraw();
 }
@@ -94,6 +94,23 @@ void UpdateUI()
    ChartRedraw();
 }
 
+void DrawVirtualTP(double price)
+{
+   ObjectDelete(0, LINE_VIRTUAL_TP);
+   ObjectCreate(0, LINE_VIRTUAL_TP, OBJ_HLINE, 0, 0, price);
+   ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_COLOR, clrLime);
+   ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_STYLE, STYLE_DASHDOT);
+   ObjectSetInteger(0, LINE_VIRTUAL_TP, OBJPROP_WIDTH, 2);
+   ObjectSetString(0, LINE_VIRTUAL_TP, OBJPROP_TEXT, "Virtual TP");
+   ChartRedraw();
+}
+
+void DeleteVirtualTP()
+{
+   ObjectDelete(0, LINE_VIRTUAL_TP);
+   ChartRedraw();
+}
+
 void CleanupUI()
 {
    ObjectDelete(0, BG_PANEL);
@@ -104,4 +121,5 @@ void CleanupUI()
    ObjectDelete(0, "NewsEA_Event");
    ObjectDelete(0, "NewsEA_Params");
    ObjectDelete(0, "NewsEA_Rule");
+   DeleteVirtualTP();
 }

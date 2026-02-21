@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.11       |
-//|      Update: Auto-arm on init, single CANCEL button               |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.12       |
+//|      Update: Virtual TP + Breakeven + Trailing (unlimited upside) |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.11"
+#property version   "1.12"
 
 //--- Standard Library
 #include <Trade/Trade.mqh>
@@ -76,8 +76,8 @@ void OnTick()
             else
                g_trade.OrderDelete(g_buyOrderTicket);
 
-            // Poner TP si está ON. No tocamos SL.
-            if(g_useTP) SetTakeProfitOnly();
+            // Poner TP Virtual si está ON (línea verde, no va al broker)
+            if(g_useTP) SetVirtualTP();
          }
       }
    }
@@ -138,6 +138,10 @@ void OnChartEvent(const int id, const long &l, const double &d, const string &s)
       g_tpReached = false;
       g_buyOrderTicket = 0;
       g_sellOrderTicket = 0;
+      g_virtualTP = 0;
+      
+      // Borrar línea TP Virtual
+      DeleteVirtualTP();
       
       Print("[CANCEL] Todo cancelado y reseteado");
    }
