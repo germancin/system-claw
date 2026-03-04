@@ -331,6 +331,7 @@
   <a href="#costs">12. Cost Estimates</a>
   <a href="#roadmap">13. Roadmap</a>
   <a href="#soul">14. SOUL.md Reference</a>
+  <a href="#pricing">15. Pricing & Subscription Tiers</a>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1054,6 +1055,178 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
   </ul>
   <p>This file is loaded as the first section of every system prompt. User-specific context is appended dynamically by the <code>buildSystemPrompt()</code> function.</p>
 </div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="pricing">💳 15. Pricing & Subscription Tiers</h2>
+
+<div class="card card-accent">
+  <h3>Cost Per User Breakdown</h3>
+  <table>
+    <tr><th>User Type</th><th>% of Users</th><th>Activity</th><th>Cost/User/Mo</th></tr>
+    <tr><td>🔥 Heavy (20+ chats/day)</td><td>~10%</td><td>Power traders</td><td>~$8-10</td></tr>
+    <tr><td>📊 Medium (5-10 chats/day)</td><td>~30%</td><td>Regular use</td><td>~$3-4</td></tr>
+    <tr><td>💬 Light (1-3 chats/day)</td><td>~40%</td><td>Casual</td><td>~$1-2</td></tr>
+    <tr><td>😴 Dormant</td><td>~20%</td><td>Subscribed, inactive</td><td>~$0.10</td></tr>
+    <tr style="font-weight:700;"><td colspan="3">Weighted Average</td><td>~$2.30/mo</td></tr>
+  </table>
+</div>
+
+<h3>Subscription Tiers</h3>
+
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin:1.5rem 0;">
+
+  <!-- Starter -->
+  <div style="background: var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; position:relative; display:flex; flex-direction:column;">
+    <div style="font-size:2rem; margin-bottom:0.25rem;">🥉</div>
+    <h3 style="margin:0 0 0.25rem; color:var(--text);">Starter</h3>
+    <div style="display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.25rem;">
+      <span style="font-size:2.5rem; font-weight:800; color:var(--text);">$29</span>
+      <span style="color:var(--muted); font-size:0.9rem;">/month</span>
+    </div>
+    <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">$290/year (save $58)</div>
+    <ul style="flex:1; padding-left:1.2rem; margin:0;">
+      <li>15 chart analyses per day</li>
+      <li>Basic memory (trade log, preferences)</li>
+      <li>GPT-4o-mini for chat</li>
+      <li>Claude for signals (10/day)</li>
+      <li style="color:var(--muted); text-decoration:line-through;">Crons & briefings</li>
+      <li style="color:var(--muted); text-decoration:line-through;">Telegram / Email delivery</li>
+      <li style="color:var(--muted); text-decoration:line-through;">Broker integration</li>
+    </ul>
+    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+      Cost: ~$0.80/user → <span style="color:var(--green); font-weight:600;">36x margin</span>
+    </div>
+  </div>
+
+  <!-- Pro -->
+  <div style="background: linear-gradient(135deg, var(--surface), #111a2e); border:2px solid var(--accent); border-radius:16px; padding:2rem; position:relative; display:flex; flex-direction:column;">
+    <div style="position:absolute; top:-12px; right:16px; background:var(--accent); color:#fff; font-size:0.7rem; font-weight:700; padding:0.25rem 0.75rem; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">Most Popular</div>
+    <div style="font-size:2rem; margin-bottom:0.25rem;">🥈</div>
+    <h3 style="margin:0 0 0.25rem; color:var(--accent);">Pro</h3>
+    <div style="display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.25rem;">
+      <span style="font-size:2.5rem; font-weight:800; color:var(--text);">$59</span>
+      <span style="color:var(--muted); font-size:0.9rem;">/month</span>
+    </div>
+    <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">$590/year (save $118)</div>
+    <ul style="flex:1; padding-left:1.2rem; margin:0;">
+      <li>50 chart analyses per day</li>
+      <li><strong>Full memory system</strong> (trades, lessons, behaviors, feedback)</li>
+      <li>Model router (Claude + GPT-4o + GPT-5)</li>
+      <li>Economic calendar + news enrichment</li>
+      <li>5 custom crons/reminders</li>
+      <li>Pre-market briefings</li>
+      <li>Telegram notifications</li>
+      <li style="color:var(--muted); text-decoration:line-through;">Broker integration</li>
+    </ul>
+    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+      Cost: ~$2.50/user → <span style="color:var(--green); font-weight:600;">23x margin</span>
+    </div>
+  </div>
+
+  <!-- Elite -->
+  <div style="background: linear-gradient(135deg, var(--surface), #1a1510); border:1px solid var(--gold); border-radius:16px; padding:2rem; position:relative; display:flex; flex-direction:column;">
+    <div style="font-size:2rem; margin-bottom:0.25rem;">🥇</div>
+    <h3 style="margin:0 0 0.25rem; color:var(--gold);">Elite</h3>
+    <div style="display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.25rem;">
+      <span style="font-size:2.5rem; font-weight:800; color:var(--text);">$99</span>
+      <span style="color:var(--muted); font-size:0.9rem;">/month</span>
+    </div>
+    <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">$900/year (save $288)</div>
+    <ul style="flex:1; padding-left:1.2rem; margin:0;">
+      <li><strong>Unlimited</strong> analyses</li>
+      <li>Full memory + deep behavioral analysis</li>
+      <li>GPT-5 for deep research</li>
+      <li>Unlimited crons</li>
+      <li>Telegram + Email delivery</li>
+      <li>Broker integration (Arkbank read-only)</li>
+      <li>Priority processing (faster responses)</li>
+      <li>Weekly AI performance report</li>
+    </ul>
+    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+      Cost: ~$5/user → <span style="color:var(--green); font-weight:600;">19x margin</span>
+    </div>
+  </div>
+
+  <!-- Institutional -->
+  <div style="background: linear-gradient(135deg, var(--surface), #15101a); border:1px solid var(--accent2); border-radius:16px; padding:2rem; position:relative; display:flex; flex-direction:column;">
+    <div style="font-size:2rem; margin-bottom:0.25rem;">💎</div>
+    <h3 style="margin:0 0 0.25rem; color:var(--accent2);">Institutional</h3>
+    <div style="display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.25rem;">
+      <span style="font-size:2.5rem; font-weight:800; color:var(--text);">$249</span>
+      <span style="color:var(--muted); font-size:0.9rem;">/month</span>
+    </div>
+    <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">Custom annual pricing</div>
+    <ul style="flex:1; padding-left:1.2rem; margin:0;">
+      <li>Everything in Elite</li>
+      <li>API access (build on top)</li>
+      <li>Custom integrations</li>
+      <li>Dedicated support</li>
+      <li>White-label option</li>
+    </ul>
+    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+      Cost: ~$8/user → <span style="color:var(--green); font-weight:600;">31x margin</span>
+    </div>
+  </div>
+
+</div>
+
+<h3>Revenue Projections (10,000 users)</h3>
+
+<div class="grid-2">
+  <div class="card card-green">
+    <h3>📉 Conservative Scenario</h3>
+    <table>
+      <tr><th>Tier</th><th>Users</th><th>%</th><th>Revenue/mo</th></tr>
+      <tr><td>Starter $29</td><td>5,000</td><td>50%</td><td>$145,000</td></tr>
+      <tr><td>Pro $59</td><td>3,000</td><td>30%</td><td>$177,000</td></tr>
+      <tr><td>Elite $99</td><td>1,500</td><td>15%</td><td>$148,500</td></tr>
+      <tr><td>Institutional $249</td><td>500</td><td>5%</td><td>$124,500</td></tr>
+      <tr style="background:rgba(16,185,129,0.1); font-weight:700;">
+        <td colspan="3">TOTAL</td><td>$595,000/mo</td>
+      </tr>
+    </table>
+    <p style="margin-top:0.75rem; color:var(--muted);">Cost: $23K → Profit: <strong style="color:var(--green);">$572K/mo</strong> (96% margin)</p>
+  </div>
+
+  <div class="card card-cyan">
+    <h3>📈 Optimistic Scenario</h3>
+    <table>
+      <tr><th>Tier</th><th>Users</th><th>%</th><th>Revenue/mo</th></tr>
+      <tr><td>Starter $29</td><td>3,000</td><td>30%</td><td>$87,000</td></tr>
+      <tr><td>Pro $59</td><td>4,000</td><td>40%</td><td>$236,000</td></tr>
+      <tr><td>Elite $99</td><td>2,500</td><td>25%</td><td>$247,500</td></tr>
+      <tr><td>Institutional $249</td><td>500</td><td>5%</td><td>$124,500</td></tr>
+      <tr style="background:rgba(6,182,212,0.1); font-weight:700;">
+        <td colspan="3">TOTAL</td><td>$695,000/mo</td>
+      </tr>
+    </table>
+    <p style="margin-top:0.75rem; color:var(--muted);">Cost: $23K → Profit: <strong style="color:var(--cyan);">$672K/mo</strong> (97% margin)</p>
+  </div>
+</div>
+
+<h3>🧠 Pricing Strategy Notes</h3>
+
+<div class="card card-gold">
+  <ul>
+    <li><strong>Annual discount = cash upfront.</strong> Users who pay yearly have 80% less churn.</li>
+    <li><strong>Free trial → conversion.</strong> 7 days of Pro free. The memory accumulated in 7 days is the hook — they don't want to lose it.</li>
+    <li><strong>Usage-based add-on.</strong> Starter users who exceed 15 analyses: $0.50 per extra. Captures upsell without forcing tier jump.</li>
+    <li><strong>The memory moat.</strong> Once the AI has 30 days of their trades, lessons, behavioral data... leaving hurts. It's like deleting your medical history. The memory IS the product lock-in.</li>
+    <li><strong>Breakeven point:</strong> The product pays for itself with just <strong>300 users on Starter</strong> ($8,700/mo vs $23K cost at full scale — but at 300 users, cost is ~$700/mo).</li>
+  </ul>
+</div>
+
+<h3>Cost Optimization Techniques</h3>
+<table>
+  <tr><th>Technique</th><th>Savings</th><th>How</th></tr>
+  <tr><td>Response caching (Redis)</td><td>20-30%</td><td>Cache similar analyses for same symbol/timeframe</td></tr>
+  <tr><td>GPT-4o-mini for non-vision tasks</td><td>40-50%</td><td>Only use expensive models when needed</td></tr>
+  <tr><td>Rate limiting per tier</td><td>Controls outliers</td><td>Prevent abuse from heavy users</td></tr>
+  <tr><td>Prompt optimization</td><td>15-20%</td><td>Fewer tokens = less cost per call</td></tr>
+  <tr><td>Shared briefings</td><td>Huge</td><td>1 briefing per instrument, not per user</td></tr>
+</table>
+<p style="color:var(--muted); margin-top:0.75rem;">With optimization, real cost could drop to <strong>$15K-18K/mo</strong> for 10K users.</p>
 
 <!-- ═══════════════════════════════════════════ -->
 <hr class="separator">
