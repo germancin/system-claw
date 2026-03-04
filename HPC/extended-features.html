@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPC — Extended Features Blueprint</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2234;
+    --border: #1e2d4a;
+    --accent: #3b82f6;
+    --accent2: #8b5cf6;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --cyan: #06b6d4;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --gold: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 2.5rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-accent {
+    border-left: 4px solid var(--accent);
+  }
+
+  .card-green {
+    border-left: 4px solid var(--green);
+  }
+
+  .card-orange {
+    border-left: 4px solid var(--orange);
+  }
+
+  .card-red {
+    border-left: 4px solid var(--red);
+  }
+
+  .card-purple {
+    border-left: 4px solid var(--accent2);
+  }
+
+  .card-cyan {
+    border-left: 4px solid var(--cyan);
+  }
+
+  .card-gold {
+    border-left: 4px solid var(--gold);
+    background: linear-gradient(135deg, var(--surface), #1a1810);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-orange { background: rgba(245,158,11,0.15); color: var(--orange); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-blue { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .badge-purple { background: rgba(139,92,246,0.15); color: var(--accent2); }
+  .badge-cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
+
+  .priority {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .p1 { color: var(--red); }
+  .p2 { color: var(--orange); }
+  .p3 { color: var(--accent); }
+  .p4 { color: var(--muted); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+
+  th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    background: var(--surface2);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tr:hover td { background: rgba(59,130,246,0.03); }
+
+  code {
+    background: var(--surface2);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: var(--cyan);
+  }
+
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    margin: 1rem 0;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    color: var(--text);
+  }
+
+  .comment { color: var(--muted); }
+  .keyword { color: var(--accent2); }
+  .string { color: var(--green); }
+  .func { color: var(--gold); }
+
+  ul { padding-left: 1.5rem; margin: 0.5rem 0; }
+  li { margin: 0.3rem 0; }
+
+  .arch-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--muted);
+  }
+
+  .arch-diagram .highlight { color: var(--accent); font-weight: 700; }
+  .arch-diagram .new { color: var(--green); font-weight: 700; }
+  .arch-diagram .exists { color: var(--muted); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 1rem; }
+    h1 { font-size: 1.8rem; }
+    .grid-2 { grid-template-columns: 1fr; }
+    table { font-size: 0.8rem; }
+    th, td { padding: 0.5rem; }
+    pre { font-size: 0.75rem; padding: 0.75rem; }
+    .arch-diagram { font-size: 0.65rem; padding: 1rem; }
+  }
+
+  .roadmap-phase {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .roadmap-phase::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    bottom: -1rem;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .roadmap-phase:last-child::before { display: none; }
+
+  .roadmap-dot {
+    position: absolute;
+    left: 0;
+    top: 0.4rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    border: 2px solid;
+  }
+
+  .dot-red { border-color: var(--red); background: rgba(239,68,68,0.2); }
+  .dot-orange { border-color: var(--orange); background: rgba(245,158,11,0.2); }
+  .dot-blue { border-color: var(--accent); background: rgba(59,130,246,0.2); }
+  .dot-purple { border-color: var(--accent2); background: rgba(139,92,246,0.2); }
+
+  .cost-bar {
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 0.3rem;
+  }
+
+  .separator {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3rem 0;
+  }
+
+  .signal-example {
+    background: linear-gradient(135deg, #0f1a12, #111827);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+
+  .signal-example .dir { color: var(--green); font-weight: 700; font-size: 1.1rem; }
+  .signal-example .label { color: var(--muted); }
+  .signal-example .value { color: var(--text); font-weight: 600; }
+  .signal-example .warn { color: var(--orange); }
+  .signal-example .conf { color: var(--cyan); }
+
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    display: block;
+    padding: 0.3rem 0;
+    transition: color 0.2s;
+  }
+
+  .toc a:hover { color: var(--accent); }
+  .toc .toc-title { color: var(--text); font-weight: 600; margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>⚡ HPC — Extended Features Blueprint</h1>
+<p class="subtitle">Architecture, features, integrations, and roadmap for the HPC Trading AI Chrome Extension</p>
+
+<div class="toc">
+  <div class="toc-title">📑 Table of Contents</div>
+  <a href="#architecture">1. System Architecture</a>
+  <a href="#memory">2. Memory System</a>
+  <a href="#prompt">3. Dynamic System Prompt</a>
+  <a href="#feedback">4. Feedback Loop (Learn from Results)</a>
+  <a href="#model-router">5. Model Router</a>
+  <a href="#enrichment">6. Market Data Enrichment</a>
+  <a href="#signals">7. Trade Study Signals</a>
+  <a href="#scheduler">8. Cron / Scheduler System</a>
+  <a href="#briefing">9. Pre-Market Briefings</a>
+  <a href="#integrations">10. Integrations (Telegram, Gmail, Broker)</a>
+  <a href="#tools">11. Function Calling Tools</a>
+  <a href="#costs">12. Cost Estimates</a>
+  <a href="#roadmap">13. Roadmap</a>
+  <a href="#soul">14. SOUL.md Reference</a>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="architecture">🏗️ 1. System Architecture</h2>
+
+<div class="arch-diagram"><span class="highlight">CHROME EXTENSION (React)</span> ── <span class="exists">already built</span>
+├── Screenshot capture (chrome.tabs.captureVisibleTab)
+├── DOM scraping (symbol, timeframe, indicators, price)
+├── Chat UI (sidebar / popup)
+├── Trade logger (screenshot-based)
+├── Briefing panel (pre-loaded)
+├── Badge notifications
+└── Auth (login per user)
+       │
+       │ HTTPS API calls
+       ▼
+<span class="highlight">API GATEWAY + LAMBDAS (AWS)</span> ── <span class="exists">already built</span>
+├── DynamoDB ── <span class="exists">exists</span>
+├── Redis ── <span class="exists">exists</span>
+├── OpenAI API ── <span class="exists">exists</span>
+│
+│ ── <span class="new">NEW additions</span> ──
+├── <span class="new">Anthropic API (Claude Sonnet 4.5)</span> ← trade signals without restrictions
+├── <span class="new">Telegram Bot API</span> ← notifications & delivery
+├── <span class="new">Gmail API</span> ← email reminders (Phase 4)
+├── <span class="new">Arkbank Broker API</span> ← read-only positions (Phase 4)
+├── <span class="new">Economic Calendar API</span> ← event awareness
+└── <span class="new">News Search (Brave API)</span> ← sentiment enrichment
+
+<span class="highlight">VPS UBUNTU (existing server)</span>
+└── <span class="new">Cron scheduler process (node-cron)</span>
+    ├── Reads schedules from DynamoDB
+    ├── Executes tasks (AI calls, briefings)
+    └── Delivers via Telegram / Push / Email</div>
+
+<div class="card card-accent">
+  <h3>Key Principle</h3>
+  <p>The Chrome Extension is the <strong>frontend and data capture layer</strong>. All intelligence, memory, enrichment, and heavy processing lives in the <strong>backend</strong>. The extension sends data; the backend thinks.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="memory">🧠 2. Memory System</h2>
+<span class="priority p1">🔴 PRIORITY #1</span>
+
+<div class="card card-purple">
+  <h3>What It Is</h3>
+  <p>Every user gets persistent memory. The AI knows them — their trades, patterns, mistakes, preferences, emotional tendencies. This is what makes it feel personal, not generic.</p>
+</div>
+
+<h3>DynamoDB Table: <code>user_memory</code></h3>
+<table>
+  <tr><th>PK</th><th>SK</th><th>Description</th><th>Example</th></tr>
+  <tr>
+    <td><code>USER#{userId}</code></td>
+    <td><code>TRADE#{timestamp}</code></td>
+    <td>Trade logged by user or extracted from chat</td>
+    <td>LONG NQ 18200→18250, +$50, scalp, 15min hold</td>
+  </tr>
+  <tr>
+    <td><code>USER#{userId}</code></td>
+    <td><code>LESSON#{date}</code></td>
+    <td>Insight learned from trade or feedback</td>
+    <td>"Low volume bounces on NQ = weak, don't trust"</td>
+  </tr>
+  <tr>
+    <td><code>USER#{userId}</code></td>
+    <td><code>BEHAVIOR#{date}</code></td>
+    <td>Emotional/behavioral pattern detected</td>
+    <td>"Revenge trades after 2+ consecutive losses"</td>
+  </tr>
+  <tr>
+    <td><code>USER#{userId}</code></td>
+    <td><code>PREFERENCE#{key}</code></td>
+    <td>User preference expressed in conversation</td>
+    <td>"No trades 30 min before high-impact news"</td>
+  </tr>
+  <tr>
+    <td><code>USER#{userId}</code></td>
+    <td><code>FEEDBACK#{timestamp}</code></td>
+    <td>"Mira aquí" result feedback linked to signal</td>
+    <td>Signal was LONG NQ → hit TP +50pts, breakout confirmed</td>
+  </tr>
+  <tr>
+    <td><code>USER#{userId}</code></td>
+    <td><code>SIGNAL#{timestamp}</code></td>
+    <td>Trade study signal given by AI</td>
+    <td>LONG NQ 18200, SL 18175, TP 18260, conf 7/10</td>
+  </tr>
+</table>
+
+<h3>Memory Post-Processor</h3>
+<div class="card card-green">
+  <p>Runs <strong>after every conversation ends</strong>. A Lambda calls <code>GPT-4o-mini</code> (~$0.001 per run) to extract structured data from the chat:</p>
+  <ul>
+    <li>Did the user mention a trade? → <code>TRADE</code></li>
+    <li>Was there a lesson learned? → <code>LESSON</code></li>
+    <li>Did the user show emotional pattern? → <code>BEHAVIOR</code></li>
+    <li>Did the user express a preference? → <code>PREFERENCE</code></li>
+    <li>Did the user send result feedback? → <code>FEEDBACK</code></li>
+  </ul>
+</div>
+
+<pre><code><span class="comment">// Lambda: memory_post_processor</span>
+<span class="keyword">async function</span> <span class="func">extractMemory</span>(userId, conversation) {
+  <span class="keyword">const</span> extraction = <span class="keyword">await</span> openai.chat({
+    model: <span class="string">'gpt-4o-mini'</span>,
+    messages: [{
+      role: <span class="string">'system'</span>,
+      content: <span class="string">`Analyze this trading conversation. Extract:
+        1. trades[] — any trade results (symbol, direction, entry, exit, pnl)
+        2. lessons[] — insights learned
+        3. behaviors[] — emotional patterns (revenge, tilt, overconfidence)
+        4. preferences[] — stated preferences
+        5. feedback[] — result screenshots/outcomes linked to prior signals
+        Return JSON. Empty arrays if nothing to extract.`</span>
+    }, ...conversation]
+  });
+
+  <span class="keyword">const</span> data = JSON.parse(extraction);
+
+  <span class="keyword">for</span> (<span class="keyword">const</span> trade <span class="keyword">of</span> data.trades) {
+    <span class="keyword">await</span> <span class="func">saveMemory</span>(userId, <span class="string">'TRADE'</span>, trade);
+  }
+  <span class="keyword">for</span> (<span class="keyword">const</span> lesson <span class="keyword">of</span> data.lessons) {
+    <span class="keyword">await</span> <span class="func">saveMemory</span>(userId, <span class="string">'LESSON'</span>, lesson);
+  }
+  <span class="comment">// ... same for behaviors, preferences, feedback</span>
+}</code></pre>
+
+<h3>Memory Retrieval (injected at chat start)</h3>
+<pre><code><span class="keyword">async function</span> <span class="func">getUserMemory</span>(userId) {
+  <span class="keyword">const</span> trades    = <span class="keyword">await</span> query(userId, <span class="string">'TRADE#'</span>, { limit: 20, reverse: true });
+  <span class="keyword">const</span> lessons   = <span class="keyword">await</span> query(userId, <span class="string">'LESSON#'</span>, { limit: 10, reverse: true });
+  <span class="keyword">const</span> behaviors = <span class="keyword">await</span> query(userId, <span class="string">'BEHAVIOR#'</span>, { limit: 5, reverse: true });
+  <span class="keyword">const</span> prefs     = <span class="keyword">await</span> query(userId, <span class="string">'PREFERENCE#'</span>);
+
+  <span class="keyword">return</span> { trades, lessons, behaviors, preferences: prefs };
+}</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="prompt">💬 3. Dynamic System Prompt</h2>
+<span class="priority p1">🔴 PRIORITY #1</span>
+
+<div class="card card-accent">
+  <h3>What It Is</h3>
+  <p>Every LLM request is built dynamically: <strong>Base Soul</strong> (fixed personality) + <strong>User Profile</strong> (style, instruments, risk) + <strong>User Memory</strong> (trades, lessons, behaviors) + <strong>Market Context</strong> (today's briefing, calendar) + <strong>Conversation History</strong> (last 20 messages).</p>
+</div>
+
+<pre><code><span class="keyword">async function</span> <span class="func">buildSystemPrompt</span>(userId) {
+  <span class="keyword">const</span> soul    = <span class="keyword">await</span> <span class="func">getBaseSoul</span>();       <span class="comment">// SOUL.md content — fixed</span>
+  <span class="keyword">const</span> user    = <span class="keyword">await</span> <span class="func">getUser</span>(userId);       <span class="comment">// DynamoDB: profile</span>
+  <span class="keyword">const</span> memory  = <span class="keyword">await</span> <span class="func">getUserMemory</span>(userId); <span class="comment">// DynamoDB: trades, lessons, etc.</span>
+  <span class="keyword">const</span> market  = <span class="keyword">await</span> <span class="func">getMarketContext</span>();     <span class="comment">// Redis: today's briefing + calendar</span>
+  <span class="keyword">const</span> stats   = <span class="keyword">await</span> <span class="func">getUserStats</span>(userId);  <span class="comment">// Calculated from trade history</span>
+
+  <span class="keyword">return</span> <span class="string">`${soul}
+
+## Current User
+- Name: ${user.name}
+- Trading Style: ${user.tradingStyle}
+- Instruments: ${user.instruments.join(', ')}
+- Account Size: $${user.accountSize}
+- Risk per Trade: ${user.riskPercent}%
+- Language: ${user.language}
+
+## What You Know About This Trader
+- Win rate (30d): ${stats.winRate30d}%
+- Current streak: ${stats.currentStreak}
+- Trades today: ${stats.tradesToday}
+- P/L today: $${stats.pnlToday}
+${stats.tradesToday >= 3 && stats.pnlToday < 0
+    ? '⚠️ ALERT: 3+ losing trades today. Watch for revenge trading.'
+    : ''}
+
+## Behavioral Notes
+${memory.behaviors.map(b => '- ' + b.note).join('\\n')}
+
+## Learned Lessons
+${memory.lessons.map(l => '- ' + l.note).join('\\n')}
+
+## Preferences
+${memory.preferences.map(p => '- ' + p.note).join('\\n')}
+
+## Recent Trades
+${memory.trades.map(t =>
+    '- ' + t.direction + ' ' + t.symbol + ' ' + t.entry + '→' + t.exit + ' ' + (t.pnl > 0 ? '+' : '') + '$' + t.pnl
+  ).join('\\n')}
+
+## Market Context Today
+${market.summary}
+Upcoming events: ${market.upcomingEvents}`</span>;
+}</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="feedback">🔄 4. Feedback Loop</h2>
+<span class="priority p1">🔴 PRIORITY #1</span>
+
+<div class="card card-green">
+  <h3>What It Is</h3>
+  <p>The user sends a screenshot of what happened after a signal — "mira, se fue para arriba" — and the AI learns from the outcome. This is what makes the system get smarter over time <strong>for each specific user</strong>.</p>
+</div>
+
+<h3>Flow</h3>
+<table>
+  <tr><th>Step</th><th>What Happens</th><th>Where</th></tr>
+  <tr><td>1</td><td>AI gives trade study signal</td><td>Saved as <code>SIGNAL#{ts}</code> in DynamoDB</td></tr>
+  <tr><td>2</td><td>User sends result screenshot or text (minutes/hours later)</td><td>Extension → Backend</td></tr>
+  <tr><td>3</td><td>AI analyzes the result via vision, compares with original signal</td><td>Lambda + LLM</td></tr>
+  <tr><td>4</td><td>Extracts: win/loss, what worked, what failed, lesson</td><td>LLM extraction</td></tr>
+  <tr><td>5</td><td>Saves as <code>FEEDBACK#{ts}</code> linked to original <code>SIGNAL#{ts}</code></td><td>DynamoDB</td></tr>
+  <tr><td>6</td><td>Future analyses reference this history for similar setups</td><td>Prompt injection</td></tr>
+</table>
+
+<div class="card card-orange">
+  <h3>Example Interaction</h3>
+  <p><strong>User:</strong> "Mira, llegó a 18,280" + screenshot</p>
+  <p><strong>AI:</strong> "Bien ahí 🎯 El breakout de la consolidación funcionó. TP1 hit +45pts. Noto que el volumen subió justo en la ruptura — eso lo guardo como confirmación para setups similares. Tu win rate en breakouts de NQ sube a 68%."</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="model-router">🔀 5. Model Router</h2>
+<span class="priority p2">🟠 PRIORITY #2</span>
+
+<div class="card card-cyan">
+  <h3>Why</h3>
+  <p>OpenAI refuses trade signals due to financial advice guardrails. Claude doesn't. Route trade analysis to Claude, cheap tasks to GPT-4o-mini, deep research to GPT-5. Saves cost and avoids refusals.</p>
+</div>
+
+<table>
+  <tr><th>Task</th><th>Model</th><th>Provider</th><th>Why</th></tr>
+  <tr>
+    <td>Chart analysis / Trade signals</td>
+    <td><code>claude-sonnet-4-5</code></td>
+    <td>Anthropic</td>
+    <td>No financial restrictions, great vision</td>
+  </tr>
+  <tr>
+    <td>Quick chat / Q&A</td>
+    <td><code>gpt-4o-mini</code></td>
+    <td>OpenAI</td>
+    <td>Cheap, fast</td>
+  </tr>
+  <tr>
+    <td>Deep research / Complex analysis</td>
+    <td><code>gpt-5</code></td>
+    <td>OpenAI</td>
+    <td>Best reasoning</td>
+  </tr>
+  <tr>
+    <td>Memory extraction (post-chat)</td>
+    <td><code>gpt-4o-mini</code></td>
+    <td>OpenAI</td>
+    <td>Classification task, cheap</td>
+  </tr>
+  <tr>
+    <td>Intent classification</td>
+    <td><code>gpt-4o-mini</code></td>
+    <td>OpenAI</td>
+    <td>~$0.0005 per call</td>
+  </tr>
+</table>
+
+<pre><code><span class="keyword">function</span> <span class="func">routeModel</span>(intent, hasImage) {
+  <span class="keyword">if</span> (intent === <span class="string">'trade_signal'</span> || intent === <span class="string">'chart_analysis'</span>) {
+    <span class="keyword">return</span> { provider: <span class="string">'anthropic'</span>, model: <span class="string">'claude-sonnet-4-5-20250514'</span> };
+  }
+  <span class="keyword">if</span> (intent === <span class="string">'deep_research'</span>) {
+    <span class="keyword">return</span> { provider: <span class="string">'openai'</span>, model: <span class="string">'gpt-5'</span> };
+  }
+  <span class="keyword">return</span> { provider: <span class="string">'openai'</span>, model: <span class="string">'gpt-4o-mini'</span> };
+}</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="enrichment">📊 6. Market Data Enrichment</h2>
+<span class="priority p2">🟠 PRIORITY #2</span>
+
+<div class="card card-accent">
+  <p>On-demand only — triggered when the user asks for analysis. No crons scanning every pair. The extension sends DOM data (price, indicators); the backend adds what the chart doesn't show.</p>
+</div>
+
+<h3>Data Sources</h3>
+<table>
+  <tr><th>Data</th><th>API</th><th>Cost</th><th>Use Case</th></tr>
+  <tr><td>Crypto prices</td><td>Existing API (already integrated)</td><td>Free</td><td>Confirm prices, get ranges</td></tr>
+  <tr><td>Stocks / Futures</td><td>Yahoo Finance (unofficial)</td><td>Free</td><td>NQ, ES, SPY — price, ATR, volume</td></tr>
+  <tr><td>Economic Calendar</td><td>Forex Factory scrape / Trading Economics</td><td>Free</td><td>"CPI in 30 min" awareness</td></tr>
+  <tr><td>DXY, VIX, Yields</td><td>Yahoo Finance</td><td>Free</td><td>Correlation checks</td></tr>
+  <tr><td>News headlines</td><td>Brave Search API</td><td>Free (key exists)</td><td>Sentiment analysis</td></tr>
+  <tr><td>TwelveData</td><td>TwelveData API</td><td>Free tier / $30/mo</td><td>Real-time fallback, ATR, historical</td></tr>
+</table>
+
+<div class="card card-green">
+  <h3>Key Insight: TradingView IS Your Real-Time Feed</h3>
+  <p>The user has TradingView open with real-time data. The extension scrapes the current price from the DOM and sends it to the backend. <strong>Zero cost for real-time prices.</strong> Backend APIs are only for enrichment (correlations, calendar, news) — those don't need to be real-time.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="signals">🎯 7. Trade Study Signals</h2>
+<span class="priority p1">🔴 PRIORITY #1 — exists, needs polish</span>
+
+<div class="card card-gold">
+  <h3>Signal Output Format</h3>
+  <div class="signal-example">
+<span class="dir">📊 NQ (Nasdaq 100) — LONG</span>
+
+<span class="label">Entry:</span>  <span class="value">18,245</span>
+<span class="label">SL:</span>     <span class="value">18,220</span>  (-25 pts)
+<span class="label">TP1:</span>    <span class="value">18,290</span>  (+45 pts)  ← 1.8R
+<span class="label">TP2:</span>    <span class="value">18,330</span>  (+85 pts)  ← 3.4R
+
+<span class="label">Size:</span>   <span class="value">0.02 lots</span> (based on $50 account, 10% risk)
+<span class="conf">Confidence: 7/10</span>
+
+<span class="label">Why:</span> <span class="value">Support at 18,240 held 3 times, RSI bouncing from 35,
+DXY dropping, no news next 2h. Scalp target 15-20 min.</span>
+
+<span class="warn">⚠️ If 18,220 breaks, exit. Do not move SL.</span>
+  </div>
+</div>
+
+<h3>What triggers a signal</h3>
+<ul>
+  <li>User clicks <strong>"🎯 Dame Entrada"</strong> button → auto-captures screenshot + DOM data</li>
+  <li>User types request with trade intent (semantic detection)</li>
+  <li>One click = full signal with SL, TP, size. Zero typing required.</li>
+</ul>
+
+<h3>What the backend does on signal request</h3>
+<ol>
+  <li>Receive: screenshot + symbol + timeframe + price + indicators (from extension)</li>
+  <li>Enrich: economic calendar check, correlation check (DXY/VIX), news sentiment</li>
+  <li>Load: user memory (recent trades, lessons, behavioral warnings)</li>
+  <li>Calculate: position size based on user's account + risk tolerance</li>
+  <li>Route to <strong>Claude Sonnet 4.5</strong> (no financial restrictions)</li>
+  <li>Return structured signal to chat</li>
+  <li>Save signal as <code>SIGNAL#{ts}</code> for future feedback tracking</li>
+</ol>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="scheduler">⏰ 8. Cron / Scheduler System</h2>
+<span class="priority p2">🟠 PRIORITY #2</span>
+
+<div class="card card-cyan">
+  <h3>What It Is</h3>
+  <p>Users create reminders, recurring briefings, and alerts <strong>through natural conversation</strong>. No settings UI needed — the AI manages everything via function calling. A Node.js process on the VPS executes schedules.</p>
+</div>
+
+<h3>DynamoDB Table: <code>user_schedules</code></h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Example</th></tr>
+  <tr><td><code>PK</code></td><td>String</td><td><code>USER#german123</code></td></tr>
+  <tr><td><code>SK</code></td><td>String</td><td><code>SCHEDULE#uuid-abc-123</code></td></tr>
+  <tr><td><code>cronExpression</code></td><td>String</td><td><code>30 8 * * 1-5</code></td></tr>
+  <tr><td><code>taskType</code></td><td>String</td><td><code>briefing | reminder | analysis | news_alert</code></td></tr>
+  <tr><td><code>description</code></td><td>String</td><td><code>Daily NQ + Gold briefing</code></td></tr>
+  <tr><td><code>instruments</code></td><td>List</td><td><code>["NQ", "XAUUSD"]</code></td></tr>
+  <tr><td><code>delivery</code></td><td>String</td><td><code>telegram | extension | email</code></td></tr>
+  <tr><td><code>enabled</code></td><td>Boolean</td><td><code>true</code></td></tr>
+  <tr><td><code>nextRun</code></td><td>String (ISO)</td><td><code>2026-03-04T13:30:00Z</code></td></tr>
+</table>
+
+<h3>Executor: VPS Node.js Process</h3>
+<pre><code><span class="keyword">const</span> cron = require(<span class="string">'node-cron'</span>);
+
+<span class="comment">// Runs every minute</span>
+cron.<span class="func">schedule</span>(<span class="string">'* * * * *'</span>, <span class="keyword">async</span> () => {
+  <span class="keyword">const</span> due = <span class="keyword">await</span> <span class="func">getDueSchedules</span>(); <span class="comment">// DynamoDB query: nextRun <= now</span>
+  <span class="keyword">for</span> (<span class="keyword">const</span> s <span class="keyword">of</span> due) {
+    <span class="keyword">await</span> <span class="func">executeTask</span>(s);          <span class="comment">// Run AI analysis, send reminder, etc.</span>
+    <span class="keyword">await</span> <span class="func">updateNextRun</span>(s);         <span class="comment">// Calculate next occurrence</span>
+  }
+});
+
+<span class="keyword">async function</span> <span class="func">deliver</span>(userId, message, channel) {
+  <span class="keyword">switch</span> (channel) {
+    <span class="keyword">case</span> <span class="string">'telegram'</span>:
+      <span class="keyword">await</span> <span class="func">sendTelegram</span>(<span class="keyword">await</span> <span class="func">getChatId</span>(userId), message);
+      <span class="keyword">break</span>;
+    <span class="keyword">case</span> <span class="string">'extension'</span>:
+      <span class="keyword">await</span> <span class="func">saveNotification</span>(userId, message); <span class="comment">// Extension polls for these</span>
+      <span class="keyword">break</span>;
+    <span class="keyword">case</span> <span class="string">'email'</span>:
+      <span class="keyword">await</span> <span class="func">sendEmail</span>(userId, message);
+      <span class="keyword">break</span>;
+  }
+}</code></pre>
+
+<h3>UX: Conversational Schedule Management</h3>
+<div class="card card-green">
+  <p><strong>User:</strong> "Avísame todos los días a las 8:30 qué pasa con NQ y gold"</p>
+  <p><strong>AI:</strong> "Listo ✅ Briefing diario 8:30 AM ET → NQ + Gold → Telegram. ¿Incluyo calendario económico?"</p>
+  <p><strong>User:</strong> "¿Qué alertas tengo?"</p>
+  <p><strong>AI:</strong> "3 activas: 1) Briefing diario 8:30 AM 2) Reminder 9:25 AM 'prepárate' 3) News alerts 30 min antes. ¿Cambio alguno?"</p>
+</div>
+
+<h3>Special: Pre-News Event Alerts</h3>
+<pre><code><span class="comment">// Daily cron at 6 AM ET: schedule alerts for today's events</span>
+cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span>, <span class="keyword">async</span> () => {
+  <span class="keyword">const</span> events = <span class="keyword">await</span> <span class="func">getEconomicCalendar</span>(<span class="string">'today'</span>);
+  <span class="keyword">for</span> (<span class="keyword">const</span> event <span class="keyword">of</span> events.filter(e => e.impact === <span class="string">'HIGH'</span>)) {
+    <span class="keyword">const</span> alertTime = <span class="keyword">new</span> Date(event.time - 30 * 60 * 1000); <span class="comment">// 30 min before</span>
+    <span class="keyword">await</span> <span class="func">scheduleOneTime</span>({
+      time: alertTime,
+      task: <span class="string">`Pre-event alert: ${event.name} in 30 min`</span>,
+      instruments: event.affectedInstruments
+    });
+  }
+});</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="briefing">📋 9. Pre-Market Briefings</h2>
+<span class="priority p2">🟠 PRIORITY #2</span>
+
+<div class="card card-accent">
+  <h3>How It Works</h3>
+  <ol>
+    <li>Cron runs at <strong>8:00 AM ET</strong> weekdays</li>
+    <li>Lambda generates briefing per active instrument (NQ, Gold, BTC, etc.)</li>
+    <li>Stored in DynamoDB: <code>BRIEFING#{symbol}#{date}</code></li>
+    <li>Extension polls <code>GET /api/briefings?since=lastSeen</code></li>
+    <li>New briefing → <strong>badge on extension icon</strong> + bubble in chat</li>
+    <li>Also pushed to Telegram for users who have it connected</li>
+  </ol>
+</div>
+
+<div class="card card-orange">
+  <h3>Briefing is per MARKET, not per user</h3>
+  <p>One NQ briefing serves all NQ traders. One Gold briefing serves all Gold traders. Each user sees only the instruments from their profile. The analysis is identical — only the delivery is personalized.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="integrations">🔌 10. Integrations</h2>
+<span class="priority p3">🔵 PRIORITY #3-4</span>
+
+<div class="grid-2">
+  <div class="card card-green">
+    <h3>📱 Telegram</h3>
+    <p><strong>Setup:</strong> Create bot via BotFather → user sends <code>/start</code> → store <code>chat_id</code></p>
+    <p><strong>Use:</strong> Briefings, alerts, reminders, schedule deliveries</p>
+    <p><strong>API:</strong> <code>POST api.telegram.org/bot{TOKEN}/sendMessage</code></p>
+    <p><span class="badge badge-green">Phase 3</span></p>
+  </div>
+  <div class="card card-orange">
+    <h3>📧 Gmail</h3>
+    <p><strong>Setup:</strong> OAuth2 in onboarding → store refresh token (encrypted)</p>
+    <p><strong>Use:</strong> Email reminders, weekly reports</p>
+    <p><strong>API:</strong> Gmail API via googleapis SDK</p>
+    <p><span class="badge badge-purple">Phase 4</span></p>
+  </div>
+  <div class="card card-cyan">
+    <h3>🏦 Arkbank Broker</h3>
+    <p><strong>Setup:</strong> User provides API keys → stored encrypted in DynamoDB</p>
+    <p><strong>Use:</strong> Read positions, balance, trade history. <strong>READ ONLY in Phase 1.</strong></p>
+    <p><strong>Tools:</strong> <code>get_positions()</code>, <code>get_balance()</code>, <code>get_trade_history()</code></p>
+    <p><span class="badge badge-purple">Phase 4</span></p>
+  </div>
+  <div class="card card-accent">
+    <h3>🔔 Chrome Push Notifications</h3>
+    <p><strong>Setup:</strong> Service worker in extension + Firebase Cloud Messaging</p>
+    <p><strong>Use:</strong> Backend pushes notification → Chrome shows native alert</p>
+    <p><strong>Trigger:</strong> Briefing ready, news event approaching, schedule fired</p>
+    <p><span class="badge badge-orange">Phase 3</span></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="tools">🛠️ 11. Function Calling Tools</h2>
+
+<div class="card card-accent">
+  <p>These are the tools the LLM can invoke during a conversation. Each one maps to a Lambda function.</p>
+</div>
+
+<table>
+  <tr><th>Tool</th><th>Description</th><th>Parameters</th><th>Phase</th></tr>
+  <tr>
+    <td><code>get_economic_calendar</code></td>
+    <td>Today's economic events + impact level</td>
+    <td>—</td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>get_market_data</code></td>
+    <td>Price, ATR, daily range for a symbol</td>
+    <td><code>symbol</code></td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>search_news</code></td>
+    <td>Recent news + sentiment via Brave Search</td>
+    <td><code>query</code></td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>calculate_position_size</code></td>
+    <td>Lot size from account, risk %, SL distance</td>
+    <td><code>account_size, risk_percent, sl_points, symbol</code></td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>log_trade</code></td>
+    <td>Save a trade to user's history</td>
+    <td><code>symbol, direction, entry, exit, pnl, notes</code></td>
+    <td><span class="badge badge-red">P1</span></td>
+  </tr>
+  <tr>
+    <td><code>get_user_stats</code></td>
+    <td>Win rate, P/L, streak, trade count</td>
+    <td>—</td>
+    <td><span class="badge badge-red">P1</span></td>
+  </tr>
+  <tr>
+    <td><code>get_user_trade_history</code></td>
+    <td>Past trades for pattern analysis</td>
+    <td><code>limit, symbol (optional)</code></td>
+    <td><span class="badge badge-red">P1</span></td>
+  </tr>
+  <tr>
+    <td><code>create_schedule</code></td>
+    <td>Create recurring/one-time task</td>
+    <td><code>cron, task_type, description, instruments, delivery</code></td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>list_schedules</code></td>
+    <td>Show user's active schedules</td>
+    <td>—</td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>delete_schedule</code></td>
+    <td>Remove a schedule by ID</td>
+    <td><code>schedule_id</code></td>
+    <td><span class="badge badge-orange">P2</span></td>
+  </tr>
+  <tr>
+    <td><code>send_telegram</code></td>
+    <td>Send message to user's Telegram</td>
+    <td><code>message</code></td>
+    <td><span class="badge badge-blue">P3</span></td>
+  </tr>
+  <tr>
+    <td><code>send_email</code></td>
+    <td>Send email via connected Gmail</td>
+    <td><code>to, subject, body</code></td>
+    <td><span class="badge badge-purple">P4</span></td>
+  </tr>
+  <tr>
+    <td><code>get_broker_positions</code></td>
+    <td>Read open positions from Arkbank</td>
+    <td>—</td>
+    <td><span class="badge badge-purple">P4</span></td>
+  </tr>
+  <tr>
+    <td><code>get_broker_balance</code></td>
+    <td>Read account balance from Arkbank</td>
+    <td>—</td>
+    <td><span class="badge badge-purple">P4</span></td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="costs">💰 12. Cost Estimates (10,000 users)</h2>
+
+<table>
+  <tr><th>Item</th><th>Monthly Cost</th><th>Notes</th></tr>
+  <tr>
+    <td>Anthropic (Claude Sonnet 4.5)</td>
+    <td>~$15,000</td>
+    <td>Trade signals, chart analysis</td>
+  </tr>
+  <tr>
+    <td>OpenAI GPT-4o-mini</td>
+    <td>~$2,000</td>
+    <td>Routing, extraction, quick Q&A</td>
+  </tr>
+  <tr>
+    <td>OpenAI GPT-5</td>
+    <td>~$5,000</td>
+    <td>Deep research (occasional)</td>
+  </tr>
+  <tr>
+    <td>DynamoDB</td>
+    <td>~$500</td>
+    <td>Memory, schedules, profiles</td>
+  </tr>
+  <tr>
+    <td>Lambda</td>
+    <td>~$300</td>
+    <td>All API handlers</td>
+  </tr>
+  <tr>
+    <td>Redis</td>
+    <td>~$200</td>
+    <td>Cache, sessions</td>
+  </tr>
+  <tr>
+    <td>VPS (cron scheduler)</td>
+    <td>$0</td>
+    <td>Already exists</td>
+  </tr>
+  <tr>
+    <td>Telegram Bot API</td>
+    <td>$0</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td>Market data APIs</td>
+    <td>~$30</td>
+    <td>TwelveData grow tier (optional)</td>
+  </tr>
+  <tr style="background: rgba(16,185,129,0.1); font-weight: 700;">
+    <td>TOTAL</td>
+    <td>~$23,000/mo</td>
+    <td></td>
+  </tr>
+</table>
+
+<div class="card card-gold">
+  <h3>Revenue vs Cost</h3>
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>Users</td><td>10,000</td></tr>
+    <tr><td>Price</td><td>$900/year = $75/month per user</td></tr>
+    <tr><td>Monthly Revenue</td><td><strong>$750,000</strong></td></tr>
+    <tr><td>Monthly Cost</td><td><strong>~$23,000</strong></td></tr>
+    <tr><td>Margin</td><td><strong>~97%</strong></td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="roadmap">🗓️ 13. Roadmap</h2>
+
+<div class="roadmap-phase">
+  <div class="roadmap-dot dot-red"></div>
+  <h3>Phase 1 — Core Brain <span class="badge badge-red">3-4 weeks</span></h3>
+  <div class="card">
+    <ul>
+      <li>✅ Memory system (DynamoDB <code>user_memory</code> table + post-chat extractor Lambda)</li>
+      <li>✅ Dynamic system prompt builder (Soul + user profile + memory + market)</li>
+      <li>✅ Feedback loop ("mira aquí" → AI learns from results)</li>
+      <li>✅ Model router (Claude for signals, GPT-mini for cheap tasks)</li>
+      <li>✅ Fix trade signal refusals (switch to Claude Sonnet 4.5)</li>
+      <li>✅ SOUL.md — base personality prompt</li>
+      <li>✅ Trade logging via chat (screenshot-based, AI extracts details)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="roadmap-phase">
+  <div class="roadmap-dot dot-orange"></div>
+  <h3>Phase 2 — Intelligence <span class="badge badge-orange">3-4 weeks</span></h3>
+  <div class="card">
+    <ul>
+      <li>📊 Economic calendar integration (free API)</li>
+      <li>📊 Market data enrichment (Yahoo Finance, TwelveData — correlations, ATR)</li>
+      <li>📊 News sentiment search (Brave Search API)</li>
+      <li>📊 Position size calculator tool</li>
+      <li>📊 Cron scheduler system (VPS node-cron + DynamoDB)</li>
+      <li>📊 Pre-market briefings (8 AM cron → stored → served on extension open)</li>
+      <li>📊 User schedule management via chat (create/list/delete)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="roadmap-phase">
+  <div class="roadmap-dot dot-blue"></div>
+  <h3>Phase 3 — Delivery & Notifications <span class="badge badge-blue">2-3 weeks</span></h3>
+  <div class="card">
+    <ul>
+      <li>📱 Telegram bot integration (briefings, alerts, reminders)</li>
+      <li>📱 Chrome push notifications via service worker</li>
+      <li>📱 Pre-news event alerts (30 min before high-impact events)</li>
+      <li>📱 Extension badge + bubble for new briefings</li>
+    </ul>
+  </div>
+</div>
+
+<div class="roadmap-phase">
+  <div class="roadmap-dot dot-purple"></div>
+  <h3>Phase 4 — Premium Integrations <span class="badge badge-purple">Ongoing</span></h3>
+  <div class="card">
+    <ul>
+      <li>🔮 Gmail integration (OAuth2, email reminders, weekly reports)</li>
+      <li>🔮 Arkbank broker API (read-only: positions, balance, history)</li>
+      <li>🔮 Trade history analytics dashboard (win rates, patterns, equity curve)</li>
+      <li>🔮 Emotional pattern detection + proactive warnings</li>
+      <li>🔮 Second Opinion mode (pre-trade validation with confidence score)</li>
+      <li>🔮 Voice mode (AI speaks analysis)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<h2 id="soul">📜 14. SOUL.md Reference</h2>
+
+<div class="card card-gold">
+  <h3>Location: <code>/HPC/SOUL.md</code></h3>
+  <p>The SOUL.md file in this same directory contains the complete base system prompt for the HPC AI. It defines:</p>
+  <ul>
+    <li><strong>Identity</strong> — what the AI is (educational trading study companion)</li>
+    <li><strong>Personality</strong> — direct, bilingual, confident, empathetic, adaptive</li>
+    <li><strong>Signal format</strong> — exact structure for trade study setups</li>
+    <li><strong>Memory rules</strong> — how to use and update user memory</li>
+    <li><strong>Emotional awareness</strong> — when and how to flag behavioral patterns</li>
+    <li><strong>Available tools</strong> — all function calling tools the AI can invoke</li>
+    <li><strong>Formatting rules</strong> — markdown in extension, mobile-friendly in Telegram</li>
+    <li><strong>Legal framing</strong> — educational tool, not financial advice</li>
+  </ul>
+  <p>This file is loaded as the first section of every system prompt. User-specific context is appended dynamically by the <code>buildSystemPrompt()</code> function.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr class="separator">
+<div style="text-align: center; color: var(--muted); padding: 2rem 0;">
+  <p>HPC Extended Features Blueprint v1.0</p>
+  <p>Last updated: March 2026</p>
+  <p style="margin-top: 0.5rem;">Built with 🧠 by TradingClaw</p>
+</div>
+
+</div>
+</body>
+</html>
