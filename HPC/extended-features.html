@@ -331,7 +331,7 @@
   <a href="#costs">12. Cost Estimates</a>
   <a href="#roadmap">13. Roadmap</a>
   <a href="#soul">14. SOUL.md Reference</a>
-  <a href="#pricing">15. Pricing & Subscription Tiers</a>
+  <a href="#pricing">15. Pricing — Credits Model (All Features, Pay for Usage)</a>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1058,17 +1058,27 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
 
 <!-- ═══════════════════════════════════════════ -->
 <hr class="separator">
-<h2 id="pricing">💳 15. Pricing & Subscription Tiers</h2>
+<h2 id="pricing">⚡ 15. Pricing — Credits Model (All Features, Pay for Usage)</h2>
 
+<div class="card card-gold">
+  <h3>Core Philosophy</h3>
+  <p><strong>Every tier gets ALL features.</strong> No locked features, no "upgrade to unlock." The only difference is how many credits (⚡ Energy) you get per month. Use more = pay more. Simple, fair, no frustration.</p>
+</div>
+
+<h3>Credit Costs Per Action</h3>
 <div class="card card-accent">
-  <h3>Cost Per User Breakdown</h3>
+  <p>Each action the user takes consumes credits based on real backend cost:</p>
   <table>
-    <tr><th>User Type</th><th>% of Users</th><th>Activity</th><th>Cost/User/Mo</th></tr>
-    <tr><td>🔥 Heavy (20+ chats/day)</td><td>~10%</td><td>Power traders</td><td>~$8-10</td></tr>
-    <tr><td>📊 Medium (5-10 chats/day)</td><td>~30%</td><td>Regular use</td><td>~$3-4</td></tr>
-    <tr><td>💬 Light (1-3 chats/day)</td><td>~40%</td><td>Casual</td><td>~$1-2</td></tr>
-    <tr><td>😴 Dormant</td><td>~20%</td><td>Subscribed, inactive</td><td>~$0.10</td></tr>
-    <tr style="font-weight:700;"><td colspan="3">Weighted Average</td><td>~$2.30/mo</td></tr>
+    <tr><th>Action</th><th>Credits ⚡</th><th>Backend Cost</th><th>What Happens</th></tr>
+    <tr><td>💬 Chat message (quick Q&A)</td><td><strong>1 ⚡</strong></td><td>~$0.002</td><td>GPT-4o-mini responds</td></tr>
+    <tr><td>📊 Chart analysis (screenshot)</td><td><strong>5 ⚡</strong></td><td>~$0.01</td><td>Claude vision analyzes chart</td></tr>
+    <tr><td>🎯 Trade signal (full setup)</td><td><strong>10 ⚡</strong></td><td>~$0.03</td><td>Claude + enrichment + position calc</td></tr>
+    <tr><td>🧠 Deep research</td><td><strong>20 ⚡</strong></td><td>~$0.08</td><td>GPT-5 deep reasoning</td></tr>
+    <tr><td>📋 Pre-market briefing</td><td><strong>3 ⚡</strong></td><td>~$0.01</td><td>Shared/cached market briefing</td></tr>
+    <tr><td>⏰ Cron execution</td><td><strong>2 ⚡</strong></td><td>~$0.005</td><td>Reminder, alert, scheduled task</td></tr>
+    <tr><td>🔄 Feedback loop ("mira aquí")</td><td><strong>5 ⚡</strong></td><td>~$0.01</td><td>AI learns from trade result</td></tr>
+    <tr><td>🏦 Broker data check</td><td><strong>2 ⚡</strong></td><td>~$0.001</td><td>Read positions/balance from broker</td></tr>
+    <tr><td>🤔 Second opinion</td><td><strong>10 ⚡</strong></td><td>~$0.03</td><td>Pre-trade validation + confidence</td></tr>
   </table>
 </div>
 
@@ -1085,16 +1095,23 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
       <span style="color:var(--muted); font-size:0.9rem;">/month</span>
     </div>
     <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">$290/year (save $58)</div>
+    <div style="background:var(--surface2); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:center;">
+      <span style="font-size:1.8rem; font-weight:800; color:var(--gold);">500 ⚡</span>
+      <span style="color:var(--muted); font-size:0.85rem; display:block;">credits / month</span>
+    </div>
     <ul style="flex:1; padding-left:1.2rem; margin:0;">
-      <li>15 chart analyses per day</li>
-      <li>Basic memory (trade log, preferences)</li>
-      <li>GPT-4o-mini for chat</li>
-      <li>Claude for signals (10/day)</li>
-      <li style="color:var(--muted); text-decoration:line-through;">Crons & briefings</li>
-      <li style="color:var(--muted); text-decoration:line-through;">Telegram / Email delivery</li>
-      <li style="color:var(--muted); text-decoration:line-through;">Broker integration</li>
+      <li>✅ ALL features included</li>
+      <li>✅ Full memory system</li>
+      <li>✅ All AI models</li>
+      <li>✅ Briefings, crons, integrations</li>
+      <li>Extra credits: $0.05 each</li>
+      <li>No rollover</li>
+      <li>Standard processing speed</li>
     </ul>
-    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+    <div style="margin-top:1rem; padding:0.75rem; background:var(--surface2); border-radius:8px; font-size:0.8rem; color:var(--muted);">
+      <strong>≈ Per month:</strong> ~50 trade signals + ~100 chats + daily briefings
+    </div>
+    <div style="margin-top:0.75rem; font-size:0.8rem; color:var(--muted);">
       Cost: ~$0.80/user → <span style="color:var(--green); font-weight:600;">36x margin</span>
     </div>
   </div>
@@ -1109,17 +1126,23 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
       <span style="color:var(--muted); font-size:0.9rem;">/month</span>
     </div>
     <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">$590/year (save $118)</div>
+    <div style="background:var(--surface2); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:center;">
+      <span style="font-size:1.8rem; font-weight:800; color:var(--gold);">1,500 ⚡</span>
+      <span style="color:var(--muted); font-size:0.85rem; display:block;">credits / month</span>
+    </div>
     <ul style="flex:1; padding-left:1.2rem; margin:0;">
-      <li>50 chart analyses per day</li>
-      <li><strong>Full memory system</strong> (trades, lessons, behaviors, feedback)</li>
-      <li>Model router (Claude + GPT-4o + GPT-5)</li>
-      <li>Economic calendar + news enrichment</li>
-      <li>5 custom crons/reminders</li>
-      <li>Pre-market briefings</li>
-      <li>Telegram notifications</li>
-      <li style="color:var(--muted); text-decoration:line-through;">Broker integration</li>
+      <li>✅ ALL features included</li>
+      <li>✅ Full memory system</li>
+      <li>✅ All AI models</li>
+      <li>✅ Briefings, crons, integrations</li>
+      <li>Extra credits: $0.04 each</li>
+      <li>30-day rollover</li>
+      <li>Standard processing speed</li>
     </ul>
-    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+    <div style="margin-top:1rem; padding:0.75rem; background:var(--surface2); border-radius:8px; font-size:0.8rem; color:var(--muted);">
+      <strong>≈ Per month:</strong> ~100 signals + ~300 chats + briefings + crons + feedback
+    </div>
+    <div style="margin-top:0.75rem; font-size:0.8rem; color:var(--muted);">
       Cost: ~$2.50/user → <span style="color:var(--green); font-weight:600;">23x margin</span>
     </div>
   </div>
@@ -1133,45 +1156,83 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
       <span style="color:var(--muted); font-size:0.9rem;">/month</span>
     </div>
     <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">$900/year (save $288)</div>
+    <div style="background:var(--surface2); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:center;">
+      <span style="font-size:1.8rem; font-weight:800; color:var(--gold);">5,000 ⚡</span>
+      <span style="color:var(--muted); font-size:0.85rem; display:block;">credits / month</span>
+    </div>
     <ul style="flex:1; padding-left:1.2rem; margin:0;">
-      <li><strong>Unlimited</strong> analyses</li>
-      <li>Full memory + deep behavioral analysis</li>
-      <li>GPT-5 for deep research</li>
-      <li>Unlimited crons</li>
-      <li>Telegram + Email delivery</li>
-      <li>Broker integration (Arkbank read-only)</li>
-      <li>Priority processing (faster responses)</li>
-      <li>Weekly AI performance report</li>
+      <li>✅ ALL features included</li>
+      <li>✅ Full memory system</li>
+      <li>✅ All AI models</li>
+      <li>✅ Briefings, crons, integrations</li>
+      <li>Extra credits: $0.03 each</li>
+      <li>60-day rollover</li>
+      <li>⚡ Priority processing (faster)</li>
     </ul>
-    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+    <div style="margin-top:1rem; padding:0.75rem; background:var(--surface2); border-radius:8px; font-size:0.8rem; color:var(--muted);">
+      <strong>≈ Per month:</strong> Practically hard to exhaust. Power traders, multi-session daily.
+    </div>
+    <div style="margin-top:0.75rem; font-size:0.8rem; color:var(--muted);">
       Cost: ~$5/user → <span style="color:var(--green); font-weight:600;">19x margin</span>
     </div>
   </div>
 
-  <!-- Institutional -->
+  <!-- Unlimited -->
   <div style="background: linear-gradient(135deg, var(--surface), #15101a); border:1px solid var(--accent2); border-radius:16px; padding:2rem; position:relative; display:flex; flex-direction:column;">
     <div style="font-size:2rem; margin-bottom:0.25rem;">💎</div>
-    <h3 style="margin:0 0 0.25rem; color:var(--accent2);">Institutional</h3>
+    <h3 style="margin:0 0 0.25rem; color:var(--accent2);">Unlimited</h3>
     <div style="display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.25rem;">
       <span style="font-size:2.5rem; font-weight:800; color:var(--text);">$249</span>
       <span style="color:var(--muted); font-size:0.9rem;">/month</span>
     </div>
     <div style="color:var(--green); font-size:0.85rem; margin-bottom:1.25rem;">Custom annual pricing</div>
+    <div style="background:var(--surface2); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:center;">
+      <span style="font-size:1.8rem; font-weight:800; color:var(--accent2);">∞ Unlimited</span>
+      <span style="color:var(--muted); font-size:0.85rem; display:block;">no credit limits</span>
+    </div>
     <ul style="flex:1; padding-left:1.2rem; margin:0;">
-      <li>Everything in Elite</li>
-      <li>API access (build on top)</li>
-      <li>Custom integrations</li>
-      <li>Dedicated support</li>
-      <li>White-label option</li>
+      <li>✅ ALL features included</li>
+      <li>✅ No credit limits ever</li>
+      <li>✅ API access (build on top)</li>
+      <li>✅ Custom integrations</li>
+      <li>✅ Dedicated support</li>
+      <li>✅ White-label option</li>
+      <li>⚡⚡ Fastest processing</li>
     </ul>
-    <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+    <div style="margin-top:1rem; padding:0.75rem; background:var(--surface2); border-radius:8px; font-size:0.8rem; color:var(--muted);">
+      <strong>For:</strong> Institutional traders, teams, and builders.
+    </div>
+    <div style="margin-top:0.75rem; font-size:0.8rem; color:var(--muted);">
       Cost: ~$8/user → <span style="color:var(--green); font-weight:600;">31x margin</span>
     </div>
   </div>
 
 </div>
 
-<h3>Revenue Projections (10,000 users)</h3>
+<h3>📊 Credit Usage Dashboard (in Extension Sidebar)</h3>
+<div class="card" style="max-width:360px;">
+  <div style="font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.85rem; line-height:1.8;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+      <span style="color:var(--gold); font-weight:700; font-size:1.1rem;">⚡ 847 / 1,500</span>
+      <span style="color:var(--muted); font-size:0.75rem;">Pro Plan</span>
+    </div>
+    <div style="background:var(--surface2); border-radius:4px; height:10px; overflow:hidden; margin-bottom:1rem;">
+      <div style="background:linear-gradient(90deg, var(--accent), var(--cyan)); height:100%; width:56%; border-radius:4px;"></div>
+    </div>
+    <div style="color:var(--muted); font-size:0.8rem; margin-bottom:0.75rem;">Today: <span style="color:var(--text);">43 ⚡ used</span></div>
+    <div style="padding-left:1rem; font-size:0.8rem; color:var(--muted);">
+      <div>├── 3 chart analyses <span style="color:var(--text);">(15 ⚡)</span></div>
+      <div>├── 2 trade signals <span style="color:var(--text);">(20 ⚡)</span></div>
+      <div>├── 5 quick chats <span style="color:var(--text);">(5 ⚡)</span></div>
+      <div>└── 1 briefing <span style="color:var(--text);">(3 ⚡)</span></div>
+    </div>
+    <div style="margin-top:1rem; padding-top:0.75rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted);">
+      Renews: <span style="color:var(--text);">Mar 28</span>
+    </div>
+  </div>
+</div>
+
+<h3>Revenue Projections (10,000 users) — Credits Model</h3>
 
 <div class="grid-2">
   <div class="card card-green">
@@ -1181,12 +1242,16 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
       <tr><td>Starter $29</td><td>5,000</td><td>50%</td><td>$145,000</td></tr>
       <tr><td>Pro $59</td><td>3,000</td><td>30%</td><td>$177,000</td></tr>
       <tr><td>Elite $99</td><td>1,500</td><td>15%</td><td>$148,500</td></tr>
-      <tr><td>Institutional $249</td><td>500</td><td>5%</td><td>$124,500</td></tr>
+      <tr><td>Unlimited $249</td><td>500</td><td>5%</td><td>$124,500</td></tr>
       <tr style="background:rgba(16,185,129,0.1); font-weight:700;">
         <td colspan="3">TOTAL</td><td>$595,000/mo</td>
       </tr>
+      <tr><td colspan="3" style="color:var(--muted);">+ Extra credit purchases (~5% of users)</td><td>~$15,000</td></tr>
+      <tr style="background:rgba(16,185,129,0.15); font-weight:700;">
+        <td colspan="3">GRAND TOTAL</td><td>$610,000/mo</td>
+      </tr>
     </table>
-    <p style="margin-top:0.75rem; color:var(--muted);">Cost: $23K → Profit: <strong style="color:var(--green);">$572K/mo</strong> (96% margin)</p>
+    <p style="margin-top:0.75rem; color:var(--muted);">Cost: $23K → Profit: <strong style="color:var(--green);">$587K/mo</strong> (96% margin)</p>
   </div>
 
   <div class="card card-cyan">
@@ -1196,33 +1261,88 @@ cron.<span class="func">schedule</span>(<span class="string">'0 6 * * 1-5'</span
       <tr><td>Starter $29</td><td>3,000</td><td>30%</td><td>$87,000</td></tr>
       <tr><td>Pro $59</td><td>4,000</td><td>40%</td><td>$236,000</td></tr>
       <tr><td>Elite $99</td><td>2,500</td><td>25%</td><td>$247,500</td></tr>
-      <tr><td>Institutional $249</td><td>500</td><td>5%</td><td>$124,500</td></tr>
+      <tr><td>Unlimited $249</td><td>500</td><td>5%</td><td>$124,500</td></tr>
       <tr style="background:rgba(6,182,212,0.1); font-weight:700;">
         <td colspan="3">TOTAL</td><td>$695,000/mo</td>
       </tr>
+      <tr><td colspan="3" style="color:var(--muted);">+ Extra credit purchases (~8% of users)</td><td>~$30,000</td></tr>
+      <tr style="background:rgba(6,182,212,0.15); font-weight:700;">
+        <td colspan="3">GRAND TOTAL</td><td>$725,000/mo</td>
+      </tr>
     </table>
-    <p style="margin-top:0.75rem; color:var(--muted);">Cost: $23K → Profit: <strong style="color:var(--cyan);">$672K/mo</strong> (97% margin)</p>
+    <p style="margin-top:0.75rem; color:var(--muted);">Cost: $23K → Profit: <strong style="color:var(--cyan);">$702K/mo</strong> (97% margin)</p>
   </div>
 </div>
 
-<h3>🧠 Pricing Strategy Notes</h3>
-
+<h3>Why Credits > Feature-Gating</h3>
 <div class="card card-gold">
   <ul>
-    <li><strong>Annual discount = cash upfront.</strong> Users who pay yearly have 80% less churn.</li>
-    <li><strong>Free trial → conversion.</strong> 7 days of Pro free. The memory accumulated in 7 days is the hook — they don't want to lose it.</li>
-    <li><strong>Usage-based add-on.</strong> Starter users who exceed 15 analyses: $0.50 per extra. Captures upsell without forcing tier jump.</li>
-    <li><strong>The memory moat.</strong> Once the AI has 30 days of their trades, lessons, behavioral data... leaving hurts. It's like deleting your medical history. The memory IS the product lock-in.</li>
-    <li><strong>Breakeven point:</strong> The product pays for itself with just <strong>300 users on Starter</strong> ($8,700/mo vs $23K cost at full scale — but at 300 users, cost is ~$700/mo).</li>
+    <li><strong>🚫 No frustration.</strong> Nobody sees "🔒 Upgrade to unlock." Everything is available from day one.</li>
+    <li><strong>📈 Self-upgrading users.</strong> Credits run out → user knows exactly why they need the next tier. Natural upsell.</li>
+    <li><strong>⚖️ Fair pricing.</strong> Heavy users pay more. Light users pay less. Everyone gets full features.</li>
+    <li><strong>💬 Smart nudges.</strong> "You have 50 ⚡ left with 8 days remaining. Buy more or upgrade to Pro?"</li>
+    <li><strong>🧠 Memory moat.</strong> Once the AI has 30 days of trades, lessons, behavioral data... leaving hurts. The memory IS the lock-in.</li>
+    <li><strong>🎁 Free trial hook.</strong> 7 days of Pro (1,500 ⚡). The memory accumulated is the hook — they don't want to lose it.</li>
+    <li><strong>💰 Extra revenue stream.</strong> Credit top-ups ($0.03-0.05 per extra credit) capture impulse purchases.</li>
+    <li><strong>📊 Breakeven:</strong> Product pays for itself with just <strong>300 Starter users</strong> (~$700/mo real cost at that scale).</li>
   </ul>
 </div>
+
+<h3>Backend Implementation</h3>
+<pre><code><span class="comment">// Middleware: check & deduct credits before every AI call</span>
+<span class="keyword">async function</span> <span class="func">checkCredits</span>(userId, actionType) {
+  <span class="keyword">const</span> cost = CREDIT_COSTS[actionType]; <span class="comment">// e.g. 10 for trade_signal</span>
+  <span class="keyword">const</span> user = <span class="keyword">await</span> <span class="func">getUser</span>(userId);
+
+  <span class="keyword">if</span> (user.plan === <span class="string">'unlimited'</span>) <span class="keyword">return</span> { ok: <span class="keyword">true</span> };
+
+  <span class="keyword">if</span> (user.creditsRemaining < cost) {
+    <span class="keyword">return</span> {
+      ok: <span class="keyword">false</span>,
+      message: <span class="string">`Necesitas ${cost} ⚡ pero te quedan ${user.creditsRemaining}. ¿Comprar más o subir de plan?`</span>,
+      creditsNeeded: cost,
+      creditsRemaining: user.creditsRemaining
+    };
+  }
+
+  <span class="comment">// Deduct atomically</span>
+  <span class="keyword">await</span> dynamo.<span class="func">update</span>({
+    Key: { PK: <span class="string">`USER#${userId}`</span>, SK: <span class="string">'CREDITS'</span> },
+    UpdateExpression: <span class="string">'SET creditsRemaining = creditsRemaining - :cost, usage.#action = usage.#action + :one'</span>,
+    ConditionExpression: <span class="string">'creditsRemaining >= :cost'</span>,
+    ExpressionAttributeValues: { <span class="string">':cost'</span>: cost, <span class="string">':one'</span>: 1 },
+    ExpressionAttributeNames: { <span class="string">'#action'</span>: actionType }
+  });
+
+  <span class="keyword">return</span> { ok: <span class="keyword">true</span>, remaining: user.creditsRemaining - cost };
+}</code></pre>
+
+<pre><code><span class="comment">// DynamoDB: user credit tracking</span>
+{
+  PK: <span class="string">"USER#german123"</span>,
+  SK: <span class="string">"CREDITS"</span>,
+  plan: <span class="string">"pro"</span>,
+  creditsTotal: <span class="number">1500</span>,
+  creditsRemaining: <span class="number">847</span>,
+  cycleStart: <span class="string">"2026-03-01"</span>,
+  cycleEnd: <span class="string">"2026-03-31"</span>,
+  rolloverCredits: <span class="number">0</span>,
+  usage: {
+    chart_analysis: <span class="number">45</span>,
+    trade_signal: <span class="number">22</span>,
+    quick_chat: <span class="number">156</span>,
+    briefing: <span class="number">20</span>,
+    cron_execution: <span class="number">30</span>,
+    feedback: <span class="number">8</span>,
+    deep_research: <span class="number">3</span>
+  }
+}</code></pre>
 
 <h3>Cost Optimization Techniques</h3>
 <table>
   <tr><th>Technique</th><th>Savings</th><th>How</th></tr>
   <tr><td>Response caching (Redis)</td><td>20-30%</td><td>Cache similar analyses for same symbol/timeframe</td></tr>
   <tr><td>GPT-4o-mini for non-vision tasks</td><td>40-50%</td><td>Only use expensive models when needed</td></tr>
-  <tr><td>Rate limiting per tier</td><td>Controls outliers</td><td>Prevent abuse from heavy users</td></tr>
   <tr><td>Prompt optimization</td><td>15-20%</td><td>Fewer tokens = less cost per call</td></tr>
   <tr><td>Shared briefings</td><td>Huge</td><td>1 briefing per instrument, not per user</td></tr>
 </table>
