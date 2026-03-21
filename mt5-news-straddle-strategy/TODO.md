@@ -16,6 +16,12 @@
 - Cuando se minimice, ocultar todo el contenido del panel y dejar solo el botón para restaurar
 - Útil para no tapar el chart cuando se está analizando el precio
 
+### 4. BUG — Trailing Stop no se está ejecutando
+- El trailing stop no se activa como debería
+- Revisar la lógica en `TrailingLogic.mqh` → `ManageTrade()`
+- Posibles causas: el TP virtual nunca se marca como tocado (`g_tpReached`), o la condición de comparación de precios no se cumple
+- Si `InpUseTP = false`, el trailing nunca se activa porque `ManageTrade()` retorna inmediato
+
 ---
 
 ## Backlog
