@@ -11,6 +11,11 @@
 - Las órdenes Buy Stop y Sell Stop se colocan pero no se visualizan claramente en el gráfico
 - Agregar líneas horizontales o indicadores visuales que muestren dónde están las órdenes pendientes y el TP
 
+### 3. Botón minimizar en el panel UI
+- Agregar un botón para minimizar/maximizar la ventana de información del EA en el gráfico
+- Cuando se minimice, ocultar todo el contenido del panel y dejar solo el botón para restaurar
+- Útil para no tapar el chart cuando se está analizando el precio
+
 ---
 
 ## Backlog
