@@ -10,13 +10,19 @@ bool PlaceStraddleOrders()
    double bS   = NormalizeDouble(ask + dist, _Digits);
    double sS   = NormalizeDouble(bid - dist, _Digits);
 
-   Print("[ORDERS] Ask=", ask, " Bid=", bid, " Dist=", dist, " BuyStop=", bS, " SellStop=", sS, " Digits=", _Digits, " Point=", _Point, " PipFactor=", g_pipFactor);
+   // Calcular TP si está activo
+   double tpDist = g_useTP ? PipsToPrice(InpTPPips) : 0;
+   double buyTP  = g_useTP ? NormalizeDouble(bS + tpDist, _Digits) : 0;
+   double sellTP = g_useTP ? NormalizeDouble(sS - tpDist, _Digits) : 0;
 
-   // Órdenes limpias: SL=0, TP=0
-   if(!g_trade.BuyStop(InpLotSize, bS, _Symbol, 0, 0)) return false;
+   Print("[ORDERS] Ask=", ask, " Bid=", bid, " Dist=", dist, " BuyStop=", bS, " SellStop=", sS,
+         " BuyTP=", buyTP, " SellTP=", sellTP, " Digits=", _Digits, " Point=", _Point, " PipFactor=", g_pipFactor);
+
+   // Órdenes con TP real si está ON
+   if(!g_trade.BuyStop(InpLotSize, bS, _Symbol, 0, buyTP)) return false;
    g_buyOrderTicket = g_trade.ResultOrder();
 
-   if(!g_trade.SellStop(InpLotSize, sS, _Symbol, 0, 0))
+   if(!g_trade.SellStop(InpLotSize, sS, _Symbol, 0, sellTP))
    {
       g_trade.OrderDelete(g_buyOrderTicket);
       return false;
@@ -35,5 +41,10 @@ void SetVirtualTP()
    double tp     = (g_posInfo.PositionType() == POSITION_TYPE_BUY) ? openP + tpD : openP - tpD;
    g_virtualTP   = NormalizeDouble(tp, _Digits);
 
-   Print("[VIRTUAL TP] Calculado en ", g_virtualTP, " (solo monitoreo interno, sin línea)");
+   // Enviar TP real al broker para que sea visible en chart y posición
+   double curSL = g_posInfo.StopLoss();
+   if(g_trade.PositionModify(g_positionTicket, curSL, g_virtualTP))
+      Print("[TP] Enviado al broker: ", g_virtualTP);
+   else
+      Print("[TP] Error al enviar al broker: ", GetLastError());
 }
