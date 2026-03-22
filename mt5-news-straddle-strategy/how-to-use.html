@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cómo Usar: NewsStraddleEA v1.03</title>
+    <title>Cómo Usar: NewsStraddleEA v1.15</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -429,21 +429,20 @@
 
     <div class="container">
         <header>
-            <h1>Cómo Usar el EA v1.03</h1>
-            <p class="subtitle">Guía definitiva para operar noticias sin errores de precio ni sacadas falsas</p>
+            <h1>Cómo Usar el EA v1.15</h1>
+            <p class="subtitle">Guía para operar noticias con trailing automático tras TP</p>
         </header>
 
-        <!-- NOVEDADES V1.03 -->
+        <!-- NOVEDADES V1.15 -->
         <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
                 <i data-lucide="shield-check"></i>
-                Novedades Críticas v1.03 (Protección de Latigazo)
+                Novedades v1.15
             </div>
-            <p style="margin-bottom: 1rem;">Hemos actualizado el EA para que sea más robusto contra la volatilidad extrema inicial de las noticias.</p>
             <ul class="summary-list">
-                <li><span class="highlight">SL Inicial Cero:</span> Al entrar al mercado, el EA NO pone Stop Loss. Esto evita que el latigazo inicial te saque en pérdida antes de que el movimiento real empiece.</li>
-                <li><span class="highlight">Trailing "Headroom":</span> La línea roja (SL) solo aparece cuando ya vas ganando terreno.</li>
-                <li><span class="highlight">Adiós al "Invalid Price":</span> Forzamos órdenes Stop estándar para que funcionen 100% en Nasdaq y Crypto.</li>
+                <li><span class="highlight">SL Configurable (InpSLPips):</span> El EA coloca un SL real al entrar. Default 10000 pips — suficientemente amplio para aguantar el latigazo inicial sin cerrarse.</li>
+                <li><span class="highlight">Trailing inteligente tras TP:</span> Cuando el precio toca el TP virtual, el trailing arranca inmediatamente. El SL queda a <code>InpTrailingPips</code> del precio actual y sube con el precio.</li>
+                <li><span class="highlight">Sin hardcoding:</span> Eliminado el buffer fijo de 5000 pips. Todo es configurable desde los inputs.</li>
             </ul>
         </section>
 
@@ -451,27 +450,27 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="zap"></i>
-                Inicio Rápido (3 Pasos)
+                Inicio Rápido
             </div>
             <div class="step-item">
                 <div class="step-number">1</div>
                 <div class="step-content">
                     <h3>Carga el EA y Configura</h3>
-                    <p>Arrastra <code>NewsStraddleEA</code> al gráfico. Configura <code>InpNewsTime</code> con la hora exacta de la noticia (Hora del Servidor).</p>
+                    <p>Arrastra <code>NewsStraddleEA</code> al gráfico. Configura <code>InpNewsTime</code> con la hora exacta (Hora del Servidor MT5). Activa <code>InpUseTP = true</code> y define <code>InpTPPips</code> y <code>InpTrailingPips</code>.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <h3>Presiona ▶ ARMAR</h3>
-                    <p>El EA entra en modo <span class="highlight">ARMED</span>. Verás el contador ⏱ T-MM:SS. El EA pondrá las trampas a T-10 segundos.</p>
+                    <h3>El EA se arma automáticamente</h3>
+                    <p>Al cargar, el EA entra en <span class="highlight">ARMED</span> y muestra el contador T-MM:SS. A T-10 segundos coloca el Buy Stop y Sell Stop con SL real.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">3</div>
                 <div class="step-content">
-                    <h3>Deja que el precio respire</h3>
-                    <p>Al entrar, no verás Stop Loss. No te asustes. El EA espera a que el precio corra a tu favor para poner la protección automáticamente.</p>
+                    <h3>El trailing se activa solo</h3>
+                    <p>Cuando el precio toca el TP virtual → trailing arranca. El SL sube con el precio. Si el precio revierte, salís con la ganancia del TP asegurada.</p>
                 </div>
             </div>
         </section>
@@ -480,7 +479,7 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="settings"></i>
-                Configuración v1.03
+                Configuración v1.15
             </div>
             <div class="table-wrapper">
                 <table>
@@ -493,24 +492,29 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Distancia Entrada</strong></td>
-                            <td><span class="highlight">15.0</span> pips</td>
-                            <td><span class="highlight">5000.0</span> pips</td>
+                            <td><strong>Distancia Entrada (InpEntryDistPips)</strong></td>
+                            <td><span class="highlight">1000</span> pips</td>
+                            <td><span class="highlight">5000</span> pips</td>
                         </tr>
                         <tr>
-                            <td><strong>Trailing Stop</strong></td>
-                            <td><span class="highlight">15.0</span> pips <span class="dim">(Mínimo sugerido)</span></td>
-                            <td><span class="highlight">2000.0</span> pips</td>
+                            <td><strong>Stop Loss (InpSLPips)</strong></td>
+                            <td><span class="highlight">10000</span> pips <span class="dim">(amplio para noticias)</span></td>
+                            <td><span class="highlight">10000</span> pips</td>
                         </tr>
                         <tr>
-                            <td><strong>Botón TP</strong></td>
-                            <td><span class="category-badge">OFF</span> <span class="dim">(Dejar correr)</span></td>
-                            <td><span class="category-badge">OFF</span></td>
+                            <td><strong>Take Profit (InpTPPips)</strong></td>
+                            <td><span class="highlight">200+</span> pips</td>
+                            <td><span class="highlight">2000+</span> pips</td>
                         </tr>
                         <tr>
-                            <td><strong>Tipo de Orden</strong></td>
-                            <td><span class="highlight">Buy/Sell Stop</span></td>
-                            <td><span class="highlight">Buy/Sell Stop</span></td>
+                            <td><strong>Trailing Stop (InpTrailingPips)</strong></td>
+                            <td><span class="highlight">200</span> pips <span class="dim">(> spread en noticias)</span></td>
+                            <td><span class="highlight">2000</span> pips</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Usar TP (InpUseTP)</strong></td>
+                            <td><span class="category-badge">ON</span> <span class="dim">(para activar trailing)</span></td>
+                            <td><span class="category-badge">ON</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -520,18 +524,31 @@
         <!-- GESTIÓN DE SALIDAS -->
         <section class="card">
             <div class="card-title">
-                <i data-lucide="external-link"></i>
-                Gestión de Salidas (TP vs Trailing)
-            </div>
-            
-            <div class="info-box">
-                <p><strong>🛡️ Trailing Stop (Automático):</strong></p>
-                <p class="dim">Es tu guardaespaldas. Solo aparece cuando vas ganando. Si el Nasdaq sube 50 puntos y luego cae 15, el Trailing te saca con 35 puntos de ganancia.</p>
+                <i data-lucide="trending-up"></i>
+                Cómo funciona el Trailing Stop
             </div>
 
-            <div class="info-box" style="margin-top: 1rem; border-left-color: #30669e;">
-                <p><strong>🎯 Take Profit (Botón TP):</strong></p>
-                <p class="dim">Si lo pones en <span class="highlight">ON</span>, el EA pone una meta fija (ej. 30 pips). Úsalo solo si tienes un objetivo claro de ganancia rápida y no quieres arriesgarte a un retroceso.</p>
+            <div class="info-box">
+                <p><strong>Flujo completo:</strong></p>
+                <p class="dim" style="margin-top: 0.5rem;">
+                    1. Entrada en <strong>20,000</strong> con SL en 19,000 (InpSLPips = 10000)<br>
+                    2. TP virtual en <strong>20,200</strong> (InpTPPips = 200)<br>
+                    3. Precio toca 20,200 → trailing arranca → SL = 20,200 − 200 = <strong>20,000</strong><br>
+                    4. Precio sube a 20,400 → SL sube a <strong>20,200</strong> (ganancia asegurada)<br>
+                    5. Precio cae → cierra en 20,200 con <strong>+200 puntos</strong>
+                </p>
+            </div>
+
+            <div class="warning-box" style="margin-top: 1rem;">
+                <i data-lucide="alert-triangle"></i>
+                <div>
+                    <strong>Importante:</strong> El trailing solo funciona con <code>InpUseTP = true</code>. Con TP OFF el EA no gestiona nada — control manual total.
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 1rem;">
+                <p><strong>Sobre el spread en noticias:</strong></p>
+                <p class="dim">En noticias el spread puede ser 3-5x mayor al normal. Usa <code>InpTrailingPips</code> mayor al spread máximo esperado. Con 200 pips en NAS100 estás bien cubierto.</p>
             </div>
         </section>
 
@@ -539,13 +556,13 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="monitor"></i>
-                Guía del Panel
+                Panel del EA
             </div>
             <ul class="summary-list">
-                <li><strong>Estado:</strong> IDLE → ARMED → ORDERS PLACED → TRADE ACTIVE</li>
-                <li><strong>Botón ARMAR:</strong> Activa el contador para la noticia.</li>
-                <li><strong>Botón CANCELAR:</strong> Borra todo y vuelve a la seguridad.</li>
-                <li><strong>Botón TP:</strong> Cambia entre "Dejar Correr" o "Meta Fija".</li>
+                <li><strong>Estado ARMED:</strong> EA armado, mostrando countdown T-MM:SS</li>
+                <li><strong>Estado ORDERS PLACED:</strong> Buy Stop y Sell Stop colocados, esperando activación</li>
+                <li><strong>Estado TRADE ACTIVE:</strong> Posición abierta — muestra "Esperando TP..." o "TRAILING ACTIVO"</li>
+                <li><strong>CANCEL ALL:</strong> Cancela órdenes pendientes y cierra posición abierta al instante</li>
             </ul>
         </section>
 
@@ -553,17 +570,17 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="lightbulb"></i>
-                Tips de "El Board"
+                Tips
             </div>
             <ul class="summary-list">
-                <li><strong>No uses Trailing < 10 pips:</strong> El Nasdaq es muy volátil y te sacará en breakeven antes de tiempo.</li>
-                <li><strong>Hora del Servidor:</strong> Asegúrate de que <code>InpNewsTime</code> coincida con el reloj de tu MT5.</li>
-                <li><strong>Noticias de alto impacto:</strong> Como el PCE de hoy, el latigazo inicial es normal. Confía en el "SL Inicial Cero".</li>
+                <li><strong>Trailing mayor al spread:</strong> En noticias el spread se dispara. Con 200 pips en NAS100 tenés margen suficiente.</li>
+                <li><strong>Hora del Servidor:</strong> Verificá que <code>InpNewsTime</code> coincida con el reloj de MT5, no con tu hora local.</li>
+                <li><strong>InpSLPips amplio:</strong> El latigazo inicial puede ser violento. 10000 pips da libertad para que el precio respire sin cerrarse.</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | El Board v1.03</p>
+            <p>&copy; 2026 MT5 Strategy Spec | v1.15</p>
         </footer>
     </div>
 

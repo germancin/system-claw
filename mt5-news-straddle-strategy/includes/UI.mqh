@@ -58,7 +58,7 @@ void InitUI()
    CreateButton(BTN_CANCEL, "CANCEL ALL", baseX + 110, baseY, 120, 35, C'207,34,46', clrWhite);
 
    // Labels
-   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.13 ═══",     baseX, baseY + 40,  clrGold, 11);
+   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.15 ═══",     baseX, baseY + 40,  clrGold, 11);
    CreateLabel(LBL_STATE,       "Estado: IDLE",                        baseX, baseY + 62,  clrWhite, 9);
    CreateLabel("NewsEA_Event",  "Evento: " + InpNewsTime,             baseX, baseY + 80,  clrSilver, 9);
    CreateLabel(LBL_COUNT,       "",                                    baseX, baseY + 98,  clrYellow, 9);

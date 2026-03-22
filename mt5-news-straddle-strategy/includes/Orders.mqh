@@ -10,19 +10,25 @@ bool PlaceStraddleOrders()
    double bS   = NormalizeDouble(ask + dist, _Digits);
    double sS   = NormalizeDouble(bid - dist, _Digits);
 
+   // Calcular SL
+   double slDist = PipsToPrice(InpSLPips);
+   double buySL  = NormalizeDouble(bS - slDist, _Digits);
+   double sellSL = NormalizeDouble(sS + slDist, _Digits);
+
    // Calcular TP si está activo
    double tpDist = g_useTP ? PipsToPrice(InpTPPips) : 0;
    double buyTP  = g_useTP ? NormalizeDouble(bS + tpDist, _Digits) : 0;
    double sellTP = g_useTP ? NormalizeDouble(sS - tpDist, _Digits) : 0;
 
    Print("[ORDERS] Ask=", ask, " Bid=", bid, " Dist=", dist, " BuyStop=", bS, " SellStop=", sS,
+         " BuySL=", buySL, " SellSL=", sellSL,
          " BuyTP=", buyTP, " SellTP=", sellTP, " Digits=", _Digits, " Point=", _Point, " PipFactor=", g_pipFactor);
 
-   // Órdenes con TP real si está ON
-   if(!g_trade.BuyStop(InpLotSize, bS, _Symbol, 0, buyTP)) return false;
+   // Órdenes con SL y TP
+   if(!g_trade.BuyStop(InpLotSize, bS, _Symbol, buySL, buyTP)) return false;
    g_buyOrderTicket = g_trade.ResultOrder();
 
-   if(!g_trade.SellStop(InpLotSize, sS, _Symbol, 0, sellTP))
+   if(!g_trade.SellStop(InpLotSize, sS, _Symbol, sellSL, sellTP))
    {
       g_trade.OrderDelete(g_buyOrderTicket);
       return false;

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estrategia: Pre-News Straddle (v1.03)</title>
+    <title>Estrategia: Pre-News Straddle (v1.15)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -328,22 +328,22 @@
 
     <div class="container">
         <header>
-            <h1>Pre-News Straddle v1.03</h1>
-            <p class="subtitle">Estrategia de Supervivencia: Libertad de Precio + Protección Inteligente</p>
+            <h1>Pre-News Straddle v1.15</h1>
+            <p class="subtitle">Straddle de Noticias: SL Configurable + Trailing inteligente tras TP</p>
         </header>
 
         <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
                 <i data-lucide="zap"></i>
-                Filosofía v1.03: "Cero SL Inicial"
+                Filosofía v1.15
             </div>
-            <p>La noticia causa latigazos violentos. Poner un Stop Loss pegado al precio al entrar es suicidio. La v1.03 elimina el SL inicial para que el precio respire y solo activa la protección cuando el trade ya está en verde.</p>
+            <p>La noticia genera movimientos violentos. El EA coloca un straddle (Buy Stop + Sell Stop) antes de la noticia. El lado que se activa corre con un SL amplio configurable. Cuando el precio alcanza el TP virtual, el trailing arranca automáticamente desde ese nivel — bloqueando progresivamente la ganancia sin cerrar la posición.</p>
         </section>
 
         <section class="card">
             <div class="card-title">
                 <i data-lucide="layers"></i>
-                Especificación Técnica v1.03
+                Especificación Técnica v1.15
             </div>
             <div class="table-wrapper">
                 <table>
@@ -357,23 +357,23 @@
                     <tbody>
                         <tr>
                             <td><span class="category-badge">Órdenes</span></td>
-                            <td><strong>Standard Stops</strong></td>
-                            <td>Forzamos <span class="highlight">Buy/Sell Stop</span>. Eliminamos Stop-Limit para garantizar ejecución 100% y evitar errores de precio.</td>
+                            <td><strong>Buy/Sell Stop</strong></td>
+                            <td>Forzamos <span class="highlight">Buy/Sell Stop</span> estándar para garantizar ejecución 100% sin errores de precio.</td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Entrada</span></td>
-                            <td><strong>SL Fantasma</strong></td>
-                            <td>Entrada con <span class="highlight">SL = 0</span>. El precio tiene libertad total para el latigazo inicial de la noticia.</td>
+                            <td><strong>SL Configurable</strong></td>
+                            <td>Parámetro <span class="highlight">InpSLPips</span> (default 10000). Un SL amplio da espacio al latigazo inicial sin cerrarse prematuramente.</td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Gestión</span></td>
-                            <td><strong>Smart Trailing</strong></td>
-                            <td>La línea roja de SL solo aparece cuando el precio avanza a favor <span class="highlight">> 15 pips</span>.</td>
+                            <td><strong>TP Virtual → Trailing</strong></td>
+                            <td>Con <span class="highlight">InpUseTP = true</span>, el EA monitorea el TP internamente. Cuando el precio lo toca, el trailing arranca inmediatamente: <code>SL = precio_actual - InpTrailingPips</code>. El SL solo sube, nunca baja.</td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Salida</span></td>
-                            <td><strong>Independencia TP</strong></td>
-                            <td>El botón TP solo gestiona la meta de ganancia. No interfiere con el SL ni con el Trailing.</td>
+                            <td><strong>Trailing continuo</strong></td>
+                            <td>Cada tick que el precio avanza, el SL sigue a <span class="highlight">InpTrailingPips</span> de distancia. Si el precio revierte, el SL ya estaba cerca del TP — salís con ganancia asegurada.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -382,18 +382,32 @@
 
         <section class="card">
             <div class="card-title">
+                <i data-lucide="trending-up"></i>
+                Flujo del Trailing Stop
+            </div>
+            <ul class="summary-list">
+                <li><strong>Precio toca TP virtual</strong> → trailing arranca en ese mismo tick</li>
+                <li><strong>SL inicial del trailing</strong> = precio en el momento del TP − InpTrailingPips</li>
+                <li><strong>Precio continúa subiendo</strong> → SL sigue subiendo tick a tick</li>
+                <li><strong>Precio revierte</strong> → SL ya está cerca del TP, posición cierra con ganancia</li>
+                <li><strong>InpUseTP = false</strong> → trailing desactivado, control manual total</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
                 <i data-lucide="mouse-pointer-2"></i>
                 Interfaz del Gráfico (UI)
             </div>
             <ul class="summary-list">
-                <li><strong>▶ ARMAR:</strong> Sincroniza y espera a T-10s.</li>
-                <li><strong>■ CANCELAR:</strong> Limpieza total de órdenes y posiciones.</li>
-                <li><strong>TP ON/OFF:</strong> Activa/Desactiva la meta de salida fija.</li>
+                <li><strong>CANCEL ALL:</strong> Cancela órdenes pendientes y cierra posición abierta.</li>
+                <li><strong>Estado:</strong> IDLE → ARMED → ORDERS PLACED → TRADE ACTIVE</li>
+                <li><strong>Countdown:</strong> T-MM:SS hasta el evento, luego muestra estado del trailing.</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | El Board v1.03</p>
+            <p>&copy; 2026 MT5 Strategy Spec | v1.15</p>
         </footer>
     </div>
 

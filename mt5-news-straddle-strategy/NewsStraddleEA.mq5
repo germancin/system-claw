@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.13       |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.15       |
 //|      Update: Virtual TP + Breakeven + Trailing (unlimited upside) |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.13"
+#property version   "1.15"
 
 //--- Standard Library
 #include <Trade/Trade.mqh>

@@ -1,11 +1,11 @@
 //+------------------------------------------------------------------+
 //| TrailingLogic.mqh — Gestión del trade activo y trailing stop      |
 //|                                                                    |
-//| NUEVA LÓGICA (v1.11 - TP VIRTUAL):                                |
-//|   - Si TP OFF → El EA no toca nada. Control manual.               |
-//|   - Si TP ON  → Dibuja línea verde (TP Virtual). NO va al broker.|
-//|   - Cuando precio toca TP Virtual → Pone SL breakeven + buffer.   |
-//|   - Desde ahí activa Trailing Stop para seguir subiendo.          |
+//| LÓGICA v1.15:                                                      |
+//|   - Si TP OFF → El EA no toca nada. Control manual total.         |
+//|   - Si TP ON  → Monitorea TP internamente.                        |
+//|   - Cuando precio toca TP Virtual → Trailing arranca ese tick.    |
+//|   - SL = precio_actual - InpTrailingPips (sube, nunca baja).      |
 //+------------------------------------------------------------------+
 
 void ManageTrade()
@@ -27,14 +27,7 @@ void ManageTrade()
          if(bid >= g_virtualTP)
          {
             g_tpReached = true;
-            
-            // Poner SL en breakeven + buffer (5000 pips = $50 para BTC)
-            double openP = g_posInfo.PriceOpen();
-            double buffer = PipsToPrice(5000);  // $50 buffer para spread
-            double breakeven = NormalizeDouble(openP + buffer, _Digits);
-            
-            g_trade.PositionModify(g_positionTicket, breakeven, 0);
-            Print("[VIRTUAL TP] Tocado en BUY. SL en breakeven+buffer: ", breakeven);
+            Print("[VIRTUAL TP] Tocado en BUY. Trailing activo desde: ", bid);
          }
       }
       else  // SELL
@@ -43,14 +36,7 @@ void ManageTrade()
          if(ask <= g_virtualTP)
          {
             g_tpReached = true;
-            
-            // Poner SL en breakeven - buffer
-            double openP = g_posInfo.PriceOpen();
-            double buffer = PipsToPrice(5000);
-            double breakeven = NormalizeDouble(openP - buffer, _Digits);
-            
-            g_trade.PositionModify(g_positionTicket, breakeven, 0);
-            Print("[VIRTUAL TP] Tocado en SELL. SL en breakeven-buffer: ", breakeven);
+            Print("[VIRTUAL TP] Tocado en SELL. Trailing activo desde: ", ask);
          }
       }
       
