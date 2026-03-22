@@ -1,13 +1,15 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.16       |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.17       |
 //|      Update: Virtual TP + Breakeven + Trailing (unlimited upside) |
 //|      v1.16: Botón minimizar/restaurar panel UI (esquina superior) |
+//|      v1.17: Fix trailing - quita TP broker al tocar VirtualTP     |
+//|             + logs detallados de trailing y cierre de posición    |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.16"
+#property version   "1.17"
 
 //--- Standard Library
 #include <Trade/Trade.mqh>
@@ -90,6 +92,35 @@ void OnTick()
          ManageTrade();
       else
       {
+         // Posición cerrada — buscar en historial para loggear resultado
+         if(HistoryDealSelect(g_positionTicket) ||
+            HistorySelectByPosition(g_positionTicket))
+         {
+            int total = HistoryDealsTotal();
+            for(int d = total - 1; d >= 0; d--)
+            {
+               ulong dTicket = HistoryDealGetTicket(d);
+               if(HistoryDealGetInteger(dTicket, DEAL_POSITION_ID) == (long)g_positionTicket)
+               {
+                  double profit = HistoryDealGetDouble(dTicket, DEAL_PROFIT);
+                  double closeP = HistoryDealGetDouble(dTicket, DEAL_PRICE);
+                  long   reason = HistoryDealGetInteger(dTicket, DEAL_REASON);
+                  string reasonStr = (reason == DEAL_REASON_SL) ? "SL" :
+                                     (reason == DEAL_REASON_TP) ? "TP" :
+                                     (reason == DEAL_REASON_EXPERT) ? "EA" : "MANUAL/OTRO";
+                  Print("[POSICION CERRADA] Ticket=", g_positionTicket,
+                        " | Precio cierre=", closeP,
+                        " | Motivo=", reasonStr,
+                        " | Profit=", DoubleToString(profit, 2),
+                        " | Trailing activo fue=", (g_tpReached ? "SI" : "NO"));
+                  break;
+               }
+            }
+         }
+         else
+            Print("[POSICION CERRADA] Ticket=", g_positionTicket,
+                  " | No encontrada en historial aún | Trailing activo fue=", (g_tpReached ? "SI" : "NO"));
+
          g_state = STATE_IDLE;
          g_positionTicket = 0;
          g_tpReached = false;
