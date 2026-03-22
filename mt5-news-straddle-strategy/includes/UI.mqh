@@ -2,10 +2,11 @@
 //| UI.mqh — Panel visual del gráfico (botones, labels, colores)      |
 //+------------------------------------------------------------------+
 
-const string BG_PANEL  = "NewsEA_BgPanel";
-const string BTN_CANCEL= "NewsEA_BtnCancel";
-const string LBL_STATE = "NewsEA_LblState";
-const string LBL_COUNT = "NewsEA_LblCountdown";
+const string BG_PANEL     = "NewsEA_BgPanel";
+const string BTN_CANCEL   = "NewsEA_BtnCancel";
+const string BTN_MINIMIZE  = "NewsEA_BtnMinimize";
+const string LBL_STATE    = "NewsEA_LblState";
+const string LBL_COUNT    = "NewsEA_LblCountdown";
 
 void CreateButton(string name, string text, int x, int y, int width, int height, color bgColor, color txtColor)
 {
@@ -55,10 +56,11 @@ void InitUI()
    ObjectSetInteger(0, BG_PANEL, OBJPROP_ZORDER, 50);
 
    // Buttons
-   CreateButton(BTN_CANCEL, "CANCEL ALL", baseX + 110, baseY, 120, 35, C'207,34,46', clrWhite);
+   CreateButton(BTN_CANCEL,   "CANCEL ALL", baseX + 110, baseY,       120, 35, C'207,34,46', clrWhite);
+   CreateButton(BTN_MINIMIZE, "-",          baseX + 308, baseY - 10 + 3, 20, 20, C'60,60,80',   clrWhite);
 
    // Labels
-   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.15 ═══",     baseX, baseY + 40,  clrGold, 11);
+   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.16 ═══",     baseX, baseY + 40,  clrGold, 11);
    CreateLabel(LBL_STATE,       "Estado: IDLE",                        baseX, baseY + 62,  clrWhite, 9);
    CreateLabel("NewsEA_Event",  "Evento: " + InpNewsTime,             baseX, baseY + 80,  clrSilver, 9);
    CreateLabel(LBL_COUNT,       "",                                    baseX, baseY + 98,  clrYellow, 9);
@@ -69,8 +71,32 @@ void InitUI()
    ChartRedraw();
 }
 
+void SetVisible(string name, bool visible)
+{
+   ObjectSetInteger(0, name, OBJPROP_TIMEFRAMES, visible ? OBJ_ALL_PERIODS : OBJ_NO_PERIODS);
+}
+
+void ToggleMinimize()
+{
+   g_panelMinimized = !g_panelMinimized;
+   bool show = !g_panelMinimized;
+
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, show ? 181 : 26);
+   SetVisible(BTN_CANCEL,        show);
+   SetVisible("NewsEA_Title",    show);
+   SetVisible(LBL_STATE,         show);
+   SetVisible("NewsEA_Event",    show);
+   SetVisible(LBL_COUNT,         show);
+   SetVisible("NewsEA_Params",   show);
+   SetVisible("NewsEA_Rule",     show);
+   ObjectSetString(0, BTN_MINIMIZE, OBJPROP_TEXT, show ? "-" : "+");
+   ChartRedraw();
+}
+
 void UpdateUI()
 {
+   if(g_panelMinimized) { ChartRedraw(); return; }
+
    ObjectSetString(0, LBL_STATE, OBJPROP_TEXT, "Estado: " + StateToString(g_state));
 
    if(g_state == STATE_ARMED && g_eventTime > 0)
@@ -98,6 +124,7 @@ void CleanupUI()
 {
    ObjectDelete(0, BG_PANEL);
    ObjectDelete(0, BTN_CANCEL);
+   ObjectDelete(0, BTN_MINIMIZE);
    ObjectDelete(0, LBL_STATE);
    ObjectDelete(0, LBL_COUNT);
    ObjectDelete(0, "NewsEA_Title");

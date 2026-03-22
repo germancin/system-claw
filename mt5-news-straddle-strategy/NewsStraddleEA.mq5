@@ -1,12 +1,13 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.15       |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.16       |
 //|      Update: Virtual TP + Breakeven + Trailing (unlimited upside) |
+//|      v1.16: Botón minimizar/restaurar panel UI (esquina superior) |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.15"
+#property version   "1.16"
 
 //--- Standard Library
 #include <Trade/Trade.mqh>
@@ -117,6 +118,9 @@ void OnTimer()
 void OnChartEvent(const int id, const long &l, const double &d, const string &s)
 {
    if(id != CHARTEVENT_OBJECT_CLICK) return;
+
+   // MINIMIZE — Colapsar/expandir panel
+   if(s == BTN_MINIMIZE) { ToggleMinimize(); return; }
 
    // CANCEL ALL — Cerrar posiciones + borrar órdenes pendientes
    if(s == BTN_CANCEL)
