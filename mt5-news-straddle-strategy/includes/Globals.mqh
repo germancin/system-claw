@@ -13,10 +13,7 @@ datetime g_eventTime       = 0;
 ulong    g_buyOrderTicket  = 0;
 ulong    g_sellOrderTicket = 0;
 ulong    g_positionTicket  = 0;
-bool     g_useTP           = false;
 double   g_pipFactor       = 0;
-bool     g_tpReached       = false;
-double   g_virtualTP       = 0;  // TP Virtual (no va al broker, solo monitoreo interno)
 bool     g_panelMinimized  = false;
 
 //--- Utilidades

@@ -4,7 +4,7 @@
 
 const string BG_PANEL     = "NewsEA_BgPanel";
 const string BTN_CANCEL   = "NewsEA_BtnCancel";
-const string BTN_MINIMIZE  = "NewsEA_BtnMinimize";
+const string BTN_MINIMIZE = "NewsEA_BtnMinimize";
 const string LBL_STATE    = "NewsEA_LblState";
 const string LBL_COUNT    = "NewsEA_LblCountdown";
 
@@ -49,24 +49,23 @@ void InitUI()
    ObjectSetInteger(0, BG_PANEL, OBJPROP_XDISTANCE, baseX - 10);
    ObjectSetInteger(0, BG_PANEL, OBJPROP_YDISTANCE, baseY - 10);
    ObjectSetInteger(0, BG_PANEL, OBJPROP_XSIZE, 340);
-   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, 181);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, 163);
    ObjectSetInteger(0, BG_PANEL, OBJPROP_BGCOLOR, C'25,25,35');
    ObjectSetInteger(0, BG_PANEL, OBJPROP_BORDER_COLOR, C'60,60,80');
    ObjectSetInteger(0, BG_PANEL, OBJPROP_CORNER, CORNER_LEFT_UPPER);
    ObjectSetInteger(0, BG_PANEL, OBJPROP_ZORDER, 50);
 
    // Buttons
-   CreateButton(BTN_CANCEL,   "CANCEL ALL", baseX + 110, baseY,       120, 35, C'207,34,46', clrWhite);
-   CreateButton(BTN_MINIMIZE, "-",          baseX + 308, baseY - 10 + 3, 20, 20, C'60,60,80',   clrWhite);
+   CreateButton(BTN_CANCEL,   "CANCEL ALL", baseX + 110, baseY,            120, 35, C'207,34,46', clrWhite);
+   CreateButton(BTN_MINIMIZE, "-",          baseX + 308, baseY - 10 + 3,   20,  20, C'60,60,80',  clrWhite);
 
    // Labels
-   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.16 ═══",     baseX, baseY + 40,  clrGold, 11);
-   CreateLabel(LBL_STATE,       "Estado: IDLE",                        baseX, baseY + 62,  clrWhite, 9);
-   CreateLabel("NewsEA_Event",  "Evento: " + InpNewsTime,             baseX, baseY + 80,  clrSilver, 9);
-   CreateLabel(LBL_COUNT,       "",                                    baseX, baseY + 98,  clrYellow, 9);
-   CreateLabel("NewsEA_Params", StringFormat("Dist: %.1f | Trail: %.1f | TP: %.1f pips",
-               InpEntryDistPips, InpTrailingPips, InpTPPips),          baseX, baseY + 116, C'100,200,255', 8);
-   CreateLabel("NewsEA_Rule",   "Regla: Trailing solo tras tocar TP",  baseX, baseY + 134, C'255,200,100', 8);
+   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.19 ═══",                    baseX, baseY + 40,  clrGold,          11);
+   CreateLabel(LBL_STATE,       "Estado: IDLE",                                       baseX, baseY + 62,  clrWhite,          9);
+   CreateLabel("NewsEA_Event",  "Evento: " + InpNewsTime,                            baseX, baseY + 80,  clrSilver,         9);
+   CreateLabel(LBL_COUNT,       "",                                                   baseX, baseY + 98,  clrYellow,         9);
+   CreateLabel("NewsEA_Params", StringFormat("Dist: %.1f pips | SL: %.1f pips",
+               InpEntryDistPips, InpSLPips),                                          baseX, baseY + 116, C'100,200,255',    8);
 
    ChartRedraw();
 }
@@ -81,14 +80,13 @@ void ToggleMinimize()
    g_panelMinimized = !g_panelMinimized;
    bool show = !g_panelMinimized;
 
-   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, show ? 181 : 26);
+   ObjectSetInteger(0, BG_PANEL, OBJPROP_YSIZE, show ? 163 : 26);
    SetVisible(BTN_CANCEL,        show);
    SetVisible("NewsEA_Title",    show);
    SetVisible(LBL_STATE,         show);
    SetVisible("NewsEA_Event",    show);
    SetVisible(LBL_COUNT,         show);
    SetVisible("NewsEA_Params",   show);
-   SetVisible("NewsEA_Rule",     show);
    ObjectSetString(0, BTN_MINIMIZE, OBJPROP_TEXT, show ? "-" : "+");
    ChartRedraw();
 }
@@ -106,11 +104,6 @@ void UpdateUI()
          ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, StringFormat("T-%02d:%02d", (int)(secs / 60), (int)(secs % 60)));
       else
          ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, "COLOCANDO ORDENES...");
-   }
-   else if(g_state == STATE_TRADE_ACTIVE)
-   {
-      string tpStatus = g_tpReached ? "TRAILING ACTIVO" : (g_useTP ? "Esperando TP..." : "SIN TP - Libre");
-      ObjectSetString(0, LBL_COUNT, OBJPROP_TEXT, tpStatus);
    }
    else
    {
@@ -130,5 +123,4 @@ void CleanupUI()
    ObjectDelete(0, "NewsEA_Title");
    ObjectDelete(0, "NewsEA_Event");
    ObjectDelete(0, "NewsEA_Params");
-   ObjectDelete(0, "NewsEA_Rule");
 }
