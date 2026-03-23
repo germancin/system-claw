@@ -1,15 +1,17 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) + Trailing | v1.17       |
+//|      Pre-News Straddle (Standard Stops) + Trailing | v1.18       |
 //|      Update: Virtual TP + Breakeven + Trailing (unlimited upside) |
 //|      v1.16: Botón minimizar/restaurar panel UI (esquina superior) |
 //|      v1.17: Fix trailing - quita TP broker al tocar VirtualTP     |
 //|             + logs detallados de trailing y cierre de posición    |
+//|      v1.18: Fix compile error HistorySelectByPosition             |
+//|             + logs detallados en detección de entry/order delete  |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.17"
+#property version   "1.18"
 
 //--- Standard Library
 #include <Trade/Trade.mqh>
@@ -71,13 +73,22 @@ void OnTick()
             g_state = STATE_TRADE_ACTIVE;
             g_tpReached = false;
 
-            Print("[ENTRY] Posición detectada. Ticket: ", g_positionTicket);
+            string posDir = (g_posInfo.PositionType() == POSITION_TYPE_BUY) ? "BUY" : "SELL";
+            Print("[ENTRY] Posición ", posDir, " detectada. Ticket=", g_positionTicket,
+                  " | BuyOrderTicket=", g_buyOrderTicket,
+                  " | SellOrderTicket=", g_sellOrderTicket);
 
             // Borrar la orden opuesta
             if(g_posInfo.PositionType() == POSITION_TYPE_BUY)
-               g_trade.OrderDelete(g_sellOrderTicket);
+            {
+               bool ok = g_trade.OrderDelete(g_sellOrderTicket);
+               Print("[ENTRY] Eliminando SellStop ticket=", g_sellOrderTicket, " | OK=", ok, " Err=", GetLastError());
+            }
             else
-               g_trade.OrderDelete(g_buyOrderTicket);
+            {
+               bool ok = g_trade.OrderDelete(g_buyOrderTicket);
+               Print("[ENTRY] Eliminando BuyStop ticket=", g_buyOrderTicket, " | OK=", ok, " Err=", GetLastError());
+            }
 
             // Poner TP Virtual si está ON (línea verde, no va al broker)
             if(g_useTP) SetVirtualTP();
@@ -93,33 +104,33 @@ void OnTick()
       else
       {
          // Posición cerrada — buscar en historial para loggear resultado
-         if(HistoryDealSelect(g_positionTicket) ||
-            HistorySelectByPosition(g_positionTicket))
+         HistorySelect(TimeCurrent() - 86400, TimeCurrent());
+         int total = HistoryDealsTotal();
+         bool found = false;
+         for(int d = total - 1; d >= 0; d--)
          {
-            int total = HistoryDealsTotal();
-            for(int d = total - 1; d >= 0; d--)
+            ulong dTicket = HistoryDealGetTicket(d);
+            if(HistoryDealGetInteger(dTicket, DEAL_POSITION_ID) == (long)g_positionTicket &&
+               HistoryDealGetInteger(dTicket, DEAL_ENTRY) == DEAL_ENTRY_OUT)
             {
-               ulong dTicket = HistoryDealGetTicket(d);
-               if(HistoryDealGetInteger(dTicket, DEAL_POSITION_ID) == (long)g_positionTicket)
-               {
-                  double profit = HistoryDealGetDouble(dTicket, DEAL_PROFIT);
-                  double closeP = HistoryDealGetDouble(dTicket, DEAL_PRICE);
-                  long   reason = HistoryDealGetInteger(dTicket, DEAL_REASON);
-                  string reasonStr = (reason == DEAL_REASON_SL) ? "SL" :
-                                     (reason == DEAL_REASON_TP) ? "TP" :
-                                     (reason == DEAL_REASON_EXPERT) ? "EA" : "MANUAL/OTRO";
-                  Print("[POSICION CERRADA] Ticket=", g_positionTicket,
-                        " | Precio cierre=", closeP,
-                        " | Motivo=", reasonStr,
-                        " | Profit=", DoubleToString(profit, 2),
-                        " | Trailing activo fue=", (g_tpReached ? "SI" : "NO"));
-                  break;
-               }
+               double profit   = HistoryDealGetDouble(dTicket, DEAL_PROFIT);
+               double closeP   = HistoryDealGetDouble(dTicket, DEAL_PRICE);
+               long   reason   = HistoryDealGetInteger(dTicket, DEAL_REASON);
+               string reasonStr = (reason == DEAL_REASON_SL)     ? "SL"     :
+                                  (reason == DEAL_REASON_TP)     ? "TP"     :
+                                  (reason == DEAL_REASON_EXPERT) ? "EA"     : "MANUAL/OTRO";
+               Print("[POSICION CERRADA] Ticket=", g_positionTicket,
+                     " | Precio=", closeP,
+                     " | Motivo=", reasonStr,
+                     " | Profit=", DoubleToString(profit, 2),
+                     " | Trailing fue activado=", (g_tpReached ? "SI" : "NO"));
+               found = true;
+               break;
             }
          }
-         else
+         if(!found)
             Print("[POSICION CERRADA] Ticket=", g_positionTicket,
-                  " | No encontrada en historial aún | Trailing activo fue=", (g_tpReached ? "SI" : "NO"));
+                  " | No encontrada en historial | Trailing fue activado=", (g_tpReached ? "SI" : "NO"));
 
          g_state = STATE_IDLE;
          g_positionTicket = 0;
