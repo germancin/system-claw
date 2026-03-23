@@ -1,3 +1,3 @@
 //+------------------------------------------------------------------+
-//| TrailingLogic.mqh — Eliminado en v1.19 (sin trailing stop)       |
+//| TrailingLogic.mqh — Módulo removido, archivo vacío               |
 //+------------------------------------------------------------------+

@@ -342,8 +342,7 @@
                     seguridad.</li>
                 <li><strong>Acción Automática:</strong> 1 minuto antes del evento, el sistema coloca un "straddle" (Buy
                     Stop y Sell Stop) a la distancia X del precio actual.</li>
-                <li><strong>Gestión de Trade:</strong> Al activarse una orden, se habilita el Trailing Stop (5 puntos) y
-                    se elimina automáticamente la orden contraria.</li>
+                <li><strong>Gestión de Trade:</strong> Al activarse una orden, se elimina automáticamente la orden contraria. La posición corre con SL fijo hasta que el broker la cierre.</li>
                 <li><strong>Interfaz:</strong> Control total desde el gráfico (Armar/Cancelar) con reporte de estado
                     interactivo.</li>
             </ul>
@@ -398,11 +397,10 @@
                         <tr>
                             <td>D</td>
                             <td><span class="category-badge">Gestión</span></td>
-                            <td>Lógica de Trailing Stop (5 pts)</td>
+                            <td>Stop Loss fijo en pips</td>
                             <td>
-                                <span class="option-item"><strong>D1:</strong> Clásico, Break-even +5 o Híbrido</span>
-                                <span class="option-item"><strong>D2:</strong> ¿Inicio inmediato o tras ganancia
-                                    mínima?</span>
+                                <span class="option-item"><strong>D1:</strong> SL simétrico para BuyStop y SellStop</span>
+                                <span class="option-item"><strong>D2:</strong> Configurable via <code>InpSLPips</code></span>
                             </td>
                         </tr>
                         <tr>

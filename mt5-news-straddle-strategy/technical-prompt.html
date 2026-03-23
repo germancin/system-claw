@@ -480,12 +480,6 @@
                                 orden contraria.</td>
                         </tr>
                         <tr>
-                            <td><span class="category-badge">Trailing</span></td>
-                            <td><strong>Motor de Trailing</strong></td>
-                            <td>Trailing Stop clásico por pips. Se activa inmediatamente al ejecutarse la orden.
-                                Modifica SL vía <code>PositionModify()</code>.</td>
-                        </tr>
-                        <tr>
                             <td><span class="category-badge">UI</span></td>
                             <td><strong>Panel Gráfico</strong></td>
                             <td>Botones ARMAR / CANCELAR / TP ON-OFF renderizados con <code>OBJ_BUTTON</code>. Feedback
@@ -521,7 +515,7 @@
                     <code>NormalizeDouble(price, _Digits)</code> antes de enviar órdenes.
                 </li>
                 <li><span class="tag tag-important">IMPORTANTE</span> Usar <code>input</code> variables para todos los
-                    parámetros configurables (hora del evento, distancia en pips, trailing, TP).</li>
+                    parámetros configurables (hora del evento, distancia en pips, SL).</li>
                 <li><span class="tag tag-important">IMPORTANTE</span> Implementar un Magic Number único para identificar
                     las órdenes/posiciones del EA y no interferir con otras operaciones.</li>
                 <li><span class="tag tag-best">BEST PRACTICE</span> Arquitectura basada en State Machine para controlar
@@ -548,7 +542,7 @@
 
                 <span class="section-label">OBJETIVO</span>
                 Desarrollar un Expert Advisor (EA) completo en MQL5 llamado <code>NewsStraddleEA</code> que implemente
-                la estrategia "Pre-News Stop-Limit Straddle (10s) + Trailing". El EA debe ser instalable directamente en
+                la estrategia "Pre-News Stop-Limit Straddle (10s)". El EA debe ser instalable directamente en
                 MT5, compilar sin errores ni warnings, y funcionar en cuentas demo y reales.
 
                 <span class="section-label">ESTRATEGIA (LÓGICA DE NEGOCIO)</span>
@@ -559,9 +553,7 @@
                 • <code>ORDER_TYPE_SELL_STOP_LIMIT</code> → a una distancia de X pips ABAJO del precio actual (Bid).
                 3. Al ejecutarse cualquiera de las dos órdenes (se convierte en posición abierta):
                 • Se elimina INMEDIATAMENTE la orden contraria que quedó pendiente.
-                • Se activa el Trailing Stop con la distancia configurada en pips.
-                4. La posición se gestiona por Trailing Stop (salida principal). NO hay Take Profit por defecto.
-                5. Opcionalmente, el usuario puede activar un Take Profit fijo en pips mediante un toggle ON/OFF.
+                4. La posición corre con SL fijo hasta que el broker la cierre o el trader la cierre manualmente.
 
                 <span class="section-label">MÁQUINA DE ESTADOS (STATE MACHINE)</span>
                 El EA debe operar con los siguientes estados estrictos:
@@ -570,10 +562,8 @@
                 • <code>STATE_ARMED</code>: El evento está programado. El EA espera a que falten 10 segundos para la
                 hora configurada.
                 • <code>STATE_ORDERS_PLACED</code>: Las órdenes Stop-Limit han sido colocadas. Monitorea ejecución.
-                • <code>STATE_TRADE_ACTIVE</code>: Una orden se ejecutó. La contraria fue eliminada. Trailing Stop
-                activo.
-                • <code>STATE_DONE</code>: La posición fue cerrada (por trailing, TP, o manualmente). Listo para
-                rearmar.
+                • <code>STATE_TRADE_ACTIVE</code>: Una orden se ejecutó. La contraria fue eliminada. Posición corriendo con SL fijo.
+                • <code>STATE_DONE</code>: La posición fue cerrada (por SL o manualmente). Listo para rearmar.
 
                 Transiciones:
                 IDLE → (botón ARMAR) → ARMED
@@ -586,10 +576,8 @@
 
                 <span class="section-label">PARÁMETROS DE ENTRADA (input variables)</span>
                 <code>input string   InpNewsTime        = "08:30:00";   // Hora del evento (HH:MM:SS, hora del servidor)
-input double   InpEntryDistPips   = 15.0;         // Distancia de entrada en pips (soporta decimales: 0.01, 1.00, 15.00)
-input double   InpTrailingPips    = 5.0;          // Distancia del Trailing Stop en pips (soporta decimales)
-input bool     InpUseTP           = false;        // Usar Take Profit (ON/OFF)
-input double   InpTPPips          = 30.0;         // Take Profit en pips (solo si InpUseTP == true)
+input double   InpEntryDistPips   = 15.0;         // Distancia de entrada en pips
+input double   InpSLPips          = 10000.0;      // Stop Loss en pips
 input double   InpLotSize         = 0.01;         // Tamaño de lote
 input int      InpMagicNumber     = 202601;       // Magic Number único del EA
 input int      InpLeadTimeSeconds = 10;           // Segundos antes del evento para colocar órdenes</code>
@@ -625,19 +613,10 @@ input int      InpLeadTimeSeconds = 10;           // Segundos antes del evento p
                 • Eliminar inmediatamente la orden pendiente contraria con <code>trade.OrderDelete(ticket)</code>.
                 • Validar que la eliminación fue exitosa.
 
-                <span class="section-label">TRAILING STOP (módulo Trailing)</span>
-                Implementar trailing clásico:
-                1. En cada <code>OnTick()</code>, si el estado es <code>STATE_TRADE_ACTIVE</code>:
-                • Obtener la posición abierta del EA (filtrar por Magic Number y símbolo).
-                • Para posición BUY:
-                - Calcular nuevo SL = Bid - PipsToPrice(InpTrailingPips)
-                - Si el nuevo SL es mayor que el SL actual → mover SL con <code>trade.PositionModify()</code>
-                • Para posición SELL:
-                - Calcular nuevo SL = Ask + PipsToPrice(InpTrailingPips)
-                - Si el nuevo SL es menor que el SL actual (o SL actual == 0) → mover SL
-                2. El trailing se activa INMEDIATAMENTE al ejecutarse la orden (sin esperar ganancia mínima).
-                3. Si InpUseTP está activo, establecer el TP al momento de detectar la ejecución:
-                <code>trade.PositionModify(ticket, newSL, tpPrice)</code>.
+                <span class="section-label">GESTIÓN DE POSICIÓN ACTIVA</span>
+                En cada <code>OnTick()</code>, si el estado es <code>STATE_TRADE_ACTIVE</code>:
+                • Verificar si la posición sigue abierta con <code>CPositionInfo.SelectByTicket()</code>.
+                • Si la posición ya no existe → registrar cierre en log → transición a STATE_IDLE.
 
                 <span class="section-label">INTERFAZ GRÁFICA (módulo UI)</span>
                 Crear botones directamente en el gráfico usando objetos <code>OBJ_BUTTON</code>:
@@ -648,7 +627,7 @@ input int      InpLeadTimeSeconds = 10;           // Segundos antes del evento p
                 • <code>[TP ON/OFF]</code> – Toggle. Color azul cuando está ON, gris cuando está OFF.
 
                 Panel de estado (usar <code>OBJ_LABEL</code> o <code>Comment()</code>):
-                • Mostrar: Estado actual | Hora del evento | Distancia (pips) | Trailing (pips) | TP (si aplica)
+                • Mostrar: Estado actual | Hora del evento | Distancia (pips) | SL (pips)
                 • Actualizar en cada tick o cambio de estado.
 
                 Para los botones:
@@ -668,7 +647,7 @@ input int      InpLeadTimeSeconds = 10;           // Segundos antes del evento p
 
                 <code>OnTick():</code>
                 • Si STATE_ORDERS_PLACED: verificar si alguna orden se ejecutó (escanear posiciones por Magic).
-                • Si STATE_TRADE_ACTIVE: ejecutar lógica de Trailing Stop.
+                • Si STATE_TRADE_ACTIVE: verificar si la posición sigue abierta.
                 • Verificar si la posición sigue abierta; si fue cerrada → STATE_DONE.
 
                 <code>OnTimer():</code>
@@ -726,7 +705,7 @@ input int      InpLeadTimeSeconds = 10;           // Segundos antes del evento p
                 ✅ Se colocan Buy Stop-Limit y Sell Stop-Limit a la distancia configurada.
                 ✅ Al ejecutarse una orden: Trailing Stop se activa + orden contraria se elimina inmediatamente.
                 ✅ TP no se usa por defecto, pero funciona correctamente cuando TP ON está activo.
-                ✅ Los botones ARMAR / CANCELAR / TP ON-OFF funcionan desde el gráfico.
+                ✅ Los botones ARMAR / CANCELAR funcionan desde el gráfico.
                 ✅ El panel muestra estado, hora, y parámetros en tiempo real.
                 ✅ OnDeinit limpia todos los objetos y órdenes pendientes.
                 ✅ Todos los errores se manejan con reintentos y logs claros.

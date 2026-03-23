@@ -2,9 +2,8 @@
 //|                                              NewsStraddleEA.mq5  |
 //|      Pre-News Straddle (Standard Stops) | v1.19                  |
 //|      v1.16: Botón minimizar/restaurar panel UI (esquina superior) |
-//|      v1.17: Fix trailing - quita TP broker al tocar VirtualTP     |
 //|      v1.18: Fix compile error + logs detallados entry/order delete|
-//|      v1.19: Eliminado trailing stop — bot opera solo con SL fijo  |
+//|      v1.19: Simplificado — opera con SL fijo, sin gestión de TP   |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
@@ -21,7 +20,6 @@
 #include "includes/Globals.mqh"
 #include "includes/UI.mqh"
 #include "includes/Orders.mqh"
-#include "includes/TrailingLogic.mqh"
 
 //+------------------------------------------------------------------+
 //| OnInit                                                            |
