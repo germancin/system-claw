@@ -102,7 +102,7 @@ void OnTick()
    }
 
    // Monitorear trade activo — detectar cierre
-   if(g_state == STATE_TRADE_ACTIVE)
+   else if(g_state == STATE_TRADE_ACTIVE)
    {
       // Buscar posición por magic (más robusto que por ticket)
       bool found = false;
