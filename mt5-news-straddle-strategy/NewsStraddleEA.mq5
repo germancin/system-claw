@@ -1,19 +1,16 @@
 //+------------------------------------------------------------------+
 //|                                              NewsStraddleEA.mq5  |
-//|      Pre-News Straddle (Standard Stops) | v1.19                  |
-//|      v1.16: Botón minimizar/restaurar panel UI (esquina superior) |
-//|      v1.18: Fix compile error + logs detallados entry/order delete|
-//|      v1.19: Simplificado — opera con SL fijo, sin gestión de TP   |
+//|      Pre-News Straddle (Market Orders) | v2.01                   |
+//|      v2.01: Trailing Stop clásico + TP on/off                    |
 //|                                        github.com/germancin      |
 //+------------------------------------------------------------------+
 #property copyright "germancin"
 #property link      "https://github.com/germancin/system-claw"
-#property version   "1.19"
+#property version   "2.01"
 
 //--- Standard Library
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
-#include <Trade/OrderInfo.mqh>
 
 //--- EA Modules
 #include "includes/Inputs.mqh"
@@ -30,7 +27,6 @@ int OnInit()
    g_trade.SetExpertMagicNumber(InpMagicNumber);
    g_trade.SetDeviationInPoints(50);
 
-   // Detectar filling mode del broker
    long fillType = SymbolInfoInteger(_Symbol, SYMBOL_FILLING_MODE);
    if((fillType & SYMBOL_FILLING_IOC) != 0)
       g_trade.SetTypeFilling(ORDER_FILLING_IOC);
@@ -39,12 +35,9 @@ int OnInit()
    else
       g_trade.SetTypeFilling(ORDER_FILLING_RETURN);
 
-   Print("[INIT] Filling mode: ", fillType);
-
-   // Auto-arm: parse event time and set state to ARMED
    g_eventTime = ParseEventTime(InpNewsTime);
    g_state = STATE_ARMED;
-   Print("[INIT] EA armado automáticamente para ", InpNewsTime);
+   Print("[INIT] EA armado para ", InpNewsTime, " | Filling=", fillType);
 
    InitUI();
    EventSetMillisecondTimer(500);
@@ -52,71 +45,100 @@ int OnInit()
 }
 
 //+------------------------------------------------------------------+
-//| OnTick                                                            |
+//| OnTick — Monitorea niveles y abre market order al cruzar          |
 //+------------------------------------------------------------------+
 void OnTick()
 {
-   // Detectar si una orden pendiente se activó
-   if(g_state == STATE_ORDERS_PLACED)
+   // Monitorear niveles — abrir market order cuando el precio cruza
+   if(g_state == STATE_MONITORING)
    {
-      for(int i = PositionsTotal() - 1; i >= 0; i--)
+      double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+      double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+
+      if(ask >= g_buyLevel)
       {
-         if(g_posInfo.SelectByIndex(i) && g_posInfo.Magic() == InpMagicNumber)
+         Print("[MARKET] Ask=", ask, " cruzó BuyLevel=", g_buyLevel, " — abriendo BUY");
+         bool ok = g_trade.Buy(InpLotSize, _Symbol, ask, g_buySL, g_buyTP);
+         Print("[MARKET] Buy OK=", ok,
+               " | retcode=", g_trade.ResultRetcode(),
+               " | desc=", g_trade.ResultRetcodeDescription());
+
+         if(ok)
          {
-            g_positionTicket = g_posInfo.Ticket();
+            g_positionTicket = g_trade.ResultOrder();
             g_state = STATE_TRADE_ACTIVE;
-
-            string posDir = (g_posInfo.PositionType() == POSITION_TYPE_BUY) ? "BUY" : "SELL";
-            Print("[ENTRY] Posición ", posDir, " detectada. Ticket=", g_positionTicket,
-                  " | BuyOrderTicket=", g_buyOrderTicket,
-                  " | SellOrderTicket=", g_sellOrderTicket);
-
-            // Borrar la orden opuesta
-            if(g_posInfo.PositionType() == POSITION_TYPE_BUY)
-            {
-               bool ok = g_trade.OrderDelete(g_sellOrderTicket);
-               Print("[ENTRY] Eliminando SellStop ticket=", g_sellOrderTicket, " | OK=", ok, " Err=", GetLastError());
-            }
-            else
-            {
-               bool ok = g_trade.OrderDelete(g_buyOrderTicket);
-               Print("[ENTRY] Eliminando BuyStop ticket=", g_buyOrderTicket, " | OK=", ok, " Err=", GetLastError());
-            }
          }
+         else
+         {
+            Print("[MARKET] ERROR — deteniendo EA");
+            g_state = STATE_IDLE;
+         }
+         g_buyLevel = 0;
+         g_sellLevel = 0;
+         RemoveTriggerLines();
+      }
+      else if(bid <= g_sellLevel)
+      {
+         Print("[MARKET] Bid=", bid, " cruzó SellLevel=", g_sellLevel, " — abriendo SELL");
+         bool ok = g_trade.Sell(InpLotSize, _Symbol, bid, g_sellSL, g_sellTP);
+         Print("[MARKET] Sell OK=", ok,
+               " | retcode=", g_trade.ResultRetcode(),
+               " | desc=", g_trade.ResultRetcodeDescription());
+
+         if(ok)
+         {
+            g_positionTicket = g_trade.ResultOrder();
+            g_state = STATE_TRADE_ACTIVE;
+         }
+         else
+         {
+            Print("[MARKET] ERROR — deteniendo EA");
+            g_state = STATE_IDLE;
+         }
+         g_buyLevel = 0;
+         g_sellLevel = 0;
+         RemoveTriggerLines();
       }
    }
 
    // Monitorear trade activo — detectar cierre
    if(g_state == STATE_TRADE_ACTIVE)
    {
-      if(!g_posInfo.SelectByTicket(g_positionTicket))
+      // Buscar posición por magic (más robusto que por ticket)
+      bool found = false;
+      for(int i = PositionsTotal() - 1; i >= 0; i--)
       {
-         // Posición cerrada — buscar en historial para loggear resultado
+         if(g_posInfo.SelectByIndex(i) && g_posInfo.Magic() == InpMagicNumber
+            && g_posInfo.Symbol() == _Symbol)
+         {
+            found = true;
+            g_positionTicket = g_posInfo.Ticket();
+            break;
+         }
+      }
+
+      if(found)
+         ApplyTrailingStop();
+
+      if(!found)
+      {
          HistorySelect(TimeCurrent() - 86400, TimeCurrent());
-         int total = HistoryDealsTotal();
-         bool found = false;
-         for(int d = total - 1; d >= 0; d--)
+         for(int d = HistoryDealsTotal() - 1; d >= 0; d--)
          {
             ulong dTicket = HistoryDealGetTicket(d);
-            if(HistoryDealGetInteger(dTicket, DEAL_POSITION_ID) == (long)g_positionTicket &&
+            if(HistoryDealGetInteger(dTicket, DEAL_MAGIC) == InpMagicNumber &&
+               HistoryDealGetString(dTicket, DEAL_SYMBOL) == _Symbol &&
                HistoryDealGetInteger(dTicket, DEAL_ENTRY) == DEAL_ENTRY_OUT)
             {
-               double profit   = HistoryDealGetDouble(dTicket, DEAL_PROFIT);
-               double closeP   = HistoryDealGetDouble(dTicket, DEAL_PRICE);
-               long   reason   = HistoryDealGetInteger(dTicket, DEAL_REASON);
-               string reasonStr = (reason == DEAL_REASON_SL)     ? "SL"    :
-                                  (reason == DEAL_REASON_TP)     ? "TP"    :
-                                  (reason == DEAL_REASON_EXPERT) ? "EA"    : "MANUAL/OTRO";
-               Print("[POSICION CERRADA] Ticket=", g_positionTicket,
-                     " | Precio=", closeP,
-                     " | Motivo=", reasonStr,
-                     " | Profit=", DoubleToString(profit, 2));
-               found = true;
+               double profit = HistoryDealGetDouble(dTicket, DEAL_PROFIT);
+               long   reason = HistoryDealGetInteger(dTicket, DEAL_REASON);
+               string reasonStr = (reason == DEAL_REASON_SL) ? "SL" :
+                                  (reason == DEAL_REASON_TP) ? "TP" :
+                                  (reason == DEAL_REASON_EXPERT) ? "EA" : "MANUAL/OTRO";
+               Print("[CERRADA] Motivo=", reasonStr, " | Profit=", DoubleToString(profit, 2));
                break;
             }
          }
-         if(!found)
-            Print("[POSICION CERRADA] Ticket=", g_positionTicket, " | No encontrada en historial aún");
 
          g_state = STATE_IDLE;
          g_positionTicket = 0;
@@ -125,51 +147,43 @@ void OnTick()
 }
 
 //+------------------------------------------------------------------+
-//| OnTimer                                                           |
+//| OnTimer — Countdown + activar monitoreo                           |
 //+------------------------------------------------------------------+
 void OnTimer()
 {
    if(g_state == STATE_ARMED && TimeCurrent() >= g_eventTime - InpLeadTimeSeconds)
    {
-      if(PlaceStraddleOrders())
-         g_state = STATE_ORDERS_PLACED;
-      else
-         g_state = STATE_IDLE;
+      SetStraddleLevels();
+      g_state = STATE_MONITORING;
+      Print("[TIMER] Monitoreo activo");
    }
    UpdateUI();
 }
 
 //+------------------------------------------------------------------+
-//| OnChartEvent — Click del botón CANCEL                             |
+//| OnChartEvent — CANCEL y MINIMIZE                                  |
 //+------------------------------------------------------------------+
 void OnChartEvent(const int id, const long &l, const double &d, const string &s)
 {
    if(id != CHARTEVENT_OBJECT_CLICK) return;
 
-   // MINIMIZE — Colapsar/expandir panel
    if(s == BTN_MINIMIZE) { ToggleMinimize(); return; }
 
-   // CANCEL ALL — Cerrar posiciones + borrar órdenes pendientes
    if(s == BTN_CANCEL)
    {
-      // Borrar órdenes pendientes
-      g_trade.OrderDelete(g_buyOrderTicket);
-      g_trade.OrderDelete(g_sellOrderTicket);
-
-      // Cerrar posición abierta si existe
+      // Cerrar posición si existe
       if(g_positionTicket != 0 && g_posInfo.SelectByTicket(g_positionTicket))
       {
          g_trade.PositionClose(g_positionTicket);
          Print("[CANCEL] Posición cerrada: ", g_positionTicket);
       }
 
-      // Resetear estado
       g_state = STATE_IDLE;
       g_positionTicket = 0;
-      g_buyOrderTicket = 0;
-      g_sellOrderTicket = 0;
-
-      Print("[CANCEL] Todo cancelado y reseteado");
+      g_buyLevel = 0;
+      g_sellLevel = 0;
+      RemoveTriggerLines();
+      Print("[CANCEL] Todo cancelado");
    }
 }
 

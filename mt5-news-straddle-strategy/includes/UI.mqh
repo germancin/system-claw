@@ -60,12 +60,15 @@ void InitUI()
    CreateButton(BTN_MINIMIZE, "-",          baseX + 308, baseY - 10 + 3,   20,  20, C'60,60,80',  clrWhite);
 
    // Labels
-   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v1.19 ═══",                    baseX, baseY + 40,  clrGold,          11);
+   CreateLabel("NewsEA_Title",  "═══ NEWS STRADDLE EA v2.01 ═══",                    baseX, baseY + 40,  clrGold,          11);
    CreateLabel(LBL_STATE,       "Estado: IDLE",                                       baseX, baseY + 62,  clrWhite,          9);
    CreateLabel("NewsEA_Event",  "Evento: " + InpNewsTime,                            baseX, baseY + 80,  clrSilver,         9);
    CreateLabel(LBL_COUNT,       "",                                                   baseX, baseY + 98,  clrYellow,         9);
-   CreateLabel("NewsEA_Params", StringFormat("Dist: %.1f pips | SL: %.1f pips",
-               InpEntryDistPips, InpSLPips),                                          baseX, baseY + 116, C'100,200,255',    8);
+   CreateLabel("NewsEA_Params", StringFormat("Dist:%.0f | SL:%.0f | TP:%s | Trail:%s",
+               InpEntryDistPips, InpSLPips,
+               InpEnableTP ? StringFormat("%.0f", InpTPPips) : "OFF",
+               InpTrailingStopPips > 0 ? StringFormat("%.0f", InpTrailingStopPips) : "OFF"),
+               baseX, baseY + 116, C'100,200,255', 8);
 
    ChartRedraw();
 }
@@ -123,4 +126,6 @@ void CleanupUI()
    ObjectDelete(0, "NewsEA_Title");
    ObjectDelete(0, "NewsEA_Event");
    ObjectDelete(0, "NewsEA_Params");
+   ObjectDelete(0, "NewsEA_BuyLevel");
+   ObjectDelete(0, "NewsEA_SellLevel");
 }
