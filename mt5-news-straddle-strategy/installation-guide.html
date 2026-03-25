@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía de Instalación: NewsStraddleEA</title>
+    <title>Guia de Instalacion: NewsStraddleEA v2.01</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -175,12 +175,62 @@
             margin-bottom: 1rem;
         }
 
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .dim {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 255, 204, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: var(--accent-color);
+        }
+
+        .file-tree {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin-top: 10px;
+            color: var(--text-main);
+        }
+
+        .file-tree .folder {
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        .file-tree .file {
+            color: var(--accent-color);
+        }
+
+        .file-tree .main-file {
+            color: #ffa657;
+            font-weight: 600;
+        }
+
+        .file-tree .comment {
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
         .code-snippet {
             background: #0d1117;
             border: 1px solid var(--border-color);
             padding: 10px;
             border-radius: 6px;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
             color: #58a6ff;
             font-size: 0.9rem;
             margin-top: 10px;
@@ -196,6 +246,58 @@
             display: flex;
             gap: 12px;
             align-items: flex-start;
+        }
+
+        .danger-box {
+            background: rgba(207, 34, 46, 0.1);
+            border: 1px solid #cf222e;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #ff7b72;
+            margin-top: 1rem;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .info-box {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            background: rgba(0, 255, 204, 0.05);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .file-list {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .file-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-list li:last-child {
+            border-bottom: none;
+        }
+
+        .file-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent-color);
+        }
+
+        .file-badge-main {
+            background: rgba(255, 166, 87, 0.15);
+            color: #ffa657;
         }
 
         footer {
@@ -229,16 +331,16 @@
             <i data-lucide="layout"></i> Resumen General
         </a>
         <a href="refined-strategy.html">
-            <i data-lucide="target"></i> Estrategia Refinada (10s)
+            <i data-lucide="target"></i> Estrategia Refinada
         </a>
         <a href="technical-prompt.html">
-            <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
+            <i data-lucide="code-2"></i> Prompt Tecnico (MQL5)
         </a>
         <a href="installation-guide.html" class="active">
-            <i data-lucide="download"></i> Guía de Instalación
+            <i data-lucide="download"></i> Guia de Instalacion
         </a>
         <a href="how-to-use.html">
-            <i data-lucide="book-open"></i> User Story / Uso
+            <i data-lucide="book-open"></i> Como Usar el EA
         </a>
         <a href="telegram-bot.html">
             <i data-lucide="message-circle"></i> Telegram Alert Bot
@@ -247,62 +349,113 @@
 
     <div class="container">
         <header>
-            <h1>Guía de Instalación</h1>
-            <p class="subtitle">Cómo instalar y activar el EA en MetaTrader 5</p>
+            <h1>Guia de Instalacion</h1>
+            <p class="subtitle">Como instalar y activar NewsStraddleEA v2.01 en MetaTrader 5</p>
         </header>
 
-        <section class="card">
+        <!-- ARCHIVOS REQUERIDOS -->
+        <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
-                <i data-lucide="download-cloud"></i>
-                Descargar el EA
+                <i data-lucide="alert-circle"></i>
+                Archivos Requeridos (NO es un solo archivo)
             </div>
-            <p style="margin-bottom: 1rem;">Descarga el archivo del Expert Advisor directamente desde GitHub:</p>
-            <a href="https://raw.githubusercontent.com/germancin/system-claw/main/mt5-news-straddle-strategy/NewsStraddleEA.mq5"
-                download="NewsStraddleEA.mq5"
-                style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%); color: #0d1117; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: opacity 0.2s;"
-                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-                <i data-lucide="download"></i> Descargar NewsStraddleEA.mq5
-            </a>
-            <p class="dim" style="margin-top: 0.75rem;">Después de instalarlo, consulta la <a href="how-to-use.html"
-                    style="color: var(--accent-color);">Guía de Uso</a> para configurar los parámetros según tu
-                instrumento (Nasdaq / BTCUSD).</p>
+            <p style="margin-bottom: 1rem;">El EA esta compuesto por <strong>6 archivos</strong> organizados en 2 niveles. Necesitas copiar <strong>TODOS</strong> para que funcione:</p>
+
+            <ul class="file-list">
+                <li>
+                    <span class="file-badge file-badge-main">PRINCIPAL</span>
+                    <code>NewsStraddleEA.mq5</code> <span class="dim">— Motor principal del EA</span>
+                </li>
+                <li>
+                    <span class="file-badge">INCLUDE</span>
+                    <code>includes/Inputs.mqh</code> <span class="dim">— Parametros configurables</span>
+                </li>
+                <li>
+                    <span class="file-badge">INCLUDE</span>
+                    <code>includes/Globals.mqh</code> <span class="dim">— Estado y variables globales</span>
+                </li>
+                <li>
+                    <span class="file-badge">INCLUDE</span>
+                    <code>includes/UI.mqh</code> <span class="dim">— Panel visual del chart</span>
+                </li>
+                <li>
+                    <span class="file-badge">INCLUDE</span>
+                    <code>includes/Orders.mqh</code> <span class="dim">— Logica de ordenes y trailing</span>
+                </li>
+                <li>
+                    <span class="file-badge">INCLUDE</span>
+                    <code>includes/TrailingLogic.mqh</code> <span class="dim">— Reservado (vacio)</span>
+                </li>
+            </ul>
+
+            <div class="danger-box">
+                <i data-lucide="alert-triangle"></i>
+                <span>Si solo copias el archivo <code>.mq5</code> sin la carpeta <code>includes/</code>, el EA NO va a compilar. Necesitas todos los archivos.</span>
+            </div>
         </section>
 
+        <!-- PASOS -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="file-code"></i>
-                Pasos para la Instalación
+                Pasos para la Instalacion
             </div>
 
             <div class="step-list">
                 <div class="step-item">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <h3>Localizar el archivo .mq5</h3>
-                        <p>Descarga el archivo usando el botón de arriba o asegúrate de tener el archivo
-                            <code>NewsStraddleEA.mq5</code> en tu computadora.</p>
+                        <h3>Descargar los archivos del EA</h3>
+                        <p>Descarga la carpeta completa desde GitHub. Necesitas el archivo principal <strong>Y</strong> la carpeta <code>includes/</code> con los 5 archivos <code>.mqh</code>.</p>
+                        <a href="https://github.com/germancin/system-claw/tree/main/mt5-news-straddle-strategy"
+                            target="_blank"
+                            style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%); color: #0d1117; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: opacity 0.2s;"
+                            onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                            <i data-lucide="github"></i> Ver archivos en GitHub
+                        </a>
+                        <div class="info-box" style="margin-top: 1rem;">
+                            <p class="dim"><strong>Tip:</strong> Desde GitHub, la forma mas facil es descargar el repositorio completo como ZIP (boton verde "Code" &rarr; "Download ZIP") y luego extraer solo la carpeta <code>mt5-news-straddle-strategy/</code>.</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="step-item">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h3>Abrir Carpeta de Datos en MT5</h3>
-                        <p>Abre MetaTrader 5, ve al menú superior: <br>
-                            <strong>Archivo (File) &rarr; Abrir Carpeta de Datos (Open Data Folder)</strong>.
+                        <h3>Abrir la Carpeta de Experts en MT5</h3>
+                        <p>Abre MetaTrader 5, ve al menu superior:<br>
+                            <strong>Archivo (File) &rarr; Abrir Carpeta de Datos (Open Data Folder)</strong>
                         </p>
+                        <p>En la ventana que se abre, navega a:</p>
+                        <div class="code-snippet">MQL5\Experts\</div>
+                        <p class="dim" style="margin-top: 0.5rem;">Esa es la carpeta donde MT5 busca los Expert Advisors.</p>
                     </div>
                 </div>
 
                 <div class="step-item">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3>Copiar el EA</h3>
-                        <p>En la ventana que se abrió, navega a la siguiente ruta (generalmente es la carpeta de datos
-                            de MT5, pero si instalaste en la ruta por defecto suele ser):</p>
-                        <div class="code-snippet">C:\Program Files\MetaTrader 5\MQL5\Experts</div>
-                        <p style="margin-top: 10px;">Pega el archivo <code>NewsStraddleEA.mq5</code> dentro de esa
-                            carpeta.</p>
+                        <h3>Copiar TODOS los archivos</h3>
+                        <p>Copia el archivo <code>NewsStraddleEA.mq5</code> <strong>Y</strong> la carpeta <code>includes/</code> completa dentro de <code>MQL5\Experts\</code>.</p>
+
+                        <p style="margin-top: 1rem;"><strong>Asi debe quedar la estructura dentro de MT5:</strong></p>
+
+                        <div class="file-tree">
+<span class="folder">MQL5/</span>
+<span class="folder">  Experts/</span>
+<span class="main-file">    NewsStraddleEA.mq5</span>          <span class="comment">&larr; archivo principal</span>
+<span class="folder">    includes/</span>                      <span class="comment">&larr; carpeta (crearla si no existe)</span>
+<span class="file">      Inputs.mqh</span>
+<span class="file">      Globals.mqh</span>
+<span class="file">      UI.mqh</span>
+<span class="file">      Orders.mqh</span>
+<span class="file">      TrailingLogic.mqh</span>
+                        </div>
+
+                        <div class="warning-box">
+                            <i data-lucide="alert-triangle"></i>
+                            <span>La carpeta <code>includes/</code> debe estar <strong>al mismo nivel</strong> que el archivo <code>NewsStraddleEA.mq5</code>, ambos dentro de <code>Experts/</code>. Si la pones en otro lugar, no compila.</span>
+                        </div>
                     </div>
                 </div>
 
@@ -310,33 +463,31 @@
                     <div class="step-number">4</div>
                     <div class="step-content">
                         <h3>Compilar el EA (Generar .ex5)</h3>
-                        <p>Para que el bot funcione, MetaTrader necesita transformarlo en un ejecutable:</p>
+                        <p>Para que el bot funcione, MetaTrader necesita compilarlo:</p>
                         <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-main);">
-                            <li>Presiona <strong>F4</strong> en MetaTrader 5 para abrir el <strong>MetaEditor</strong>.
-                            </li>
-                            <li>En la ventana "Navegador" del MetaEditor, abre la carpeta <code>Experts</code> y haz
-                                doble clic en <code>NewsStraddleEA.mq5</code>.</li>
-                            <li>Presiona el botón <strong>Compilar</strong> en la barra superior o presiona
-                                <strong>F7</strong>.
-                            </li>
-                            <li>Verifica en la pestaña "Errores" (abajo) que diga: <span class="highlight">0 errors, 0
-                                    warnings</span>.</li>
+                            <li>Presiona <strong>F4</strong> en MetaTrader 5 para abrir el <strong>MetaEditor</strong>.</li>
+                            <li>En el Navegador del MetaEditor, abre la carpeta <code>Experts</code> y haz doble clic en <code>NewsStraddleEA.mq5</code>.</li>
+                            <li>Presiona <strong>F7</strong> o el boton <strong>Compilar</strong>.</li>
+                            <li>Verifica en la pestana "Errores" (abajo) que diga: <span class="highlight">0 errors, 0 warnings</span>.</li>
                         </ul>
-                        <p>Regresa a MT5, ve a la ventana <strong>Navegador</strong> (Ctrl+N), haz clic derecho sobre
-                            "Asesores Expertos" y selecciona <strong>Actualizar (Refresh)</strong>. ¡El bot ya aparecerá
-                            listo!</p>
+
+                        <div class="danger-box">
+                            <i data-lucide="x-circle"></i>
+                            <span><strong>Si da errores de "cannot open include file":</strong> significa que la carpeta <code>includes/</code> no esta en el lugar correcto. Revisa el paso 3 y asegurate de que este dentro de <code>Experts/</code> junto al <code>.mq5</code>.</span>
+                        </div>
+
+                        <p style="margin-top: 1rem;">Regresa a MT5, ve a la ventana <strong>Navegador</strong> (Ctrl+N), haz clic derecho sobre "Asesores Expertos" y selecciona <strong>Actualizar (Refresh)</strong>.</p>
                     </div>
                 </div>
 
                 <div class="step-item">
                     <div class="step-number">5</div>
                     <div class="step-content">
-                        <h3>Activar el Trading Automático</h3>
-                        <p>Asegúrate de que el botón <strong>"Algo Trading"</strong> en la barra superior de MT5 esté en
-                            color <strong>Verde</strong>.</p>
+                        <h3>Activar el Trading Automatico</h3>
+                        <p>Asegurate de que el boton <strong>"Algo Trading"</strong> en la barra superior de MT5 este en color <strong>Verde</strong>.</p>
                         <div class="warning-box">
                             <i data-lucide="alert-triangle"></i>
-                            <span>Si el botón está en Rojo, el bot no podrá ejecutar las órdenes.</span>
+                            <span>Si el boton esta en Rojo, el bot no podra ejecutar ordenes. Haz clic en el para activarlo.</span>
                         </div>
                     </div>
                 </div>
@@ -344,17 +495,20 @@
                 <div class="step-item">
                     <div class="step-number">6</div>
                     <div class="step-content">
-                        <h3>Cargar al Gráfico</h3>
-                        <p>Arrastra el EA desde el Navegador hacia el gráfico del símbolo que quieras operar. En la
-                            pestaña <strong>Común</strong>, asegúrate de marcar la casilla <strong>"Permitir Algo
-                                Trading"</strong>.</p>
+                        <h3>Cargar al Grafico</h3>
+                        <p>Arrastra <code>NewsStraddleEA</code> desde el Navegador hacia el grafico del simbolo que quieras operar (ej: NAS100, BTCUSD). En la ventana de configuracion:</p>
+                        <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-main);">
+                            <li>Pestana <strong>Comun</strong>: marca <strong>"Permitir Algo Trading"</strong></li>
+                            <li>Pestana <strong>Inputs</strong>: configura los parametros (hora del evento, distancia, SL, TP, trailing, etc.)</li>
+                        </ul>
+                        <p>Consulta la <a href="how-to-use.html" style="color: var(--accent-color); font-weight: 600;">Guia de Uso</a> para entender cada parametro y como configurarlos segun tu instrumento.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | El Board</p>
+            <p>&copy; 2026 MT5 Strategy Spec | v2.01</p>
         </footer>
     </div>
 
