@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cómo Usar: NewsStraddleEA v1.15</title>
+    <title>Cómo Usar: NewsStraddleEA + Telegram Bot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -23,388 +23,52 @@
             --warning-bg: rgba(210, 153, 34, 0.1);
             --warning-border: #d29922;
             --warning-text: #e3b341;
+            --info-bg: rgba(0, 255, 204, 0.08);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 2rem 1rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 1000px;
-            width: 100%;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-dim);
-        }
-
-        /* --- Global Hamburger Menu --- */
-        .menu-toggle {
-            position: fixed;
-            top: 1.5rem;
-            left: 1.5rem;
-            z-index: 1000;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--accent-color);
-            padding: 0.75rem;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 300px;
-            height: 100%;
-            background: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            z-index: 999;
-            transition: left 0.3s ease;
-            padding: 5rem 2rem 2rem;
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .menu-overlay.active {
-            left: 0;
-        }
-
-        .menu-overlay a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-main);
-            text-decoration: none;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            transition: background 0.2s;
-        }
-
-        .menu-overlay a:hover {
-            background: var(--row-hover);
-            color: var(--accent-color);
-        }
-
-        .menu-overlay a.active {
-            background: rgba(0, 255, 204, 0.1);
-            color: var(--accent-color);
-            border-left: 3px solid var(--accent-color);
-        }
-
-        /* --- Cards --- */
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--accent-color);
-        }
-
-        .summary-list {
-            list-style: none;
-        }
-
-        .summary-list li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-main);
-        }
-
-        .summary-list li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-
-        .highlight {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .dim {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-        }
-
-        /* --- Steps --- */
-        .step-item {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 2rem;
-        }
-
-        .step-number {
-            flex-shrink: 0;
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 255, 204, 0.1);
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .step-content h3 {
-            color: var(--accent-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .step-content p {
-            color: var(--text-main);
-            margin-bottom: 0.75rem;
-        }
-
-        /* --- Tables (Fluid + Card Transformation) --- */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        thead {
-            background-color: rgba(48, 54, 61, 0.5);
-        }
-
-        th {
-            padding: 1rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-dim);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        td {
-            padding: 1.2rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
-        }
-
-        tr:hover {
-            background-color: var(--row-hover);
-        }
-
-        .category-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 6px;
-            background-color: rgba(56, 139, 253, 0.15);
-            color: #58a6ff;
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        /* --- Boxes --- */
-        .warning-box {
-            background: var(--warning-bg);
-            border: 1px solid var(--warning-border);
-            padding: 1rem;
-            border-radius: 8px;
-            color: var(--warning-text);
-            margin-top: 1rem;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-
-        .info-box {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-top: 1rem;
-            background: rgba(0, 255, 204, 0.05);
-            border-left: 3px solid var(--accent-color);
-        }
-
-        .danger-box {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-top: 1rem;
-            background: rgba(207, 34, 46, 0.1);
-            border-left: 3px solid var(--danger);
-            color: #ff7b72;
-        }
-
-        .code-snippet {
-            background: #0d1117;
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 6px;
-            font-family: monospace;
-            color: #58a6ff;
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-
-        /* --- Accordion --- */
-        .accordion-item {
-            margin-top: 1.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .accordion-header {
-            width: 100%;
-            padding: 1rem;
-            background: var(--row-hover);
-            border: none;
-            color: var(--accent-color);
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-        }
-
-        .accordion-content {
-            padding: 0;
-            max-height: 0;
-            transition: max-height 0.3s ease-out;
-            background: rgba(255, 255, 255, 0.02);
-            overflow: hidden;
-        }
-
-        /* --- Mobile --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 2rem 1rem; display: flex; justify-content: center; }
+        .container { max-width: 1200px; width: 100%; }
+        header { text-align: center; margin-bottom: 3rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+        .subtitle { font-size: 1.1rem; color: var(--text-dim); }
+        .menu-toggle { position: fixed; top: 1.5rem; left: 1.5rem; z-index: 1000; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--accent-color); padding: 0.75rem; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; }
+        .menu-overlay { position: fixed; top: 0; left: -100%; width: 300px; height: 100%; background: var(--card-bg); border-right: 1px solid var(--border-color); z-index: 999; transition: left 0.3s ease; padding: 5rem 2rem 2rem; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); overflow-y:auto; }
+        .menu-overlay.active { left: 0; }
+        .menu-overlay a { display: flex; align-items: center; gap: 12px; color: var(--text-main); text-decoration: none; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; transition: background 0.2s; }
+        .menu-overlay a:hover { background: var(--row-hover); color: var(--accent-color); }
+        .menu-overlay a.active { background: rgba(0, 255, 204, 0.1); color: var(--accent-color); border-left: 3px solid var(--accent-color); }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4); }
+        .card-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; color: var(--accent-color); }
+        .summary-list { list-style: none; }
+        .summary-list li { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; color: var(--text-main); }
+        .summary-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent-color); font-weight: bold; }
+        .highlight { color: var(--accent-color); font-weight: 600; }
+        .dim { color: var(--text-dim); font-size: 0.9rem; }
+        .step-item { display: flex; gap: 20px; margin-bottom: 2rem; }
+        .step-number { flex-shrink: 0; width: 40px; height: 40px; background: rgba(0, 255, 204, 0.1); border: 1px solid var(--accent-color); color: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+        .step-content h3 { color: var(--accent-color); margin-bottom: 0.5rem; }
+        .step-content p { color: var(--text-main); margin-bottom: 0.75rem; }
+        .table-wrapper { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead { background-color: rgba(48, 54, 61, 0.5); }
+        th { padding: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); border-bottom: 2px solid var(--border-color); }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        tr:hover { background-color: var(--row-hover); }
+        .info-box { padding: 1rem; border-radius: 8px; margin-top: 1rem; background: var(--info-bg); border-left: 3px solid var(--accent-color); }
+        .warning-box { background: var(--warning-bg); border: 1px solid var(--warning-border); padding: 1rem; border-radius: 8px; color: var(--warning-text); margin-top: 1rem; display: flex; gap: 12px; align-items: flex-start; }
+        .code-snippet { background: #0d1117; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-family: monospace; color: #58a6ff; font-size: 0.95rem; margin-top: 10px; overflow-x:auto; }
+        .pill { display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--border-color); color:var(--text-dim); font-size:0.75rem; margin-right:6px; margin-bottom:6px; }
+        .calendar-table td:nth-child(1), .calendar-table th:nth-child(1) { white-space: nowrap; }
+        .calendar-table td:nth-child(5), .calendar-table td:nth-child(6), .calendar-table td:nth-child(7) { white-space: nowrap; }
+        footer { text-align: center; margin-top: 3rem; color: var(--text-dim); font-size: 0.85rem; }
         @media screen and (max-width: 768px) {
-
-            table,
-            thead,
-            tbody,
-            th,
-            td,
-            tr {
-                display: block;
-            }
-
-            thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-
-            tr {
-                margin-bottom: 1.5rem;
-                background: var(--card-bg);
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-            }
-
-            td {
-                border: none;
-                border-bottom: 1px solid var(--border-color);
-                position: relative;
-                padding-left: 45%;
-                min-height: 3rem;
-            }
-
-            td::before {
-                position: absolute;
-                left: 1rem;
-                width: 40%;
-                padding-right: 10px;
-                white-space: nowrap;
-                font-weight: bold;
-                color: var(--text-dim);
-                font-size: 0.8rem;
-                text-transform: uppercase;
-            }
-
-            td:nth-of-type(1)::before {
-                content: "Parámetro";
-            }
-
-            td:nth-of-type(2)::before {
-                content: "Nasdaq";
-            }
-
-            td:nth-of-type(3)::before {
-                content: "BTCUSD";
-            }
-
-            td:last-child {
-                border-bottom: none;
-            }
-
-            .step-item {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            color: var(--text-dim);
-            font-size: 0.85rem;
+            .step-item { flex-direction: column; gap: 10px; }
+            h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
 
 <body>
-
     <button class="menu-toggle" id="menuToggle">
         <i data-lucide="menu"></i>
     </button>
@@ -423,63 +87,113 @@
             <i data-lucide="download"></i> Guía de Instalación
         </a>
         <a href="how-to-use.html" class="active">
-            <i data-lucide="book-open"></i> User Story / Uso
+            <i data-lucide="book-open"></i> How to Use + Telegram Bot
         </a>
     </div>
 
     <div class="container">
         <header>
-            <h1>Cómo Usar el EA v1.15</h1>
-            <p class="subtitle">Guía para operar noticias con straddle automático y SL fijo</p>
+            <h1>Cómo usar el EA + Telegram Bot</h1>
+            <p class="subtitle">Guía práctica para operar el EA y recibir recordatorios automáticos de noticias en Telegram</p>
         </header>
 
-        <!-- NOVEDADES V1.15 -->
         <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
-                <i data-lucide="shield-check"></i>
-                Novedades v1.15
+                <i data-lucide="message-circle-more"></i>
+                Nuevo: Telegram Bot de Alertas
             </div>
             <ul class="summary-list">
-                <li><span class="highlight">SL Configurable (InpSLPips):</span> El EA coloca un SL real al entrar. Default 10000 pips — suficientemente amplio para aguantar el latigazo inicial sin cerrarse.</li>
-                <li><span class="highlight">SL fijo configurable (InpSLPips):</span> El EA coloca un SL real al entrar. Default 10000 pips — suficientemente amplio para aguantar el latigazo inicial sin cerrarse prematuramente.</li>
-                <li><span class="highlight">Sin hardcoding:</span> Eliminado el buffer fijo de 5000 pips. Todo es configurable desde los inputs.</li>
+                <li><span class="highlight">Bot oficial:</span> <a href="https://t.me/news_straddle_alerts_bot" target="_blank" style="color: var(--accent-color);">@news_straddle_alerts_bot</a></li>
+                <li><span class="highlight">Qué hace:</span> Te avisa <strong>1 día antes</strong>, <strong>4h</strong>, <strong>3h</strong>, <strong>2h</strong>, <strong>1h</strong> y <strong>30 min antes</strong> de cada evento configurado.</li>
+                <li><span class="highlight">Zona horaria:</span> Todas las alertas y el calendario están pensados en <strong>hora de New York / Miami</strong>.</li>
+                <li><span class="highlight">Comandos del bot:</span> <span class="pill">/start</span><span class="pill">/today</span><span class="pill">/next</span><span class="pill">/status</span><span class="pill">/help</span></li>
             </ul>
         </section>
 
-        <!-- QUICK START -->
         <section class="card">
             <div class="card-title">
-                <i data-lucide="zap"></i>
-                Inicio Rápido
+                <i data-lucide="smartphone"></i>
+                Cómo acceder al bot
             </div>
             <div class="step-item">
                 <div class="step-number">1</div>
                 <div class="step-content">
-                    <h3>Carga el EA y Configura</h3>
-                    <p>Arrastra <code>NewsStraddleEA</code> al gráfico. Configura <code>InpNewsTime</code> con la hora exacta (Hora del Servidor MT5), <code>InpEntryDistPips</code> y <code>InpSLPips</code>.</p>
+                    <h3>Abre Telegram</h3>
+                    <p>Busca el bot por username o entra directo con este link:</p>
+                    <div class="code-snippet">https://t.me/news_straddle_alerts_bot</div>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Presiona Start</h3>
+                    <p>Al enviar <code>/start</code>, quedas registrado automáticamente para recibir <strong>todas las alertas</strong> del calendario.</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Usa los comandos rápidos</h3>
+                    <p><code>/today</code> muestra todos los eventos de hoy. <code>/next</code> muestra el próximo evento. <code>/status</code> confirma si estás activo. <code>/help</code> resume el funcionamiento.</p>
+                </div>
+            </div>
+            <div class="warning-box">
+                <i data-lucide="triangle-alert"></i>
+                <div>
+                    <strong>Importante:</strong> El bot avisa y organiza el tiempo. No abre operaciones por ti. La idea es que te sientes, abras tu setup y despliegues el EA con tiempo antes del evento.
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="bell-ring"></i>
+                Qué hace el bot exactamente
+            </div>
+            <ul class="summary-list">
+                <li>Envía recordatorio automático para cada evento del calendario predefinido.</li>
+                <li>Los mensajes incluyen instrumento, mercado, nombre del evento y hora New York.</li>
+                <li><strong>/today</strong> sirve para ver el plan del día completo.</li>
+                <li><strong>/next</strong> sirve para ver el siguiente evento cronológicamente, incluso si hoy no hay ninguno.</li>
+                <li>La idea es que uses las alertas como sistema de preparación previa al despliegue del EA.</li>
+            </ul>
+            <div class="info-box">
+                <p><strong>Flujo recomendado:</strong> recibes la alerta → revisas spread y condiciones → abres MT5 → cargas el EA → verificas <code>InpNewsTime</code> y parámetros → dejas el setup listo antes de la noticia.</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="zap"></i>
+                Inicio rápido del EA
+            </div>
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Carga el EA y configura</h3>
+                    <p>Arrastra <code>NewsStraddleEA</code> al gráfico. Configura <code>InpNewsTime</code> con la hora exacta del evento en MT5, más <code>InpEntryDistPips</code> y <code>InpSLPips</code>.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">2</div>
                 <div class="step-content">
                     <h3>El EA se arma automáticamente</h3>
-                    <p>Al cargar, el EA entra en <span class="highlight">ARMED</span> y muestra el contador T-MM:SS. A T-10 segundos coloca el Buy Stop y Sell Stop con SL real.</p>
+                    <p>Al cargar, el EA entra en <span class="highlight">ARMED</span> y muestra el contador. A T-10 segundos coloca el Buy Stop y Sell Stop con SL real.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">3</div>
                 <div class="step-content">
                     <h3>La posición corre sola</h3>
-                    <p>Una orden se activa, la contraria se cancela automáticamente. La posición corre con el SL fijo hasta que el mercado la cierre o uses el botón CANCEL ALL.</p>
+                    <p>Una orden se activa, la contraria se cancela automáticamente. La posición queda viva hasta SL o cierre manual.</p>
                 </div>
             </div>
         </section>
 
-        <!-- CONFIGURACIÓN RECOMENDADA -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="settings"></i>
-                Configuración v1.15
+                Configuración recomendada v1.15
             </div>
             <div class="table-wrapper">
                 <table>
@@ -506,91 +220,872 @@
             </div>
         </section>
 
-        <!-- GESTIÓN DE SALIDAS -->
         <section class="card">
             <div class="card-title">
-                <i data-lucide="trending-up"></i>
-                Flujo completo
+                <i data-lucide="calendar-range"></i>
+                Calendario 2026 de eventos que usa el bot
             </div>
-
-            <div class="info-box">
-                <p><strong>Ejemplo:</strong></p>
-                <p class="dim" style="margin-top: 0.5rem;">
-                    1. T-10s: EA coloca BuyStop en <strong>20,000</strong> y SellStop en <strong>19,000</strong> con SL fijo<br>
-                    2. Noticia sale — precio sube fuerte → BuyStop se activa<br>
-                    3. SellStop contrario se elimina automáticamente<br>
-                    4. Posición corre con SL fijo — el broker la cierra cuando toca el SL o cerrás manualmente
-                </p>
-            </div>
-
-            <div class="info-box" style="margin-top: 1rem;">
-                <p><strong>Sobre el spread en noticias:</strong></p>
-                <p class="dim">En noticias el spread puede ser 3-5x mayor al normal. Usá un <code>InpSLPips</code> amplio para no cerrarte en el latigazo inicial.</p>
+            <p class="dim" style="margin-bottom:1rem;">Tabla en hora New York / Miami. Este es el calendario base que el bot usa para disparar los recordatorios automáticos.</p>
+            <div class="table-wrapper">
+                <table class="calendar-table">
+                    <thead>
+                        <tr>
+                            <th>Instrumento</th>
+                            <th>Mercado</th>
+                            <th>Evento</th>
+                            <th>Mes ref</th>
+                            <th>Fecha NY</th>
+                            <th>Hora NY</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-02</td>
+                            <td>2026-03-03</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-02</td>
+                            <td>2026-03-06</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-03</td>
+                            <td>2026-03-11</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-01</td>
+                            <td>2026-03-13</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-02</td>
+                            <td>2026-03-25</td>
+                            <td>03:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-03</td>
+                            <td>2026-03-30</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-03</td>
+                            <td>2026-03-30</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-03</td>
+                            <td>2026-03-31</td>
+                            <td>02:45</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-03</td>
+                            <td>2026-03-31</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-03</td>
+                            <td>2026-03-31</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-03</td>
+                            <td>2026-04-03</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-02</td>
+                            <td>2026-04-09</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-04</td>
+                            <td>2026-04-13</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-03</td>
+                            <td>2026-04-22</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-04</td>
+                            <td>2026-04-29</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-04</td>
+                            <td>2026-04-30</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-04</td>
+                            <td>2026-04-30</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-03</td>
+                            <td>2026-04-30</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-04</td>
+                            <td>2026-04-30</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-04</td>
+                            <td>2026-04-30</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-04</td>
+                            <td>2026-05-08</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-05</td>
+                            <td>2026-05-13</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-04</td>
+                            <td>2026-05-20</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-04</td>
+                            <td>2026-05-28</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-05</td>
+                            <td>2026-05-28</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-05</td>
+                            <td>2026-05-29</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-05</td>
+                            <td>2026-05-29</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-05</td>
+                            <td>2026-05-30</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-05</td>
+                            <td>2026-06-02</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-05</td>
+                            <td>2026-06-05</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-06</td>
+                            <td>2026-06-11</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-05</td>
+                            <td>2026-06-17</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-05</td>
+                            <td>2026-06-25</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-06</td>
+                            <td>2026-06-25</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-06</td>
+                            <td>2026-06-29</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-06</td>
+                            <td>2026-06-30</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-06</td>
+                            <td>2026-06-30</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-06</td>
+                            <td>2026-07-01</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-06</td>
+                            <td>2026-07-02</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-07</td>
+                            <td>2026-07-13</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-06</td>
+                            <td>2026-07-22</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-06</td>
+                            <td>2026-07-30</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-07</td>
+                            <td>2026-07-30</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-07</td>
+                            <td>2026-07-30</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-07</td>
+                            <td>2026-07-31</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-07</td>
+                            <td>2026-07-31</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-07</td>
+                            <td>2026-07-31</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-07</td>
+                            <td>2026-08-07</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-08</td>
+                            <td>2026-08-12</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-07</td>
+                            <td>2026-08-19</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-07</td>
+                            <td>2026-08-26</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-08</td>
+                            <td>2026-08-27</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-08</td>
+                            <td>2026-08-30</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-08</td>
+                            <td>2026-08-31</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-08</td>
+                            <td>2026-08-31</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-08</td>
+                            <td>2026-09-01</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-08</td>
+                            <td>2026-09-04</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-09</td>
+                            <td>2026-09-10</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-08</td>
+                            <td>2026-09-16</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-09</td>
+                            <td>2026-09-29</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-09</td>
+                            <td>2026-09-30</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-09</td>
+                            <td>2026-09-30</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-08</td>
+                            <td>2026-09-30</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-09</td>
+                            <td>2026-10-01</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-09</td>
+                            <td>2026-10-02</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-09</td>
+                            <td>2026-10-02</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-10</td>
+                            <td>2026-10-13</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-09</td>
+                            <td>2026-10-21</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-09</td>
+                            <td>2026-10-29</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-10</td>
+                            <td>2026-10-29</td>
+                            <td>19:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-10</td>
+                            <td>2026-10-30</td>
+                            <td>03:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-10</td>
+                            <td>2026-10-30</td>
+                            <td>09:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-10</td>
+                            <td>2026-10-30</td>
+                            <td>21:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-10</td>
+                            <td>2026-11-04</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-10</td>
+                            <td>2026-11-06</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-11</td>
+                            <td>2026-11-11</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-10</td>
+                            <td>2026-11-18</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-10</td>
+                            <td>2026-11-25</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-11</td>
+                            <td>2026-11-26</td>
+                            <td>18:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-11</td>
+                            <td>2026-11-29</td>
+                            <td>20:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CAC40.fs</strong></td>
+                            <td>Índice Francia (CAC 40)</td>
+                            <td>IPC preliminar de Francia</td>
+                            <td>2026-11</td>
+                            <td>2026-11-30</td>
+                            <td>02:45</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DAX40.fs</strong></td>
+                            <td>Índice Alemania (DAX 40)</td>
+                            <td>IPC preliminar de Alemania</td>
+                            <td>2026-11</td>
+                            <td>2026-11-30</td>
+                            <td>08:00</td>
+                            <td>estimado_desde_patron_reciente_oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EUSTX50.fs</strong></td>
+                            <td>Índice Eurozona (Euro Stoxx 50)</td>
+                            <td>Flash CPI / HICP flash estimate de la eurozona</td>
+                            <td>2026-11</td>
+                            <td>2026-12-01</td>
+                            <td>09:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XAUUSD</strong></td>
+                            <td>Metales (Oro spot)</td>
+                            <td>Nonfarm Payrolls / Employment Situation</td>
+                            <td>2026-11</td>
+                            <td>2026-12-04</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WTI.fs</strong></td>
+                            <td>Petróleo (WTI)</td>
+                            <td>OPEC Monthly Oil Market Report (MOMR)</td>
+                            <td>2026-12</td>
+                            <td>2026-12-14</td>
+                            <td>04:00</td>
+                            <td>fecha_oficial_hora_secundaria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FT100.fs</strong></td>
+                            <td>Índice Reino Unido (FTSE 100)</td>
+                            <td>CPI Reino Unido</td>
+                            <td>2026-11</td>
+                            <td>2026-12-16</td>
+                            <td>02:00</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS100.fs</strong></td>
+                            <td>Índice USA (Nasdaq 100)</td>
+                            <td>Core PCE / Personal Income and Outlays</td>
+                            <td>2026-11</td>
+                            <td>2026-12-23</td>
+                            <td>08:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NK225.fs</strong></td>
+                            <td>Índice Japón (Nikkei 225)</td>
+                            <td>Tokyo CPI (Ku-area, preliminar)</td>
+                            <td>2026-12</td>
+                            <td>2026-12-24</td>
+                            <td>18:30</td>
+                            <td>oficial</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CHINA50.fs</strong></td>
+                            <td>Índice China (China A50 / China50)</td>
+                            <td>PMI manufacturero oficial de China</td>
+                            <td>2026-12</td>
+                            <td>2026-12-30</td>
+                            <td>20:30</td>
+                            <td>oficial</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
 
-        <!-- PANEL UI GUIDE -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="monitor"></i>
                 Panel del EA
             </div>
             <ul class="summary-list">
-                <li><strong>Estado ARMED:</strong> EA armado, mostrando countdown T-MM:SS</li>
-                <li><strong>Estado ORDERS PLACED:</strong> Buy Stop y Sell Stop colocados, esperando activación</li>
-                <li><strong>Estado TRADE ACTIVE:</strong> Posición abierta — esperando cierre por SL o manual</li>
-                <li><strong>CANCEL ALL:</strong> Cancela órdenes pendientes y cierra posición abierta al instante</li>
+                <li><strong>Estado ARMED:</strong> EA armado, mostrando countdown.</li>
+                <li><strong>Estado ORDERS PLACED:</strong> Buy Stop y Sell Stop colocados, esperando activación.</li>
+                <li><strong>Estado TRADE ACTIVE:</strong> Posición abierta, esperando cierre por SL o manual.</li>
+                <li><strong>CANCEL ALL:</strong> Cancela órdenes pendientes y cierra posición abierta al instante.</li>
             </ul>
         </section>
 
-        <!-- TIPS -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="lightbulb"></i>
-                Tips
+                Tips prácticos
             </div>
             <ul class="summary-list">
-                <li><strong>SL amplio:</strong> En noticias el spread se dispara y hay latigazo inicial. Con 10000 pips de SL en NAS100 tenés margen suficiente.</li>
-                <li><strong>Hora del Servidor:</strong> Verificá que <code>InpNewsTime</code> coincida con el reloj de MT5, no con tu hora local.</li>
-                <li><strong>InpSLPips amplio:</strong> El latigazo inicial puede ser violento. 10000 pips da libertad para que el precio respire sin cerrarse.</li>
+                <li><strong>SL amplio:</strong> En noticias el spread se dispara y hay latigazo inicial.</li>
+                <li><strong>Hora del Servidor:</strong> Verificá que <code>InpNewsTime</code> coincida con el reloj de MT5, no solo con tu reloj local.</li>
+                <li><strong>Usa el bot como prep:</strong> cuando te llegue la alerta de 1h o 30m, ya deberías estar revisando el gráfico, spread, VPS y broker.</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | v1.15</p>
+            <p>&copy; 2026 MT5 Strategy Spec | EA + Telegram Alert Layer</p>
         </footer>
     </div>
 
     <script>
         lucide.createIcons();
-
-        function toggleAccordion(btn) {
-            const content = btn.nextElementSibling;
-            const chevron = btn.querySelector('.chevron-icon');
-            const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
-            if (isOpen) {
-                content.style.maxHeight = '0px';
-                chevron.style.transform = 'rotate(0deg)';
-            } else {
-                content.style.maxHeight = content.scrollHeight + 'px';
-                chevron.style.transform = 'rotate(180deg)';
-            }
-        }
-
         const menuToggle = document.getElementById('menuToggle');
         const menuOverlay = document.getElementById('menuOverlay');
-
         menuToggle.addEventListener('click', () => {
             menuOverlay.classList.toggle('active');
             const icon = menuToggle.querySelector('i');
-            if (menuOverlay.classList.contains('active')) {
-                icon.setAttribute('data-lucide', 'x');
-            } else {
-                icon.setAttribute('data-lucide', 'menu');
-            }
+            icon.setAttribute('data-lucide', menuOverlay.classList.contains('active') ? 'x' : 'menu');
             lucide.createIcons();
         });
-
         document.addEventListener('click', (e) => {
             if (!menuOverlay.contains(e.target) && !menuToggle.contains(e.target) && menuOverlay.classList.contains('active')) {
                 menuOverlay.classList.remove('active');
@@ -600,5 +1095,4 @@
         });
     </script>
 </body>
-
 </html>
