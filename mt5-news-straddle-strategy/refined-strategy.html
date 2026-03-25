@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estrategia: Pre-News Straddle (v1.15)</title>
+    <title>Estrategia: Pre-News Straddle (v2.01)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -149,12 +149,12 @@
         .summary-list li {
             position: relative;
             padding-left: 1.5rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             color: var(--text-main);
         }
 
         .summary-list li::before {
-            content: "→";
+            content: "\2192";
             position: absolute;
             left: 0;
             color: var(--accent-color);
@@ -217,6 +217,14 @@
             font-size: 0.9rem;
         }
 
+        .info-box {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            background: rgba(0, 255, 204, 0.05);
+            border-left: 3px solid var(--accent-color);
+        }
+
         /* Mobile Version of Table */
         @media screen and (max-width: 768px) {
 
@@ -262,30 +270,16 @@
                 text-transform: uppercase;
             }
 
-            /* Tabla "Especificación Técnica" */
-            .table-wrapper:nth-of-type(1) td:nth-of-type(1)::before {
+            td:nth-of-type(1)::before {
                 content: "Fase";
             }
 
-            .table-wrapper:nth-of-type(1) td:nth-of-type(2)::before {
+            td:nth-of-type(2)::before {
                 content: "Concepto";
             }
 
-            .table-wrapper:nth-of-type(1) td:nth-of-type(3)::before {
-                content: "Lógica / Detalle";
-            }
-
-            /* Tabla "Adaptación Automática" */
-            .table-wrapper:nth-of-type(2) td:nth-of-type(1)::before {
-                content: "Característica";
-            }
-
-            .table-wrapper:nth-of-type(2) td:nth-of-type(2)::before {
-                content: "Nasdaq";
-            }
-
-            .table-wrapper:nth-of-type(2) td:nth-of-type(3)::before {
-                content: "BTC";
+            td:nth-of-type(3)::before {
+                content: "Detalle";
             }
 
             td:last-child {
@@ -313,16 +307,16 @@
             <i data-lucide="layout"></i> Resumen General
         </a>
         <a href="refined-strategy.html" class="active">
-            <i data-lucide="target"></i> Estrategia Refinada (v1.03)
+            <i data-lucide="target"></i> Estrategia Refinada
         </a>
         <a href="technical-prompt.html">
-            <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
-        </a>
-        <a href="how-to-use.html">
-            <i data-lucide="book-open"></i> Cómo Usar el EA
+            <i data-lucide="code-2"></i> Prompt Tecnico (MQL5)
         </a>
         <a href="installation-guide.html">
-            <i data-lucide="download"></i> Guía de Instalación
+            <i data-lucide="download"></i> Guia de Instalacion
+        </a>
+        <a href="how-to-use.html">
+            <i data-lucide="book-open"></i> Como Usar el EA
         </a>
         <a href="telegram-bot.html">
             <i data-lucide="message-circle"></i> Telegram Alert Bot
@@ -331,22 +325,22 @@
 
     <div class="container">
         <header>
-            <h1>Pre-News Straddle v1.15</h1>
-            <p class="subtitle">Straddle de Noticias: SL Configurable, ejecución automática</p>
+            <h1>Pre-News Straddle v2.01</h1>
+            <p class="subtitle">Market Orders + Trailing Stop + TP configurable</p>
         </header>
 
         <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
                 <i data-lucide="zap"></i>
-                Filosofía v1.15
+                Filosofia v2.01
             </div>
-            <p>La noticia genera movimientos violentos. El EA coloca un straddle (Buy Stop + Sell Stop) antes de la noticia. El lado que se activa corre con un SL amplio configurable. La orden contraria se cancela automáticamente. La posición corre libremente hasta que el broker la cierre por SL o el trader la cierre manualmente.</p>
+            <p>La noticia genera movimientos violentos. El EA calcula niveles de entrada (arriba y abajo del precio actual) segundos antes de la noticia. Cuando el precio cruza uno de esos niveles, ejecuta una <strong>orden de mercado</strong> instantanea con SL. Un <strong>trailing stop</strong> clasico protege las ganancias automaticamente una vez que la posicion alcanza breakeven. El Take Profit es opcional y configurable.</p>
         </section>
 
         <section class="card">
             <div class="card-title">
                 <i data-lucide="layers"></i>
-                Especificación Técnica v1.15
+                Especificacion Tecnica v2.01
             </div>
             <div class="table-wrapper">
                 <table>
@@ -354,24 +348,39 @@
                         <tr>
                             <th>Fase</th>
                             <th>Concepto</th>
-                            <th>Lógica / Detalle Técnico</th>
+                            <th>Logica / Detalle Tecnico</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="category-badge">Órdenes</span></td>
-                            <td><strong>Buy/Sell Stop</strong></td>
-                            <td>Forzamos <span class="highlight">Buy/Sell Stop</span> estándar para garantizar ejecución 100% sin errores de precio.</td>
+                            <td><span class="category-badge">Preparacion</span></td>
+                            <td><strong>Calculo de niveles</strong></td>
+                            <td>A T-10s del evento, el EA captura Ask/Bid y calcula: <span class="highlight">BuyLevel = Ask + InpEntryDistPips</span> y <span class="highlight">SellLevel = Bid - InpEntryDistPips</span>. Dibuja lineas horizontales en el chart.</td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Entrada</span></td>
+                            <td><strong>Market Orders</strong></td>
+                            <td>El EA monitorea el precio tick a tick. Cuando <code>Ask >= BuyLevel</code> ejecuta un <span class="highlight">Buy market</span>. Cuando <code>Bid <= SellLevel</code> ejecuta un <span class="highlight">Sell market</span>. Solo una de las dos se ejecuta.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Proteccion</span></td>
                             <td><strong>SL Configurable</strong></td>
-                            <td>Parámetro <span class="highlight">InpSLPips</span> (default 10000). Un SL amplio da espacio al latigazo inicial sin cerrarse prematuramente.</td>
+                            <td>Parametro <span class="highlight">InpSLPips</span> (default 10000). SL amplio para dar espacio al latigazo inicial sin cerrarse prematuramente.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Proteccion</span></td>
+                            <td><strong>TP On/Off</strong></td>
+                            <td>Parametro <span class="highlight">InpEnableTP</span> (default true). Cuando esta activo, la orden se coloca con TP a <code>InpTPPips</code> del precio de entrada. Cuando esta desactivado, la posicion corre sin limite de ganancia.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">Gestion</span></td>
+                            <td><strong>Trailing Stop</strong></td>
+                            <td>Parametro <span class="highlight">InpTrailingStopPips</span> (default 2000, 0=off). El trailing mueve el SL siguiendo al precio pero <strong>solo se activa cuando newSL >= precio de entrada</strong> (breakeven). Esto evita mover el SL durante el latigazo inicial.</td>
                         </tr>
                         <tr>
                             <td><span class="category-badge">Salida</span></td>
-                            <td><strong>SL fijo</strong></td>
-                            <td>La posición corre con el SL fijo definido en <span class="highlight">InpSLPips</span>. El broker cierra automáticamente si el precio toca el SL. Salida manual disponible en cualquier momento con el botón CANCEL ALL.</td>
+                            <td><strong>Cierre de posicion</strong></td>
+                            <td>La posicion se cierra por: (1) SL fijo o trailing SL, (2) TP si esta habilitado, (3) boton CANCEL ALL manual. El EA detecta el cierre y vuelve a IDLE.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -381,30 +390,47 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="trending-up"></i>
-                Flujo de la posición
+                Flujo de la posicion
             </div>
             <ul class="summary-list">
-                <li><strong>Una orden se activa</strong> → orden contraria se elimina automáticamente</li>
-                <li><strong>Posición corre</strong> con SL fijo definido en <code>InpSLPips</code></li>
-                <li><strong>Cierre por SL</strong> → el broker cierra si el precio revierte hasta el SL</li>
-                <li><strong>Cierre manual</strong> → botón CANCEL ALL en cualquier momento</li>
+                <li><strong>ARMED:</strong> EA armado, countdown T-MM:SS visible en el panel</li>
+                <li><strong>T-10s:</strong> Calcula niveles de entrada, dibuja lineas verde (buy) y roja (sell) en el chart</li>
+                <li><strong>MONITORING:</strong> Vigila precio tick a tick esperando que cruce un nivel</li>
+                <li><strong>Precio cruza nivel</strong> &rarr; ejecuta market order con SL (y TP si habilitado)</li>
+                <li><strong>TRADE ACTIVE:</strong> Trailing stop vigila la posicion, mueve SL al alcanzar breakeven</li>
+                <li><strong>Cierre por SL/TP/trailing</strong> &rarr; EA vuelve a IDLE</li>
+                <li><strong>CANCEL ALL</strong> &rarr; cierra posicion y vuelve a IDLE en cualquier momento</li>
             </ul>
         </section>
 
         <section class="card">
             <div class="card-title">
                 <i data-lucide="mouse-pointer-2"></i>
-                Interfaz del Gráfico (UI)
+                Interfaz del Grafico (UI)
             </div>
             <ul class="summary-list">
-                <li><strong>CANCEL ALL:</strong> Cancela órdenes pendientes y cierra posición abierta.</li>
-                <li><strong>Estado:</strong> IDLE → ARMED → ORDERS PLACED → TRADE ACTIVE</li>
-                <li><strong>Countdown:</strong> T-MM:SS hasta el evento, luego muestra estado de la posición.</li>
+                <li><strong>Panel:</strong> Muestra titulo (v2.01), estado actual, hora del evento, countdown, y resumen de parametros (Dist, SL, TP, Trail)</li>
+                <li><strong>CANCEL ALL:</strong> Boton rojo — cierra posicion abierta y resetea a IDLE</li>
+                <li><strong>Minimizar:</strong> Boton "-" / "+" en esquina superior derecha para colapsar/expandir el panel</li>
+                <li><strong>Estados:</strong> IDLE &rarr; ARMED &rarr; MONITORING &rarr; TRADE ACTIVE &rarr; IDLE</li>
+                <li><strong>Lineas en chart:</strong> BuyLevel (verde, dashed) y SellLevel (roja, dashed) visibles durante MONITORING</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="git-compare"></i>
+                Cambios vs versiones anteriores
+            </div>
+            <ul class="summary-list">
+                <li><strong>v1.x (pendientes):</strong> Usaba Buy Stop / Sell Stop. Al activarse una, la contraria se cancelaba. Sin trailing, sin TP toggle.</li>
+                <li><strong>v2.00 (market orders):</strong> Reemplaza ordenes pendientes por monitoreo de precio + market orders. Mas robusto, sin rechazos.</li>
+                <li><strong>v2.01 (trailing + TP):</strong> Agrega trailing stop clasico (activo desde breakeven) y toggle para activar/desactivar TP.</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | v1.15</p>
+            <p>&copy; 2026 MT5 Strategy Spec | v2.01</p>
         </footer>
     </div>
 

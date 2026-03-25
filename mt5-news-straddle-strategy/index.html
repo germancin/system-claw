@@ -311,16 +311,16 @@
             <i data-lucide="layout"></i> Resumen General
         </a>
         <a href="refined-strategy.html">
-            <i data-lucide="target"></i> Estrategia Refinada (10s)
+            <i data-lucide="target"></i> Estrategia Refinada
         </a>
         <a href="technical-prompt.html">
-            <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
+            <i data-lucide="code-2"></i> Prompt Tecnico (MQL5)
         </a>
         <a href="installation-guide.html">
-        <a href="how-to-use.html">
-            <i data-lucide="play-circle"></i> Cómo Usar el EA
+            <i data-lucide="download"></i> Guia de Instalacion
         </a>
-            <i data-lucide="download"></i> Guía de Instalación
+        <a href="how-to-use.html">
+            <i data-lucide="book-open"></i> Como Usar el EA
         </a>
         <a href="telegram-bot.html">
             <i data-lucide="message-circle"></i> Telegram Alert Bot
@@ -330,7 +330,7 @@
     <div class="container">
         <header>
             <h1>MT5 News Straddle Strategy</h1>
-            <p class="subtitle">Definición de Lógica y Requerimientos de Automatización</p>
+            <p class="subtitle">Pre-News Straddle con Market Orders, Trailing Stop y TP configurable (v2.01)</p>
         </header>
 
         <section class="card">
@@ -339,15 +339,11 @@
                 1) Resumen de la Idea
             </div>
             <ul class="summary-list">
-                <li><strong>Objetivo:</strong> Automatizar una estrategia “pre-noticia” en MetaTrader 5 gestionada
-                    mediante un botón dinámico en el gráfico.</li>
-                <li><strong>Mecánica:</strong> El trader define la hora exacta de la noticia y una distancia X de
-                    seguridad.</li>
-                <li><strong>Acción Automática:</strong> 1 minuto antes del evento, el sistema coloca un "straddle" (Buy
-                    Stop y Sell Stop) a la distancia X del precio actual.</li>
-                <li><strong>Gestión de Trade:</strong> Al activarse una orden, se elimina automáticamente la orden contraria. La posición corre con SL fijo hasta que el broker la cierre.</li>
-                <li><strong>Interfaz:</strong> Control total desde el gráfico (Armar/Cancelar) con reporte de estado
-                    interactivo.</li>
+                <li><strong>Objetivo:</strong> Automatizar una estrategia “pre-noticia” en MetaTrader 5 con ejecucion por market orders y trailing stop.</li>
+                <li><strong>Mecanica:</strong> El trader define la hora exacta de la noticia y una distancia X de seguridad.</li>
+                <li><strong>Accion Automatica:</strong> 10 segundos antes del evento (configurable), el EA calcula niveles de entrada y monitorea el precio. Cuando el precio cruza un nivel, ejecuta una orden de mercado instantanea.</li>
+                <li><strong>Gestion de Trade:</strong> La posicion corre con SL fijo + trailing stop (se activa al alcanzar breakeven). TP opcional configurable.</li>
+                <li><strong>Interfaz:</strong> Panel minimizable en el grafico con countdown, estado, parametros y boton CANCEL ALL.</li>
             </ul>
         </section>
 
@@ -369,70 +365,58 @@
                     <tbody>
                         <tr>
                             <td>A</td>
-                            <td><span class="category-badge">Ejecución</span></td>
-                            <td>¿Tipo de orden pendiente preferida?</td>
+                            <td><span class="category-badge">Ejecucion</span></td>
+                            <td>Tipo de orden</td>
                             <td>
-                                <span class="option-item"><strong>A1:</strong> Buy Stop / Sell Stop (Ejecución
-                                    agresiva)</span>
-                                <span class="option-item"><strong>A2:</strong> Buy Stop Limit / Sell Stop Limit (Control
-                                    de slippage)</span>
+                                <span class="option-item"><strong>Implementado:</strong> Market Orders — el EA monitorea precio y ejecuta orden de mercado al cruzar nivel. Mas robusto que ordenes pendientes.</span>
                             </td>
                         </tr>
                         <tr>
                             <td>B</td>
-                            <td><span class="category-badge">Parámetros</span></td>
-                            <td>Definición de Distancia X</td>
+                            <td><span class="category-badge">Parametros</span></td>
+                            <td>Distancia X</td>
                             <td>
-                                <span class="option-item"><strong>B1:</strong> Points, Pips o Precio Exacto</span>
-                                <span class="option-item"><strong>B2:</strong> ¿X es simétrica para ambas
-                                    órdenes?</span>
+                                <span class="option-item"><strong>Implementado:</strong> Pips (InpEntryDistPips). Simetrica para ambos niveles. Conversion automatica via PipsToPrice().</span>
                             </td>
                         </tr>
                         <tr>
                             <td>C</td>
                             <td><span class="category-badge">Timing</span></td>
-                            <td>Definición de "1 minuto antes"</td>
+                            <td>Lead time antes del evento</td>
                             <td>
-                                <span class="option-item"><strong>C1:</strong> Segundo 00 (HH:MM-1)</span>
-                                <span class="option-item"><strong>C2:</strong> 60 segundos exactos (Tick time)</span>
+                                <span class="option-item"><strong>Implementado:</strong> InpLeadTimeSeconds (default 10). Timer de 500ms compara TimeCurrent() con eventTime - leadTime.</span>
                             </td>
                         </tr>
                         <tr>
                             <td>D</td>
-                            <td><span class="category-badge">Gestión</span></td>
-                            <td>Stop Loss fijo en pips</td>
+                            <td><span class="category-badge">Gestion</span></td>
+                            <td>Stop Loss</td>
                             <td>
-                                <span class="option-item"><strong>D1:</strong> SL simétrico para BuyStop y SellStop</span>
-                                <span class="option-item"><strong>D2:</strong> Configurable via <code>InpSLPips</code></span>
+                                <span class="option-item"><strong>Implementado:</strong> SL fijo simetrico via <code>InpSLPips</code> (default 10000). Se coloca con la market order.</span>
                             </td>
                         </tr>
                         <tr>
                             <td>E</td>
                             <td><span class="category-badge">Riesgo</span></td>
-                            <td>Protección Inicial (SL/TP)</td>
+                            <td>Take Profit</td>
                             <td>
-                                <span class="option-item"><strong>E1:</strong> ¿SL inicial al abrir?</span>
-                                <span class="option-item"><strong>E2:</strong> ¿Take Profit definido?</span>
+                                <span class="option-item"><strong>Implementado:</strong> TP configurable via <code>InpTPPips</code> + toggle <code>InpEnableTP</code> (on/off). Default: on, 10000 pips.</span>
                             </td>
                         </tr>
                         <tr>
                             <td>F</td>
-                            <td><span class="category-badge">Opc. Contraria</span></td>
-                            <td>Cancelación de la Red</td>
+                            <td><span class="category-badge">Gestion</span></td>
+                            <td>Trailing Stop</td>
                             <td>
-                                <span class="option-item"><strong>F1:</strong> Inmediato, tras confirmación o tras
-                                    profit X</span>
+                                <span class="option-item"><strong>Implementado:</strong> Trailing clasico via <code>InpTrailingStopPips</code> (default 2000, 0=off). Se activa solo al alcanzar breakeven.</span>
                             </td>
                         </tr>
                         <tr>
                             <td>G</td>
                             <td><span class="category-badge">Seguridad</span></td>
-                            <td>Filtros de Noticias</td>
+                            <td>Filtros</td>
                             <td>
-                                <span class="option-item"><strong>G1:</strong> Límite de Spread máximo</span>
-                                <span class="option-item"><strong>G2:</strong> Expiración tras X min (si no
-                                    activa)</span>
-                                <span class="option-item"><strong>G3:</strong> Slippage máximo permitido</span>
+                                <span class="option-item"><strong>Implementado:</strong> Sin filtros de spread/slippage (en noticias son impredecibles). Magic Number para aislar operaciones del EA.</span>
                             </td>
                         </tr>
                         <tr>
@@ -440,19 +424,15 @@
                             <td><span class="category-badge">UI/UX</span></td>
                             <td>Controles en Pantalla</td>
                             <td>
-                                <span class="option-item"><strong>H1:</strong> Armar/Cancelar vs
-                                    Armar/Cancelar/Manual</span>
-                                <span class="option-item"><strong>H2:</strong> Nivel de información (Full vs
-                                    Minimal)</span>
+                                <span class="option-item"><strong>Implementado:</strong> Panel con CANCEL ALL + boton minimizar. Muestra estado, countdown, parametros. Lineas de trigger en chart.</span>
                             </td>
                         </tr>
                         <tr>
                             <td>I</td>
                             <td><span class="category-badge">Avanzado</span></td>
-                            <td>Multi-ejecución</td>
+                            <td>Multi-ejecucion</td>
                             <td>
-                                <span class="option-item"><strong>I1:</strong> Símbolo único o Multi-símbolo</span>
-                                <span class="option-item"><strong>I2:</strong> Operaciones únicas o re-intentos</span>
+                                <span class="option-item"><strong>Implementado:</strong> Simbolo unico. Una operacion por evento. Magic Number permite multiples instancias.</span>
                             </td>
                         </tr>
                     </tbody>

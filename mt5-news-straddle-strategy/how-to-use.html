@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cómo Usar: NewsStraddleEA v1.15</title>
+    <title>Como Usar: NewsStraddleEA v2.01</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -157,7 +157,7 @@
         }
 
         .summary-list li::before {
-            content: "→";
+            content: "\2192";
             position: absolute;
             left: 0;
             color: var(--accent-color);
@@ -293,36 +293,6 @@
             margin-top: 10px;
         }
 
-        /* --- Accordion --- */
-        .accordion-item {
-            margin-top: 1.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .accordion-header {
-            width: 100%;
-            padding: 1rem;
-            background: var(--row-hover);
-            border: none;
-            color: var(--accent-color);
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-        }
-
-        .accordion-content {
-            padding: 0;
-            max-height: 0;
-            transition: max-height 0.3s ease-out;
-            background: rgba(255, 255, 255, 0.02);
-            overflow: hidden;
-        }
-
         /* --- Mobile --- */
         @media screen and (max-width: 768px) {
 
@@ -369,15 +339,15 @@
             }
 
             td:nth-of-type(1)::before {
-                content: "Parámetro";
+                content: "Parametro";
             }
 
             td:nth-of-type(2)::before {
-                content: "Nasdaq";
+                content: "Default";
             }
 
             td:nth-of-type(3)::before {
-                content: "BTCUSD";
+                content: "Descripcion";
             }
 
             td:last-child {
@@ -414,16 +384,16 @@
             <i data-lucide="layout"></i> Resumen General
         </a>
         <a href="refined-strategy.html">
-            <i data-lucide="target"></i> Estrategia Refinada (10s)
+            <i data-lucide="target"></i> Estrategia Refinada
         </a>
         <a href="technical-prompt.html">
-            <i data-lucide="code-2"></i> Prompt Técnico (MQL5)
+            <i data-lucide="code-2"></i> Prompt Tecnico (MQL5)
         </a>
         <a href="installation-guide.html">
-            <i data-lucide="download"></i> Guía de Instalación
+            <i data-lucide="download"></i> Guia de Instalacion
         </a>
         <a href="how-to-use.html" class="active">
-            <i data-lucide="book-open"></i> User Story / Uso
+            <i data-lucide="book-open"></i> Como Usar el EA
         </a>
         <a href="telegram-bot.html">
             <i data-lucide="message-circle"></i> Telegram Alert Bot
@@ -432,20 +402,21 @@
 
     <div class="container">
         <header>
-            <h1>Cómo Usar el EA v1.15</h1>
-            <p class="subtitle">Guía para operar noticias con straddle automático y SL fijo</p>
+            <h1>Como Usar el EA v2.01</h1>
+            <p class="subtitle">Guia para operar noticias con straddle automatico, trailing stop y gestion de TP/SL</p>
         </header>
 
-        <!-- NOVEDADES V1.15 -->
+        <!-- NOVEDADES V2.01 -->
         <section class="card" style="border: 2px solid var(--accent-color);">
             <div class="card-title">
                 <i data-lucide="shield-check"></i>
-                Novedades v1.15
+                Novedades v2.01
             </div>
             <ul class="summary-list">
-                <li><span class="highlight">SL Configurable (InpSLPips):</span> El EA coloca un SL real al entrar. Default 10000 pips — suficientemente amplio para aguantar el latigazo inicial sin cerrarse.</li>
-                <li><span class="highlight">SL fijo configurable (InpSLPips):</span> El EA coloca un SL real al entrar. Default 10000 pips — suficientemente amplio para aguantar el latigazo inicial sin cerrarse prematuramente.</li>
-                <li><span class="highlight">Sin hardcoding:</span> Eliminado el buffer fijo de 5000 pips. Todo es configurable desde los inputs.</li>
+                <li><span class="highlight">Market Orders (v2.00):</span> El EA ya no usa ordenes pendientes (Buy/Sell Stop). Ahora monitorea el precio y ejecuta ordenes de mercado cuando el precio cruza los niveles calculados. Mas robusto y sin rechazos por tipo de orden.</li>
+                <li><span class="highlight">Trailing Stop (v2.01):</span> Trailing stop clasico configurable via <code>InpTrailingStopPips</code>. Se activa solo cuando la posicion alcanza breakeven o mejor. Protege ganancias automaticamente.</li>
+                <li><span class="highlight">Take Profit On/Off (v2.01):</span> Toggle <code>InpEnableTP</code> permite activar o desactivar el TP. Con TP off + trailing, la posicion puede correr indefinidamente.</li>
+                <li><span class="highlight">Panel Minimizable (v1.16):</span> Boton "-" / "+" en la esquina superior derecha del panel para minimizar/restaurar.</li>
             </ul>
         </section>
 
@@ -453,82 +424,178 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="zap"></i>
-                Inicio Rápido
+                Inicio Rapido
             </div>
             <div class="step-item">
                 <div class="step-number">1</div>
                 <div class="step-content">
                     <h3>Carga el EA y Configura</h3>
-                    <p>Arrastra <code>NewsStraddleEA</code> al gráfico. Configura <code>InpNewsTime</code> con la hora exacta (Hora del Servidor MT5), <code>InpEntryDistPips</code> y <code>InpSLPips</code>.</p>
+                    <p>Arrastra <code>NewsStraddleEA</code> al grafico. Configura <code>InpNewsTime</code> con la hora exacta del evento (hora del servidor MT5), <code>InpEntryDistPips</code>, <code>InpSLPips</code>, <code>InpTPPips</code>, y <code>InpTrailingStopPips</code>.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <h3>El EA se arma automáticamente</h3>
-                    <p>Al cargar, el EA entra en <span class="highlight">ARMED</span> y muestra el contador T-MM:SS. A T-10 segundos coloca el Buy Stop y Sell Stop con SL real.</p>
+                    <h3>El EA se arma automaticamente</h3>
+                    <p>Al cargar, el EA entra en <span class="highlight">ARMED</span> y muestra el contador T-MM:SS. A T-10 segundos (configurable via <code>InpLeadTimeSeconds</code>) calcula los niveles de entrada (lineas verde y roja en el chart) y pasa a <span class="highlight">MONITORING</span>.</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">3</div>
                 <div class="step-content">
-                    <h3>La posición corre sola</h3>
-                    <p>Una orden se activa, la contraria se cancela automáticamente. La posición corre con el SL fijo hasta que el mercado la cierre o uses el botón CANCEL ALL.</p>
+                    <h3>Monitoreo de precio y entrada por market order</h3>
+                    <p>El EA vigila el precio en cada tick. Cuando Ask cruza el nivel de compra o Bid cruza el nivel de venta, ejecuta una <strong>orden de mercado</strong> instantanea con SL (y TP si esta habilitado).</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>La posicion se gestiona sola</h3>
+                    <p>Una vez abierta la posicion, el <strong>Trailing Stop</strong> mueve el SL automaticamente para proteger ganancias (se activa al alcanzar breakeven). La posicion se cierra por SL, TP, trailing, o manualmente con <strong>CANCEL ALL</strong>.</p>
                 </div>
             </div>
         </section>
 
-        <!-- CONFIGURACIÓN RECOMENDADA -->
+        <!-- CONFIGURACION COMPLETA -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="settings"></i>
-                Configuración v1.15
+                Parametros de Configuracion v2.01
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>Parámetro</th>
-                            <th>Nasdaq (NQ)</th>
-                            <th>BTCUSD</th>
+                            <th>Parametro</th>
+                            <th>Default</th>
+                            <th>Descripcion</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Distancia Entrada (InpEntryDistPips)</strong></td>
-                            <td><span class="highlight">1000</span> pips</td>
-                            <td><span class="highlight">5000</span> pips</td>
+                            <td><strong>InpNewsTime</strong></td>
+                            <td><span class="highlight">"08:30:00"</span></td>
+                            <td>Hora del evento en formato HH:MM:SS (hora del servidor MT5, no tu hora local)</td>
                         </tr>
                         <tr>
-                            <td><strong>Stop Loss (InpSLPips)</strong></td>
-                            <td><span class="highlight">10000</span> pips <span class="dim">(amplio para noticias)</span></td>
+                            <td><strong>InpEntryDistPips</strong></td>
+                            <td><span class="highlight">1000</span> pips</td>
+                            <td>Distancia de los niveles de entrada respecto al precio actual (arriba para buy, abajo para sell)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpSLPips</strong></td>
                             <td><span class="highlight">10000</span> pips</td>
+                            <td>Stop Loss fijo en pips desde el precio de entrada. Amplio para aguantar el latigazo inicial de noticias</td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpTPPips</strong></td>
+                            <td><span class="highlight">10000</span> pips</td>
+                            <td>Take Profit en pips desde el precio de entrada. Solo se aplica si <code>InpEnableTP = true</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpEnableTP</strong></td>
+                            <td><span class="highlight">true</span></td>
+                            <td>Activar/desactivar Take Profit. Con <code>false</code> la posicion corre sin limite de ganancia (ideal con trailing)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpTrailingStopPips</strong></td>
+                            <td><span class="highlight">2000</span> pips</td>
+                            <td>Distancia del trailing stop. Se activa solo al alcanzar breakeven. Valor <code>0</code> = desactivado</td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpLotSize</strong></td>
+                            <td><span class="highlight">0.10</span></td>
+                            <td>Tamano de lote por operacion</td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpMagicNumber</strong></td>
+                            <td><span class="highlight">202601</span></td>
+                            <td>Numero magico unico para identificar las operaciones de este EA</td>
+                        </tr>
+                        <tr>
+                            <td><strong>InpLeadTimeSeconds</strong></td>
+                            <td><span class="highlight">10</span></td>
+                            <td>Segundos antes del evento para calcular niveles y empezar a monitorear</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- GESTIÓN DE SALIDAS -->
+        <!-- FLUJO COMPLETO -->
         <section class="card">
             <div class="card-title">
                 <i data-lucide="trending-up"></i>
-                Flujo completo
+                Flujo Completo de Operacion
             </div>
 
             <div class="info-box">
-                <p><strong>Ejemplo:</strong></p>
+                <p><strong>Ejemplo con NASDAQ (NAS100):</strong></p>
                 <p class="dim" style="margin-top: 0.5rem;">
-                    1. T-10s: EA coloca BuyStop en <strong>20,000</strong> y SellStop en <strong>19,000</strong> con SL fijo<br>
-                    2. Noticia sale — precio sube fuerte → BuyStop se activa<br>
-                    3. SellStop contrario se elimina automáticamente<br>
-                    4. Posición corre con SL fijo — el broker la cierra cuando toca el SL o cerrás manualmente
+                    1. Configuras <code>InpNewsTime = "08:30:00"</code> y <code>InpEntryDistPips = 1000</code><br>
+                    2. EA se arma automaticamente (estado ARMED), muestra countdown T-MM:SS<br>
+                    3. A T-10s: calcula niveles — BuyLevel en <strong>20,100</strong> y SellLevel en <strong>19,900</strong> (lineas en el chart)<br>
+                    4. Pasa a MONITORING — vigila el precio tick a tick<br>
+                    5. Sale la noticia, precio sube fuerte — Ask cruza 20,100 — EA ejecuta <strong>BUY market order</strong> con SL y TP<br>
+                    6. Trailing Stop activo: cuando el profit alcanza breakeven, el SL empieza a subir automaticamente<br>
+                    7. Cierre: por TP, SL, trailing, o boton CANCEL ALL
                 </p>
             </div>
 
             <div class="info-box" style="margin-top: 1rem;">
+                <p><strong>Sobre el Trailing Stop:</strong></p>
+                <p class="dim">El trailing solo se activa cuando la posicion alcanza breakeven (el nuevo SL >= precio de entrada para BUY, o <= para SELL). Esto evita mover el SL antes de tiempo. Una vez activo, el SL sigue al precio protegiendo ganancias.</p>
+            </div>
+
+            <div class="info-box" style="margin-top: 1rem;">
                 <p><strong>Sobre el spread en noticias:</strong></p>
-                <p class="dim">En noticias el spread puede ser 3-5x mayor al normal. Usá un <code>InpSLPips</code> amplio para no cerrarte en el latigazo inicial.</p>
+                <p class="dim">En noticias el spread puede ser 3-5x mayor al normal. Usa un <code>InpSLPips</code> amplio para no cerrarte en el latigazo inicial. El trailing se encarga de ajustar el SL despues.</p>
+            </div>
+        </section>
+
+        <!-- ESTADOS DEL EA -->
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="git-branch"></i>
+                Estados del EA
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Que hace</th>
+                            <th>Transicion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="category-badge">IDLE</span></td>
+                            <td>Inactivo, esperando</td>
+                            <td>Se activa automaticamente al cargar el EA al chart</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">ARMED</span></td>
+                            <td>Armado, mostrando countdown T-MM:SS hasta el evento</td>
+                            <td>Cuando faltan <code>InpLeadTimeSeconds</code> para el evento</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">MONITORING</span></td>
+                            <td>Niveles calculados (lineas en chart). Vigilando precio tick a tick</td>
+                            <td>Cuando Ask cruza BuyLevel o Bid cruza SellLevel</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">TRADE ACTIVE</span></td>
+                            <td>Posicion abierta. Trailing stop activo. Esperando cierre</td>
+                            <td>Cuando la posicion se cierra (SL/TP/trailing/manual)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="category-badge">IDLE</span></td>
+                            <td>Posicion cerrada. EA vuelve a reposo</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
 
@@ -536,13 +603,34 @@
         <section class="card">
             <div class="card-title">
                 <i data-lucide="monitor"></i>
-                Panel del EA
+                Panel del EA en el Chart
             </div>
             <ul class="summary-list">
-                <li><strong>Estado ARMED:</strong> EA armado, mostrando countdown T-MM:SS</li>
-                <li><strong>Estado ORDERS PLACED:</strong> Buy Stop y Sell Stop colocados, esperando activación</li>
-                <li><strong>Estado TRADE ACTIVE:</strong> Posición abierta — esperando cierre por SL o manual</li>
-                <li><strong>CANCEL ALL:</strong> Cancela órdenes pendientes y cierra posición abierta al instante</li>
+                <li><strong>Titulo:</strong> "NEWS STRADDLE EA v2.01" en dorado</li>
+                <li><strong>Estado:</strong> Muestra el estado actual (IDLE / ARMED / MONITORING / TRADE ACTIVE)</li>
+                <li><strong>Evento:</strong> Hora configurada del evento</li>
+                <li><strong>Countdown:</strong> T-MM:SS cuando esta en ARMED</li>
+                <li><strong>Parametros:</strong> Resumen de Dist, SL, TP (o OFF), Trail (o OFF)</li>
+                <li><strong>CANCEL ALL:</strong> Boton rojo — cierra posicion abierta y resetea el EA a IDLE</li>
+                <li><strong>Boton "-" / "+":</strong> Minimizar/restaurar el panel (esquina superior derecha)</li>
+            </ul>
+
+            <div class="info-box" style="margin-top: 1rem;">
+                <p><strong>Lineas en el chart:</strong></p>
+                <p class="dim">Cuando el EA entra en MONITORING, dibuja dos lineas horizontales: <strong style="color: lime;">verde</strong> (nivel de compra) y <strong style="color: #ff4444;">roja</strong> (nivel de venta). Se eliminan cuando la orden se ejecuta o se cancela.</p>
+            </div>
+        </section>
+
+        <!-- COMBINACIONES RECOMENDADAS -->
+        <section class="card">
+            <div class="card-title">
+                <i data-lucide="sliders"></i>
+                Combinaciones de Configuracion
+            </div>
+            <ul class="summary-list">
+                <li><strong>Trailing + TP OFF:</strong> <code>InpEnableTP=false</code> + <code>InpTrailingStopPips=2000</code>. La posicion corre sin limite de ganancia; el trailing protege lo ganado. Ideal para movimientos fuertes post-noticia.</li>
+                <li><strong>TP fijo + Trailing:</strong> <code>InpEnableTP=true</code> + <code>InpTPPips=10000</code> + <code>InpTrailingStopPips=2000</code>. Doble proteccion: si el precio llega al TP se cierra, si se revierte el trailing te protege.</li>
+                <li><strong>Solo SL (sin trailing):</strong> <code>InpTrailingStopPips=0</code> + <code>InpEnableTP=true</code>. La posicion corre con SL y TP fijos. El cierre lo decide el broker.</li>
             </ul>
         </section>
 
@@ -553,32 +641,21 @@
                 Tips
             </div>
             <ul class="summary-list">
-                <li><strong>SL amplio:</strong> En noticias el spread se dispara y hay latigazo inicial. Con 10000 pips de SL en NAS100 tenés margen suficiente.</li>
-                <li><strong>Hora del Servidor:</strong> Verificá que <code>InpNewsTime</code> coincida con el reloj de MT5, no con tu hora local.</li>
-                <li><strong>InpSLPips amplio:</strong> El latigazo inicial puede ser violento. 10000 pips da libertad para que el precio respire sin cerrarse.</li>
+                <li><strong>Hora del Servidor:</strong> Verifica que <code>InpNewsTime</code> coincida con el reloj de MT5, no con tu hora local. Puedes ver la hora del servidor en la ventana Market Watch.</li>
+                <li><strong>SL amplio:</strong> En noticias el spread se dispara y hay latigazo inicial. Con 10000 pips de SL en NAS100 tenes margen suficiente para que el trailing haga su trabajo.</li>
+                <li><strong>Trailing desde breakeven:</strong> El trailing NO mueve el SL hasta que la posicion este al menos en breakeven. Esto evita cierres prematuros durante la volatilidad inicial.</li>
+                <li><strong>Market Orders:</strong> A diferencia de versiones anteriores, el EA usa ordenes de mercado (no pendientes). Esto elimina rechazos por tipo de orden y funciona en todos los brokers.</li>
+                <li><strong>Magic Number:</strong> Si usas multiples EAs en el mismo simbolo, asegurate de que cada uno tenga un <code>InpMagicNumber</code> diferente.</li>
             </ul>
         </section>
 
         <footer>
-            <p>&copy; 2026 MT5 Strategy Spec | v1.15</p>
+            <p>&copy; 2026 MT5 Strategy Spec | v2.01</p>
         </footer>
     </div>
 
     <script>
         lucide.createIcons();
-
-        function toggleAccordion(btn) {
-            const content = btn.nextElementSibling;
-            const chevron = btn.querySelector('.chevron-icon');
-            const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
-            if (isOpen) {
-                content.style.maxHeight = '0px';
-                chevron.style.transform = 'rotate(0deg)';
-            } else {
-                content.style.maxHeight = content.scrollHeight + 'px';
-                chevron.style.transform = 'rotate(180deg)';
-            }
-        }
 
         const menuToggle = document.getElementById('menuToggle');
         const menuOverlay = document.getElementById('menuOverlay');
