@@ -1,0 +1,18 @@
+{
+  "name": "newsbot",
+  "version": "1.0.0",
+  "description": "Market news straddle alert bot for Telegram",
+  "type": "commonjs",
+  "scripts": {
+    "bot": "node app/bot.js",
+    "import": "node scripts/import_events.js",
+    "schedule": "node scripts/schedule_jobs.js",
+    "rescue": "node scripts/rescue_failed.js",
+    "test-send": "node scripts/test_send.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "dotenv": "^16.4.0",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}

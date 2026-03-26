@@ -1,0 +1,17 @@
+[Unit]
+Description=Market News Straddle Alert Bot (Telegram)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/newsbot
+ExecStart=/usr/bin/node /opt/newsbot/app/bot.js
+Restart=always
+RestartSec=10
+Environment=TZ=America/New_York
+EnvironmentFile=/opt/newsbot/.env
+StandardOutput=append:/opt/newsbot/logs/bot.log
+StandardError=append:/opt/newsbot/logs/bot.log
+
+[Install]
+WantedBy=multi-user.target
