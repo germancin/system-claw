@@ -61,7 +61,7 @@ const getNextDayEventsStmt = db.prepare(`
   SELECT id, instrument, market, event_name, reference_month, event_time_ny, event_time_utc, notes
   FROM events
   WHERE active = 1
-    AND date(event_time_ny) = ?
+    AND substr(event_time_ny, 1, 10) = ?
   ORDER BY datetime(event_time_utc) ASC
 `);
 
