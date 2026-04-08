@@ -22,7 +22,7 @@ function getTemplateLabel(templateName) {
 }
 
 function buildMessage(job) {
-  const formattedTime = toNewYorkDisplay(job.event_time_ny || job.event_time_utc);
+  const formattedTime = toNewYorkDisplay(job.event_time_utc);
   const label = getTemplateLabel(job.template_name);
 
   return [
